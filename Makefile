@@ -9,7 +9,7 @@ LIBS=-lfl -lLLVMX86AsmParser -L/opt/local/lib  -lpthread -lffi -lm -lLLVMX86AsmP
 INCLUDES=-I./include -I/opt/local/include -I./build
 BUILD_DIR=build
 RM=rm
-OBJECTS=$(BUILD_DIR)/main.o $(BUILD_DIR)/parser.o $(BUILD_DIR)/tokens.o
+OBJECTS=$(BUILD_DIR)/main.o $(BUILD_DIR)/parser.o $(BUILD_DIR)/tokens.o $(BUILD_DIR)/node_builder.o $(BUILD_DIR)/codegen.o
 
 all: test
 
@@ -18,6 +18,12 @@ $(BUILD_DIR)/%.o: $(BUILD_DIR)/%.cpp
 
 $(BUILD_DIR)/main.o: $(SRC)/main.cpp $(BUILD_DIR)/parser.hpp
 	$(CXX) $(INCLUDES) $(CXXFLAGS) -c -o $@ $(SRC)/main.cpp
+
+$(BUILD_DIR)/node_builder.o: $(SRC)/node_builder.cpp
+	$(CXX) $(INCLUDES) $(CXXFLAGS) -c -o $@ $^
+
+$(BUILD_DIR)/codegen.o: $(SRC)/codegen.cpp
+	$(CXX) $(INCLUDES) $(CXXFLAGS) -c -o $@ $^
 
 $(BUILD_DIR)/parser.cpp: $(SRC)/parser/parser.y
 	$(YACC) -d -o $@ $^
@@ -31,7 +37,7 @@ parser: $(OBJECTS)
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBS)
 
 test: parser
-	echo "my foo = 5;" | ./parser
+	echo "my foo;" | ./parser
 
 clean:
 	$(RM) parser $(BUILD_DIR)/*

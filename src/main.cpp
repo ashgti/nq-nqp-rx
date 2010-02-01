@@ -1,10 +1,11 @@
 #include "node.h"
-#include "parser.hpp"
+#include "codegen.h"
 
 using namespace std;
 
 extern int yyparse();
 extern FILE *yyin;
+extern NBlock* programBlock;
 
 int
 main(int argc, char **argv) {
@@ -14,6 +15,13 @@ main(int argc, char **argv) {
   else
     yyin = stdin;
 
-  printf("Something?\n");
   yyparse();
+
+  std::cout << programBlock << endl;
+
+  CodeGenContext context;
+  context.generateCode(*programBlock);
+  context.runCode();
+
+  return 0;  
 }

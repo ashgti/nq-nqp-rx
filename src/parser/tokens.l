@@ -17,6 +17,7 @@ SIGIL [$%@&]
 
 {DIGIT}+    { SAVE_TOKEN; printf("Got a digit"); return T_DIGIT; }
 "my"        return TOKEN(T_MY);
+";"         return TOKEN(T_SEMICOLON);
 "{"         return TOKEN(T_LBRACE);
 "}"         return TOKEN(T_RBRACE);
 "."         return TOKEN(T_DOT);
@@ -29,9 +30,7 @@ SIGIL [$%@&]
 "!="        return TOKEN(T_CNE);
 
 {SIGIL}     SAVE_TOKEN; return T_SIGIL;
-[:alpha:][:alnum:] SAVE_TOKEN; return T_ID;
-
-.           printf("Unknown token!\n"); yyterminate();
+[a-zA-Z_][a-zA-Z0-9_]* { SAVE_TOKEN; printf("Got an ID"); return T_ID; }
 
 %%
 
