@@ -1,0 +1,6 @@
+=head1 NQ-NQP-rx - Not Quiet NQP-rx
+
+NQP is Copyright (C) 2009 by The Perl Foundation.  See F<LICENSE>
+for licensing details.
+
+This project is mostly a learning exercise for me to try to learn more about compilers. However, as a long term goal, it would be nice to develop a bison or yacc like program that can be used to develop a parser for a dynamic grammar.

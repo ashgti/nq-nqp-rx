@@ -1,0 +1,1 @@
+my Str $ foo := 'hi';

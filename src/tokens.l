@@ -2,7 +2,7 @@
 
 #include <string>
 #include "node.h"
-#include "parser.hpp"
+#include "grammar.hpp"
 #define SAVE_TOKEN yylval.string = new std::string(yytext, yyleng)
 #define TOKEN(t) (yylval.token = t)
 
@@ -10,13 +10,10 @@ extern "C" int yywrap() { return 1; }
 
 %}
 
-DIGIT [0-9]
-SIGIL [$%@&]
-
 %%
 
-{DIGIT}+    { SAVE_TOKEN; printf("Got a digit"); return T_DIGIT; }
-"my"        return TOKEN(T_MY);
+[ \t\n]     ;
+[0-9]+      { SAVE_TOKEN; printf("Got a digit"); return T_DIGIT; }
 ";"         return TOKEN(T_SEMICOLON);
 "{"         return TOKEN(T_LBRACE);
 "}"         return TOKEN(T_RBRACE);
@@ -29,8 +26,8 @@ SIGIL [$%@&]
 "=="        return TOKEN(T_CEQ);
 "!="        return TOKEN(T_CNE);
 
-{SIGIL}     SAVE_TOKEN; return T_SIGIL;
-[a-zA-Z_][a-zA-Z0-9_]* { SAVE_TOKEN; printf("Got an ID"); return T_ID; }
+[$@%&]      SAVE_TOKEN; return T_SIGIL;
+[\w]+       { SAVE_TOKEN; printf("Got an ID"); return T_ID; }
 
 %%
 
