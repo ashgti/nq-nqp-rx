@@ -1,1 +1,1 @@
-my Str $ foo := 'hi';
+my Str $foo

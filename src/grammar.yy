@@ -1,17 +1,20 @@
 %{
 
 #include "node.h"
-NBlock *programBlock; /* the top level root node  of our AST */
-  
-void yyerror(const char *s) { printf("ERROR: %s\n", s);exit(1); }
-extern int yylex(YYSTYPE *, yyscan_t);
 
-#define YYPARSE_PARAM scanner
-#define YYLEX_PARAM   scanner
+void
+yyerror (char const *s) {
+  fprintf (stderr, "%s\n", s);
+}
 
 %}
 
-%pure-parser
+%defines
+%locations
+%error-verbose
+
+%parse-param { NBlock &ctx }
+/*  %lex-param   { NBLock &ctx } */
 
 %union {
     Node *node;
@@ -24,7 +27,6 @@ extern int yylex(YYSTYPE *, yyscan_t);
     std::vector<NExpression*> *exprvec;
     std::string *string;
     int token;
-
 }
 
 /* Define our terminal symbols (tokens). This should
@@ -46,7 +48,7 @@ extern int yylex(YYSTYPE *, yyscan_t);
 %type <expr> numeric expr
 %type <varvec> func_decl_args
 %type <exprvec> call_args
-%type <block> program stmts block
+%type <block> prog stmts block
 %type <stmt> stmt var_decl func_decl
 %type <token> comparison
 
@@ -54,11 +56,21 @@ extern int yylex(YYSTYPE *, yyscan_t);
 %left TPLUS TMINUS
 %left TMUL TDIV
 
-%start program
+%start prog
 
+%{
+extern int yylex(yy::parser::semantic_type* yylval,
+       yy::parser::location_type* yylloc);
+
+%}
+
+%initial-action {
+ // Filename for locations here
+ @$.begin.filename = @$.end.filename = new std::string("stdin");
+}
 %%
 
-program : stmts { programBlock = $1; }
+prog : stmts { $$ = $1; }
         ;
 
 stmts : stmt { $$ = new NBlock(); $$->statements.push_back($<stmt>1); }
@@ -73,8 +85,8 @@ block : T_LBRACE stmts T_RBRACE { $$ = $2; }
       | T_LBRACE T_RBRACE { $$ = new NBlock(); }
       ;
 
-var_decl : T_MY ident var_ident { printf("hi!"); $$ = new NVariableDeclaration(*$2, *$3); }
-         | T_MY ident var_ident T_EQUAL expr { printf("Hi\n"); $$ = new NVariableDeclaration(*$2, *$3, $5); }
+var_decl : T_MY ident var_ident { $$ = new NVariableDeclaration(*$2, *$3); }
+         | T_MY ident var_ident T_EQUAL expr { $$ = new NVariableDeclaration(*$2, *$3, $5); }
          ;
 
 func_decl : ident ident T_LPAREN func_decl_args T_RPAREN block
@@ -87,9 +99,10 @@ func_decl_args : /*blank*/  { $$ = new VariableList(); }
           ;
 
 var_ident : T_SIGIL T_ID { $$ = new NIdentifier(*$2); delete $2; }
-      ;
+          ;
 
-ident : T_ID { printf("got an id %s\n", "he"); $$ = new NIdentifier(*$1); delete $1; }
+ident : T_ID { $$ = new NIdentifier(*$1); delete $1; }
+      ;
 
 numeric : T_INTEGER { $$ = new NInteger(atol($1->c_str())); delete $1; }
         | T_DOUBLE { $$ = new NDouble(atof($1->c_str())); delete $1; }
@@ -114,3 +127,8 @@ comparison : T_CEQ | T_CNE | T_CLT | T_CLE | T_CGT | T_CGE
 
 %%
 
+namespace yy {
+  void parser::error(location const &loc, const std::string& s) {
+    std::cerr << "\n\nerror at " << loc << ": " << s << std::endl;
+  }
+}

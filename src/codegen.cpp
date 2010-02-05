@@ -1,7 +1,8 @@
 #include "node.h"
 #include "codegen.h"
-#include "grammar.hpp"
+#include "grammar.tab.hpp"
 
+typedef yy::parser::token token;
 using namespace std;
 
 CodeGenContext::CodeGenContext() { 
@@ -103,10 +104,10 @@ Value* NBinaryOperator::codeGen(CodeGenContext& context)
 	std::cout << "Creating binary operation " << op << endl;
 	Instruction::BinaryOps instr;
 	switch (op) {
-		case TPLUS: 	instr = Instruction::Add; goto math;
-		case TMINUS: 	instr = Instruction::Sub; goto math;
-		case TMUL: 		instr = Instruction::Mul; goto math;
-		case TDIV: 		instr = Instruction::SDiv; goto math;
+    case token::T_PLUS: 	instr = Instruction::Add; goto math;
+    case token::T_MINUS: 	instr = Instruction::Sub; goto math;
+    case token::T_MUL: 		instr = Instruction::Mul; goto math;
+    case token::T_DIV: 		instr = Instruction::SDiv; goto math;
 				
 		/* TODO comparison */
 	}

@@ -1,12 +1,13 @@
 #include <iostream>
 #include "node.h"
 #include "codegen.h"
+#include "grammar.tab.hpp"
 
 using namespace std;
 
 extern int yyparse();
 extern FILE *yyin;
-extern NBlock* programBlock;
+
 
 int
 main(int argc, char **argv) {
@@ -16,12 +17,15 @@ main(int argc, char **argv) {
   else
     yyin = stdin;
 
-  yyparse();
+  llvm::InitializeNativeTarget();
+  NBlock *root = new NBlock();
+  yy::parser parser(*root);
+  parser.parse();
 
-  std::cout << programBlock << endl;
+  std::cout << root << endl;
 
   CodeGenContext context;
-  context.generateCode(*programBlock);
+  context.generateCode(*root);
   context.runCode();
 
   return 0;  
