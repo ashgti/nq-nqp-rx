@@ -1,4 +1,5 @@
 
+/*
 class P6Opaque {
 public:
   P6Opaque();
@@ -9,6 +10,8 @@ public:
 };
 
 class Mu : public P6Opaque {
-};
+}; 
+
+*/
 
 

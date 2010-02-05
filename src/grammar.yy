@@ -33,10 +33,12 @@ yyerror (char const *s) {
    match our tokens.l lex file. We also define the node type
    they represent.
  */
-%token <string> T_ID T_SIGIL T_INTEGER T_DOUBLE T_DIGIT
+%token <string> T_ID T_SIGIL T_TWIGIL T_INTEGER T_DOUBLE T_DIGIT
 %token <token> T_CEQ T_CNE T_CLT T_CLE T_CGT T_CGE T_EQUAL T_BIND
-%token <token> T_MY T_LPAREN T_RPAREN T_LBRACE T_RBRACE T_COMMA T_DOT T_SEMICOLON
+%token <token> T_MY T_OUR T_HAS
+%token <token> T_LPAREN T_RPAREN T_LBRACE T_RBRACE T_COMMA T_DOT T_SEMICOLON
 %token <token> T_PLUS T_MINUS T_MUL T_DIV
+%token <token> T_SUB T_SUBMETHOD T_METHOD T_MULTI
 
 /* Define the type of node our nonterminal symbols represent.
    The types refer to the %union declaration above. Ex: when
@@ -77,20 +79,25 @@ stmts : stmt { $$ = new NBlock(); $$->statements.push_back($<stmt>1); }
       | stmts stmt { $1->statements.push_back($<stmt>2); }
       ;
 
-stmt : var_decl | func_decl
-     | expr { $$ = new NExpressionStatement(*$1); }
+stmt : var_decl T_SEMICOLON | func_decl T_SEMICOLON
+     | expr T_SEMICOLON { $$ = new NExpressionStatement(*$1); }
      ;
 
 block : T_LBRACE stmts T_RBRACE { $$ = $2; }
       | T_LBRACE T_RBRACE { $$ = new NBlock(); }
       ;
 
-var_decl : T_MY ident var_ident { $$ = new NVariableDeclaration(*$2, *$3); }
-         | T_MY ident var_ident T_EQUAL expr { $$ = new NVariableDeclaration(*$2, *$3, $5); }
+var_decl : T_MY ident variable { $$ = new NVariableDeclaration(*$2, *$3); }
+         | T_MY variable { $$ = new NVariableDeclaration(*$2); }
+         | T_MY ident variable T_EQUAL expr { $$ = new NVariableDeclaration(*$2, *$3, $*5); }
          ;
 
-func_decl : ident ident T_LPAREN func_decl_args T_RPAREN block
-            { $$ = new NFunctionDeclaration(*$1, *$2, *$4, *$6); delete $4; }
+assignment : T_EQUAL expr { $$ = new NAssignment(); }
+           | T_BIND expr { $$ = new NVariableBinding(); }
+           ;
+
+func_decl : T_SUB ident T_LPAREN func_decl_args T_RPAREN block
+            { $$ = new NFunctionDeclaration(*$2, *$4, *$6); delete $4; }
           ;
 
 func_decl_args : /*blank*/  { $$ = new VariableList(); }
@@ -98,7 +105,7 @@ func_decl_args : /*blank*/  { $$ = new VariableList(); }
           | func_decl_args T_COMMA var_decl { $1->push_back($<var_decl>3); }
           ;
 
-var_ident : T_SIGIL T_ID { $$ = new NIdentifier(*$2); delete $2; }
+variable : T_SIGIL T_ID { $$ = new NIdentifier(*$2); delete $2; }
           ;
 
 ident : T_ID { $$ = new NIdentifier(*$1); delete $1; }

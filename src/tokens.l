@@ -20,7 +20,7 @@ typedef yy::parser::token token;
 
 %{
      // start where previous token ended
-     yylloc->step ();
+     yylloc->step();
 %}
 
 [ \t\n]     ;
@@ -36,9 +36,18 @@ typedef yy::parser::token token;
 ":="        return TOKEN(token::T_BIND);
 "=="        return TOKEN(token::T_CEQ);
 "!="        return TOKEN(token::T_CNE);
+
 "my"        return TOKEN(token::T_MY);
+"our"       return TOKEN(token::T_OUR);
+"has"       return TOKEN(token::T_HAS);
+
+"sub"       return TOKEN(token::T_SUB);
+"method"    return TOKEN(token::T_METHOD);
+"submethod" return TOKEN(token::T_SUBMETHOD);
+"multi"     return TOKEN(token::T_MULTI);
 
 [$@%&]      SAVE_TOKEN; return token::T_SIGIL;
+[*\^.]      SAVE_TOKEN; return token::T_TWIGIL;
 [a-zA-Z]+   { SAVE_TOKEN; return token::T_ID; }
 .           { printf("Unknown Token."); }
 

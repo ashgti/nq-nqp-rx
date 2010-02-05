@@ -40,7 +40,7 @@ parser: $(OBJECTS)
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBS)
 
 test: parser
-	./parser test.nqp
+	./parser t/basics.nqp
 
 clean:
 	$(RM) parser $(BUILD_DIR)/*
