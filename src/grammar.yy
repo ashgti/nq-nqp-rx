@@ -1,6 +1,7 @@
 %{
 
 #include "node.h"
+#include <cstdlib>
 
 void
 yyerror (char const *s) {
@@ -13,7 +14,7 @@ yyerror (char const *s) {
 %locations
 %error-verbose
 
-%parse-param { NBlock &ctx }
+%parse-param { NBlock * &root_node }
 /*  %lex-param   { NBLock &ctx } */
 
 %union {
@@ -39,6 +40,7 @@ yyerror (char const *s) {
 %token <token> T_LPAREN T_RPAREN T_LBRACE T_RBRACE T_COMMA T_DOT T_SEMICOLON
 %token <token> T_PLUS T_MINUS T_MUL T_DIV
 %token <token> T_SUB T_SUBMETHOD T_METHOD T_MULTI
+%token <token> T_RETURN;
 
 /* Define the type of node our nonterminal symbols represent.
    The types refer to the %union declaration above. Ex: when
@@ -46,13 +48,13 @@ yyerror (char const *s) {
    calling an (NIdentifier*). It makes the compiler happy.
  */
 
-%type <ident> ident var_ident
-%type <expr> numeric expr
+%type <ident> ident variable
+%type <expr> numeric expr assignment
 %type <varvec> func_decl_args
 %type <exprvec> call_args
 %type <block> prog stmts block
 %type <stmt> stmt var_decl func_decl
-%type <token> comparison
+%type <token> comparison algerbra
 
 /* Operator precedence for mathematical operators */
 %left TPLUS TMINUS
@@ -72,15 +74,18 @@ extern int yylex(yy::parser::semantic_type* yylval,
 }
 %%
 
-prog : stmts { $$ = $1; }
-        ;
+
+prog : stmts { root_node = $1; }
+     ;
 
 stmts : stmt { $$ = new NBlock(); $$->statements.push_back($<stmt>1); }
       | stmts stmt { $1->statements.push_back($<stmt>2); }
       ;
 
-stmt : var_decl T_SEMICOLON | func_decl T_SEMICOLON
+stmt : var_decl T_SEMICOLON 
+     | func_decl 
      | expr T_SEMICOLON { $$ = new NExpressionStatement(*$1); }
+     | T_RETURN expr { $$ = new NBlockReturn(*$2); }
      ;
 
 block : T_LBRACE stmts T_RBRACE { $$ = $2; }
@@ -89,14 +94,16 @@ block : T_LBRACE stmts T_RBRACE { $$ = $2; }
 
 var_decl : T_MY ident variable { $$ = new NVariableDeclaration(*$2, *$3); }
          | T_MY variable { $$ = new NVariableDeclaration(*$2); }
-         | T_MY ident variable T_EQUAL expr { $$ = new NVariableDeclaration(*$2, *$3, $*5); }
+         | T_MY ident variable T_BIND expr { $$ = new NVariableDeclaration(*$2, *$3, $5); }
          ;
 
 assignment : T_EQUAL expr { $$ = new NAssignment(); }
            | T_BIND expr { $$ = new NVariableBinding(); }
            ;
 
-func_decl : T_SUB ident T_LPAREN func_decl_args T_RPAREN block
+func_decl : T_SUB ident block 
+            { $$ = new NFunctionDeclaration(*$2, *$3); }
+          | T_SUB ident T_LPAREN func_decl_args T_RPAREN block
             { $$ = new NFunctionDeclaration(*$2, *$4, *$6); delete $4; }
           ;
 
@@ -106,20 +113,22 @@ func_decl_args : /*blank*/  { $$ = new VariableList(); }
           ;
 
 variable : T_SIGIL T_ID { $$ = new NIdentifier(*$2); delete $2; }
-          ;
+         ;
 
 ident : T_ID { $$ = new NIdentifier(*$1); delete $1; }
       ;
 
-numeric : T_INTEGER { $$ = new NInteger(atol($1->c_str())); delete $1; }
+numeric : T_DIGIT { $$ = new NInteger(atol($1->c_str())); delete $1; }
         | T_DOUBLE { $$ = new NDouble(atof($1->c_str())); delete $1; }
         ;
 
-expr : ident T_EQUAL expr { $$ = new NAssignment(*$<ident>1, *$3); }
+expr : variable
+     | variable T_EQUAL expr { $$ = new NAssignment(*$<ident>1, *$3); }
      | ident T_LPAREN call_args T_RPAREN { $$ = new NMethodCall(*$1, *$3); delete $3; }
      | ident { $<ident>$ = $1; }
      | numeric
      | expr comparison expr { $$ = new NBinaryOperator(*$1, $2, *$3); }
+     | expr algerbra expr { $$ = new NBinaryOperator(*$1, $2, *$3); }
      | T_LPAREN expr T_RPAREN { $$ = $2; }
      ;
 
@@ -129,13 +138,16 @@ call_args : /*blank*/  { $$ = new ExpressionList(); }
           ;
 
 comparison : T_CEQ | T_CNE | T_CLT | T_CLE | T_CGT | T_CGE
-           | T_PLUS | T_MINUS | T_MUL | T_DIV
            ;
+
+algerbra : T_PLUS | T_MINUS | T_MUL | T_DIV
+         ;
 
 %%
 
 namespace yy {
   void parser::error(location const &loc, const std::string& s) {
     std::cerr << "\n\nerror at " << loc << ": " << s << std::endl;
+    exit(-1);
   }
 }

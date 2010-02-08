@@ -14,7 +14,7 @@ CodeGenContext::CodeGenContext() {
 void CodeGenContext::generateCode(NBlock& root)
 {
 	std::cout << "Generating code...\n";
-	
+
 	/* Create the top level interpreter function to call as entry */
 	vector<const Type*> argTypes;
 	FunctionType *ftype = FunctionType::get(Type::getVoidTy(getGlobalContext()), argTypes, false);
@@ -83,6 +83,14 @@ Value* NIdentifier::codeGen(CodeGenContext& context)
 	return new LoadInst(context.locals()[name], "", false, context.currentBlock());
 }
 
+Value* NBlockReturn::codeGen(CodeGenContext& context) {
+  std::cout << "Creating return instruciton" << endl;
+
+  ReturnInst *ret = ReturnInst::Create(getGlobalContext(), expression.codeGen(context));
+
+  return ret;
+}
+
 Value* NMethodCall::codeGen(CodeGenContext& context)
 {
 	Function *function = context.module->getFunction(id.name.c_str());
@@ -104,16 +112,25 @@ Value* NBinaryOperator::codeGen(CodeGenContext& context)
 	std::cout << "Creating binary operation " << op << endl;
 	Instruction::BinaryOps instr;
 	switch (op) {
-    case token::T_PLUS: 	instr = Instruction::Add; goto math;
-    case token::T_MINUS: 	instr = Instruction::Sub; goto math;
-    case token::T_MUL: 		instr = Instruction::Mul; goto math;
-    case token::T_DIV: 		instr = Instruction::SDiv; goto math;
-				
+    case token::T_PLUS:
+      instr = Instruction::Add;
+      break;
+    case token::T_MINUS:
+      instr = Instruction::Sub;
+      break;
+    case token::T_MUL:
+      instr = Instruction::Mul;
+      break;
+    case token::T_DIV:
+      instr = Instruction::SDiv;
+      break;
 		/* TODO comparison */
+    default: { 
+      /* not implemented */
+      return NULL;
+    }
 	}
 
-	return NULL;
-math:
 	return BinaryOperator::Create(instr, lhs.codeGen(context), 
 		rhs.codeGen(context), "", context.currentBlock());
 }
@@ -165,7 +182,7 @@ Value* NFunctionDeclaration::codeGen(CodeGenContext& context)
 	for (it = arguments.begin(); it != arguments.end(); it++) {
 		argTypes.push_back(typeOf((**it).type));
 	}
-	FunctionType *ftype = FunctionType::get(typeOf(type), argTypes, false);
+	FunctionType *ftype = FunctionType::get(Type::getInt64Ty(getGlobalContext()), argTypes, false);
 	Function *function = Function::Create(ftype, GlobalValue::InternalLinkage, id.name.c_str(), context.module);
 	BasicBlock *bblock = BasicBlock::Create(getGlobalContext(), "entry", function, 0);
 

@@ -5,6 +5,7 @@
 #include <llvm/DerivedTypes.h>
 #include <llvm/LLVMContext.h>
 #include <llvm/PassManager.h>
+#include <llvm/Instructions.h>
 #include <llvm/CallingConv.h>
 #include <llvm/Bitcode/ReaderWriter.h>
 #include <llvm/Analysis/Verifier.h>

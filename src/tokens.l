@@ -36,6 +36,9 @@ typedef yy::parser::token token;
 ":="        return TOKEN(token::T_BIND);
 "=="        return TOKEN(token::T_CEQ);
 "!="        return TOKEN(token::T_CNE);
+"+"         return TOKEN(token::T_PLUS);
+
+"return"    return TOKEN(token::T_RETURN);
 
 "my"        return TOKEN(token::T_MY);
 "our"       return TOKEN(token::T_OUR);
@@ -49,7 +52,7 @@ typedef yy::parser::token token;
 [$@%&]      SAVE_TOKEN; return token::T_SIGIL;
 [*\^.]      SAVE_TOKEN; return token::T_TWIGIL;
 [a-zA-Z]+   { SAVE_TOKEN; return token::T_ID; }
-.           { printf("Unknown Token."); }
+.           { printf("Unknown Token. %s\n", yytext); }
 
 %%
 

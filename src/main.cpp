@@ -18,11 +18,9 @@ main(int argc, char **argv) {
     yyin = stdin;
 
   llvm::InitializeNativeTarget();
-  NBlock *root = new NBlock();
-  yy::parser parser(*root);
+  NBlock *root;
+  yy::parser parser(root);
   parser.parse();
-
-  std::cout << root << endl;
 
   CodeGenContext context;
   context.generateCode(*root);

@@ -13,7 +13,7 @@ typedef std::vector<NExpression*> ExpressionList;
 typedef std::vector<NVariableDeclaration*> VariableList;
 
 class Node {
-public:
+  public:
     virtual ~Node() {};
     virtual llvm::Value* codeGen(CodeGenContext& context) = 0;
 };
@@ -25,7 +25,7 @@ class NStatement : public Node {
 };
 
 class NInteger : public NExpression {
-public:
+  public:
     long long value;
     NInteger(long long value) : value(value) { }
     virtual llvm::Value* codeGen(CodeGenContext& context);
@@ -89,6 +89,14 @@ public:
     virtual llvm::Value* codeGen(CodeGenContext& context);
 };
 
+class NBlockReturn : public NStatement {
+  public:
+    NExpression& expression;
+    NBlockReturn(NExpression& expression) :
+        expression(expression) { }
+    virtual llvm::Value* codeGen(CodeGenContext& context);
+};
+
 class Mu : public NIdentifier {
 public:
   Mu() : NIdentifier(std::string("Mu")) {
@@ -115,6 +123,8 @@ public:
     const NIdentifier& id;
     VariableList arguments;
     NBlock& block;
+    NFunctionDeclaration(const NIdentifier& id, NBlock& block) :
+        id(id), block(block) { }
     NFunctionDeclaration(const NIdentifier& id,
             const VariableList& arguments, NBlock& block) :
         id(id), arguments(arguments), block(block) { }
