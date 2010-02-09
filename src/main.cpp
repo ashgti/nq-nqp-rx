@@ -1,13 +1,13 @@
 #include <iostream>
-#include "node.h"
-#include "codegen.h"
-#include "grammar.tab.hpp"
+#include "node.hpp"
+#include "codegen.hpp"
+#include "parser/grammar.tab.hpp"
 
 using namespace std;
+using namespace nqp;
 
 extern int yyparse();
 extern FILE *yyin;
-
 
 int
 main(int argc, char **argv) {
@@ -19,7 +19,7 @@ main(int argc, char **argv) {
 
   llvm::InitializeNativeTarget();
   NBlock *root;
-  yy::parser parser(root);
+  parser parser(root);
   parser.parse();
 
   CodeGenContext context;
@@ -28,3 +28,4 @@ main(int argc, char **argv) {
 
   return 0;  
 }
+

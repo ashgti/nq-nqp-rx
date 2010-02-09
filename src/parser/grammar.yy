@@ -1,6 +1,6 @@
 %{
 
-#include "node.h"
+#include "node.hpp"
 #include <cstdlib>
 
 void
@@ -13,6 +13,8 @@ yyerror (char const *s) {
 %defines
 %locations
 %error-verbose
+
+%define namespace "nqp"
 
 %parse-param { NBlock * &root_node }
 /*  %lex-param   { NBLock &ctx } */
@@ -63,8 +65,8 @@ yyerror (char const *s) {
 %start prog
 
 %{
-extern int yylex(yy::parser::semantic_type* yylval,
-       yy::parser::location_type* yylloc);
+extern int yylex(nqp::parser::semantic_type* yylval,
+       nqp::parser::location_type* yylloc);
 
 %}
 
@@ -145,7 +147,7 @@ algerbra : T_PLUS | T_MINUS | T_MUL | T_DIV
 
 %%
 
-namespace yy {
+namespace nqp {
   void parser::error(location const &loc, const std::string& s) {
     std::cerr << "\n\nerror at " << loc << ": " << s << std::endl;
     exit(-1);

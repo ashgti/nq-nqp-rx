@@ -1,7 +1,8 @@
 #include <iostream>
 #include <vector>
 #include <llvm/Value.h>
-#include "objects.h"
+
+namespace nqp {
 
 class CodeGenContext;
 class NStatement;
@@ -130,4 +131,6 @@ public:
         id(id), arguments(arguments), block(block) { }
     virtual llvm::Value* codeGen(CodeGenContext& context);
 };
+
+}
 

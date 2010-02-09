@@ -1,18 +1,16 @@
-
 %option noyywrap
 %{
-#include <cstdlib>
 #include <string>
-#include "node.h"
-#include "grammar.tab.hpp"
+#include "node.hpp"
+#include "parser/grammar.tab.hpp"
 
-#define YY_DECL int yylex(yy::parser::semantic_type *yylval, \
-  yy::parser::location_type *yylloc)
+#define YY_DECL int yylex(nqp::parser::semantic_type *yylval, \
+  nqp::parser::location_type *yylloc)
 #define SAVE_TOKEN yylval->string = new std::string(yytext, yyleng)
 #define TOKEN(t) (yylval->token = t)
 #define YY_USER_ACTION yylloc->columns(yyleng);
 
-typedef yy::parser::token token;
+typedef nqp::parser::token token;
 
 %}
 

@@ -19,6 +19,8 @@
 
 using namespace llvm;
 
+namespace nqp {
+
 class NBlock;
 
 class CodeGenBlock {
@@ -42,4 +44,6 @@ public:
     void pushBlock(BasicBlock *block) { blocks.push(new CodeGenBlock()); blocks.top()->block = block; }
     void popBlock() { CodeGenBlock *top = blocks.top(); blocks.pop(); delete top; }
 };
+
+}
 
