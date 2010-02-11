@@ -59,8 +59,8 @@ yyerror (char const *s) {
 %type <token> comparison algerbra
 
 /* Operator precedence for mathematical operators */
-%left TPLUS TMINUS
-%left TMUL TDIV
+%left T_PLUS T_MINUS
+%left T_MUL T_DIV
 
 %start prog
 
@@ -75,7 +75,6 @@ extern int yylex(nqp::parser::semantic_type* yylval,
  @$.begin.filename = @$.end.filename = new std::string("stdin");
 }
 %%
-
 
 prog : stmts { root_node = $1; }
      ;
@@ -94,12 +93,12 @@ block : T_LBRACE stmts T_RBRACE { $$ = $2; }
       | T_LBRACE T_RBRACE { $$ = new NBlock(); }
       ;
 
-var_decl : T_MY ident variable { $$ = new NVariableDeclaration(*$2, *$3); }
-         | T_MY variable { $$ = new NVariableDeclaration(*$2); }
+var_decl : T_MY variable { $$ = new NVariableDeclaration(*$2); }
+         | T_MY ident variable { $$ = new NVariableDeclaration(*$2, *$3); }
          | T_MY ident variable T_BIND expr { $$ = new NVariableDeclaration(*$2, *$3, $5); }
          ;
 
-assignment : T_EQUAL expr { $$ = new NAssignment(); }
+assignment : T_EQUAL expr { $$ = $1; }
            | T_BIND expr { $$ = new NVariableBinding(); }
            ;
 
@@ -115,6 +114,7 @@ func_decl_args : /*blank*/  { $$ = new VariableList(); }
           ;
 
 variable : T_SIGIL T_ID { $$ = new NIdentifier(*$2); delete $2; }
+         | T_SIGIL T_TWIGIL T_ID { printf("var with a twigil..., not yet implemented"); }
          ;
 
 ident : T_ID { $$ = new NIdentifier(*$1); delete $1; }
@@ -124,10 +124,9 @@ numeric : T_DIGIT { $$ = new NInteger(atol($1->c_str())); delete $1; }
         | T_DOUBLE { $$ = new NDouble(atof($1->c_str())); delete $1; }
         ;
 
-expr : variable
-     | variable T_EQUAL expr { $$ = new NAssignment(*$<ident>1, *$3); }
-     | ident T_LPAREN call_args T_RPAREN { $$ = new NMethodCall(*$1, *$3); delete $3; }
-     | ident { $<ident>$ = $1; }
+expr : variable assignment { $$ = new NAssignment(*$<ident>1, *$2); }
+     | T_SIGIL ident T_LPAREN T_RPAREN { $$ = new NMethodCall(*$1); }
+     | T_SIGIL ident T_LPAREN call_args T_RPAREN { $$ = new NMethodCall(*$2, *$4); delete $4; }
      | numeric
      | expr comparison expr { $$ = new NBinaryOperator(*$1, $2, *$3); }
      | expr algerbra expr { $$ = new NBinaryOperator(*$1, $2, *$3); }

@@ -1,3 +1,14 @@
+junk/*
+nqp-rx
+*.DS_Store
+src/parser/grammar.output
+src/parser/grammar.tab.cpp
+src/parser/grammar.tab.hpp
+src/parser/location.hh
+src/parser/position.hh
+src/parser/stack.hh
+src/parser/tokens.c
 build/*
 *.swp
 *.bak
+
