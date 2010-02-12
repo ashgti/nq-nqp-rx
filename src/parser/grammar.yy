@@ -20,29 +20,65 @@ yyerror (char const *s) {
 /*  %lex-param   { NBLock &ctx } */
 
 %union {
-    Node *node;
+  std::string *string;
+  int token;
+  NBlock *block;
+  NStatement *stmt;
+  NVariableDeclaration *var_decl;
+  std::vector<NExpression*> *exprvec;
+  NIdentifier *ident;
+/*    Node *node;
     NBlock *block;
     NExpression *expr;
     NStatement *stmt;
     NIdentifier *ident;
     NVariableDeclaration *var_decl;
     std::vector<NVariableDeclaration*> *varvec;
-    std::vector<NExpression*> *exprvec;
-    std::string *string;
-    int token;
+    std::vector<NExpression*> *exprvec; */
 }
 
 /* Define our terminal symbols (tokens). This should
    match our tokens.l lex file. We also define the node type
    they represent.
  */
+/*
 %token <string> T_ID T_SIGIL T_TWIGIL T_INTEGER T_DOUBLE T_DIGIT
 %token <token> T_CEQ T_CNE T_CLT T_CLE T_CGT T_CGE T_EQUAL T_BIND
 %token <token> T_MY T_OUR T_HAS
 %token <token> T_LPAREN T_RPAREN T_LBRACE T_RBRACE T_COMMA T_DOT T_SEMICOLON
 %token <token> T_PLUS T_MINUS T_MUL T_DIV
 %token <token> T_SUB T_SUBMETHOD T_METHOD T_MULTI
-%token <token> T_RETURN;
+%token <token> T_RETURN
+*/
+/* ID of a var, func, class, etc.  */
+%token <string> T_ID
+
+/* variable sigil type */
+%token <token> T_SIGIL T_SCALAR_SIGIL T_LIST_SIGIL T_HASH_SIGIL T_CODE_SIGIL
+
+/* variable scope identifier my, our, has etc. */
+%token <token> T_MY 
+
+/* assignment = := ::= */
+%token <token> T_EQ T_BIND T_RO_BIND
+
+/* method identifiers sub, method, submethod, etc. */
+%token <token> T_SUB T_SPLAT
+
+/* some default operators */
+/* 
+  naming schema:
+    T means token
+    C means comparison
+    N means numeric
+    S means string
+ */
+/* = < > <= >= eq */
+%token <token> T_C_NEQ T_CLT T_CGT T_CLTE T_CGTE T_CEQL
+
+/* control structure tokens */
+%token <token> T_IF T_ELSE T_FOR T_WHILE
+%token T_LBRACE T_RBRACE T_LPAREN T_RPAREN T_COMMA 
 
 /* Define the type of node our nonterminal symbols represent.
    The types refer to the %union declaration above. Ex: when
@@ -50,6 +86,7 @@ yyerror (char const *s) {
    calling an (NIdentifier*). It makes the compiler happy.
  */
 
+/*
 %type <ident> ident variable
 %type <expr> numeric expr assignment
 %type <varvec> func_decl_args
@@ -57,17 +94,26 @@ yyerror (char const *s) {
 %type <block> prog stmts block
 %type <stmt> stmt var_decl func_decl
 %type <token> comparison algerbra
+*/
+%type <block> prog stmts
+%type <stmt> stmt var_decl func_decl
+%type <ident> variable
+/* control structures */
+%type <exprvec> args_list
+%type <stmt> stmt_control if_stmt unless_stmt for_stmt while_stmt
+%type <token> comparison
 
 /* Operator precedence for mathematical operators */
+/*
 %left T_PLUS T_MINUS
 %left T_MUL T_DIV
+*/
 
 %start prog
 
 %{
 extern int yylex(nqp::parser::semantic_type* yylval,
        nqp::parser::location_type* yylloc);
-
 %}
 
 %initial-action {
@@ -83,66 +129,85 @@ stmts : stmt { $$ = new NBlock(); $$->statements.push_back($<stmt>1); }
       | stmts stmt { $1->statements.push_back($<stmt>2); }
       ;
 
-stmt : var_decl T_SEMICOLON 
-     | func_decl 
-     | expr T_SEMICOLON { $$ = new NExpressionStatement(*$1); }
-     | T_RETURN expr { $$ = new NBlockReturn(*$2); }
+stmt : var_decl { $$ = new NVariableDeclaration(); }
+     | func_decl { printf("func_decl NYI."); }
+     | stmt_control { printf("stmt_contrl NYI."); }
+     | methodop { printf("methodop NYI."); }
      ;
 
-block : T_LBRACE stmts T_RBRACE { $$ = $2; }
-      | T_LBRACE T_RBRACE { $$ = new NBlock(); }
-      ;
-
-var_decl : T_MY variable { $$ = new NVariableDeclaration(*$2); }
-         | T_MY ident variable { $$ = new NVariableDeclaration(*$2, *$3); }
-         | T_MY ident variable T_BIND expr { $$ = new NVariableDeclaration(*$2, *$3, $5); }
-         ;
-
-assignment : T_EQUAL expr { $$ = $1; }
-           | T_BIND expr { $$ = new NVariableBinding(); }
+func_ident : T_ID { printf("function ID NYI.") }
+           | T_CODE_SIGIL T_ID { printf("func_ident with & NYI."); }
            ;
 
-func_decl : T_SUB ident block 
-            { $$ = new NFunctionDeclaration(*$2, *$3); }
-          | T_SUB ident T_LPAREN func_decl_args T_RPAREN block
-            { $$ = new NFunctionDeclaration(*$2, *$4, *$6); delete $4; }
+func_decl : T_SUB func_ident xblock { printf("func_decl NYI."); }
+          | T_SUB func_ident signature xblock { printf("func_decl with signature NYI."); }
           ;
 
-func_decl_args : /*blank*/  { $$ = new VariableList(); }
-          | var_decl { $$ = new VariableList(); $$->push_back($<var_decl>1); }
-          | func_decl_args T_COMMA var_decl { $1->push_back($<var_decl>3); }
+signature : T_LPAREN param_list T_RPAREN { printf("signature NYI."); }
           ;
 
-variable : T_SIGIL T_ID { $$ = new NIdentifier(*$2); delete $2; }
-         | T_SIGIL T_TWIGIL T_ID { printf("var with a twigil..., not yet implemented"); }
+param_list : /* blank */
+           | parameter { printf("param_list NYI."); }
+           | param_list T_COMMA parameter { printf("param_list NYI."); }
+           ;
+
+parameter : param_var { }
+          | T_SPLAT param_var /* slurpy? */ { } 
+          | param_var '?' { }
+          /* | param_var '!' { } not sure if this is needed */
+          | named_param { }
+          | T_SPLAT named_param { }
+          ;
+
+param_var : variable { }
+          ;
+
+named_param : ':' param_var { }
+            ;
+
+
+var_decl : T_MY variable {  }
+         | T_MY variable '=' expr { }
+         | T_MY T_LPAREN args_list T_RPAREN '=' expr { }
          ;
 
-ident : T_ID { $$ = new NIdentifier(*$1); delete $1; }
-      ;
+variable : T_SIGIL T_ID { }
+         ;
 
-numeric : T_DIGIT { $$ = new NInteger(atol($1->c_str())); delete $1; }
-        | T_DOUBLE { $$ = new NDouble(atof($1->c_str())); delete $1; }
+stmt_control : if_stmt { }
+             | unless_stmt { }
+             | for_stmt { }
+             | while_stmt { }
+             ;
+
+if_stmt : T_IF expr xblock  {}
         ;
 
-expr : variable assignment { $$ = new NAssignment(*$<ident>1, *$2); }
-     | T_SIGIL ident T_LPAREN T_RPAREN { $$ = new NMethodCall(*$1); }
-     | T_SIGIL ident T_LPAREN call_args T_RPAREN { $$ = new NMethodCall(*$2, *$4); delete $4; }
-     | numeric
-     | expr comparison expr { $$ = new NBinaryOperator(*$1, $2, *$3); }
-     | expr algerbra expr { $$ = new NBinaryOperator(*$1, $2, *$3); }
-     | T_LPAREN expr T_RPAREN { $$ = $2; }
-     ;
+for_stmt : T_FOR expr xblock {}
+        /* | expr T_FOR expr {} */
+         ;
 
-call_args : /*blank*/  { $$ = new ExpressionList(); }
-          | expr { $$ = new ExpressionList(); $$->push_back($1); }
-          | call_args T_COMMA expr  { $1->push_back($3); }
-          ;
-
-comparison : T_CEQ | T_CNE | T_CLT | T_CLE | T_CGT | T_CGE
+while_stmt : T_WHILE expr xblock { }
            ;
 
-algerbra : T_PLUS | T_MINUS | T_MUL | T_DIV
+methodop : variable T_LPAREN args_list T_RPAREN { }
          ;
+
+args_list : /* blank args */ {}
+          | expr { }
+          | args_list T_COMMA expr { }
+          ;
+
+xblock : T_LBRACE stmts T_RBRACE
+       ;
+
+expr : variable {}
+     | variable comparison variable {}
+     | T_LPAREN expr T_RPAREN {}
+     ;
+
+comparison : T_CEQ | T_CLT | T_CGT | T_CLTE | T_CLGTE
+           ;
 
 %%
 
