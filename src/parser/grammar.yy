@@ -56,14 +56,27 @@ yyerror (char const *s) {
 /* variable sigil type */
 %token <token> T_SIGIL T_SCALAR_SIGIL T_LIST_SIGIL T_HASH_SIGIL T_CODE_SIGIL
 
-/* variable scope identifier my, our, has etc. */
-%token <token> T_MY 
+/* variable scope identifier my, our, has */
+%token <token> T_MY T_OUR T_HAS
 
 /* assignment = := ::= */
 %token <token> T_EQ T_BIND T_RO_BIND
 
+/* package identifiers */
+%token <token> T_PACKAGE T_MODULE T_CLASS T_GRAMMAR
+
 /* method identifiers sub, method, submethod, etc. */
-%token <token> T_SUB T_SPLAT
+%token <token> T_SUB T_METHOD T_SUBMETHOD T_SPLAT
+
+/* Regex related things
+/* regex, token, rule */
+%token <token> T_REGEX T_TOKEN T_RULE
+
+/* slashes for regex: / \ */
+%token <token> T_SLASH T_BSLASH
+
+/* specials */
+%token <token> T_LAMBDA T_LAMBDA_RW
 
 /* some default operators */
 /* 
@@ -73,11 +86,18 @@ yyerror (char const *s) {
     N means numeric
     S means string
  */
-/* = < > <= >= eq */
-%token <token> T_C_NEQ T_CLT T_CGT T_CLTE T_CGTE T_CEQL
+/* numerics: */
+/* == != < > <= >= */
+%token <token> T_CN_EQ T_CN_NEQ T_CN_LT T_CN_GT T_CN_LTE T_CN_GTE T_CN_EQL
+/* string ops: */
+/* eq ne lt le gt ge */
+%token <token> T_CS_EQ T_CS_NEQ T_CS_LT T_CS_GT T_CS_LTE T_CS_GTE T_CS_EQL
+/* other operatos */
+/* ~~ === eqv ! */
+%token <token> T_SMARTMATCH T_TRIPLE_EQ T_EQC T_NOT
 
 /* control structure tokens */
-%token <token> T_IF T_ELSE T_FOR T_WHILE
+%token <token> T_IF T_ELSE T_UNLESS T_FOR T_WHILE
 %token T_LBRACE T_RBRACE T_LPAREN T_RPAREN T_COMMA 
 
 /* Define the type of node our nonterminal symbols represent.
@@ -96,7 +116,7 @@ yyerror (char const *s) {
 %type <token> comparison algerbra
 */
 %type <block> prog stmts
-%type <stmt> stmt var_decl func_decl
+%type <stmt> stmt var_declarator func_declarator regex_declarator
 %type <ident> variable
 /* control structures */
 %type <exprvec> args_list
@@ -129,8 +149,9 @@ stmts : stmt { $$ = new NBlock(); $$->statements.push_back($<stmt>1); }
       | stmts stmt { $1->statements.push_back($<stmt>2); }
       ;
 
-stmt : var_decl { $$ = new NVariableDeclaration(); }
-     | func_decl { printf("func_decl NYI."); }
+stmt : var_declarator { $$ = new NVariableDeclaration(); }
+     | func_declarator { printf("func_decl NYI."); }
+     | regex_declarator { printf("regex NYI."); }
      | stmt_control { printf("stmt_contrl NYI."); }
      | methodop { printf("methodop NYI."); }
      ;
@@ -139,9 +160,30 @@ func_ident : T_ID { printf("function ID NYI.") }
            | T_CODE_SIGIL T_ID { printf("func_ident with & NYI."); }
            ;
 
-func_decl : T_SUB func_ident xblock { printf("func_decl NYI."); }
-          | T_SUB func_ident signature xblock { printf("func_decl with signature NYI."); }
-          ;
+func_declarator  : T_SUB func_ident signature xblock { printf("sub NYI."); }
+                 | T_METHOD func_ident signature xblock { printf("method NYI."); }
+                 | T_SUBMETHOD func_ident signature xblock { printf("submethod NYI."); }
+                 ;
+
+
+/*
+    [
+    | $<proto>=[proto] [regex|token|rule]
+      <deflongname>
+      '{' '<...>' '}'<?ENDSTMT>
+    | $<sym>=[regex|token|rule]
+      <deflongname>
+      <.newpad>
+      [ '(' <signature> ')' ]?
+      {*} #= open
+      '{'<p6regex=.LANG('Regex','nibbler')>'}'<?ENDSTMT>
+    ]
+*/
+regex_declarator : regex_type_identifier func_ident signature { printf("Regex needs work... NYI.") }
+                 ;
+
+regex_type_identifier : T_TOKEN | T_REGEX | T_RULE 
+                      ;
 
 signature : T_LPAREN param_list T_RPAREN { printf("signature NYI."); }
           ;
@@ -166,9 +208,8 @@ named_param : ':' param_var { }
             ;
 
 
-var_decl : T_MY variable {  }
-         | T_MY variable '=' expr { }
-         | T_MY T_LPAREN args_list T_RPAREN '=' expr { }
+var_declarator  : T_MY variable {  }
+         /* | T_MY variable '=' expr { } not going to do assignment on creation yet */
          ;
 
 variable : T_SIGIL T_ID { }
@@ -180,10 +221,12 @@ stmt_control : if_stmt { }
              | while_stmt { }
              ;
 
-if_stmt : T_IF expr xblock  {}
+if_stmt : T_IF expr xblock  { }
         ;
 
-for_stmt : T_FOR expr xblock {}
+unless_stmt : T_UNLESS expr xblock { printf("unless NYI."); }
+
+for_stmt : T_FOR expr xblock { }
         /* | expr T_FOR expr {} */
          ;
 
@@ -206,9 +249,10 @@ expr : variable {}
      | T_LPAREN expr T_RPAREN {}
      ;
 
-comparison : T_CEQ | T_CLT | T_CGT | T_CLTE | T_CLGTE
+comparison : T_CN_EQ | T_CN_NEQ | T_CN_LT | T_CN_GT | T_CN_LTE | T_CN_GTE 
+           | T_CN_EQL | T_CS_EQ | T_CS_NEQ | T_CS_LT | T_CS_GT | T_CS_LTE 
+           | T_CS_GTE | T_CS_EQL
            ;
-
 %%
 
 namespace nqp {
