@@ -13,6 +13,11 @@ say($aa);
 say($aa);
 
 class Foo {
+  our $.bar;
+  submethod new($bar) {
+    self.bar = $bar;
+  }
+
   method get_string() {
     return 'Foo';
   }

@@ -1,6 +1,6 @@
 #include <iostream>
-#include "node.hpp"
-#include "codegen.hpp"
+#include "Node.hpp"
+#include "Codegen.hpp"
 #include "parser/grammar.tab.hpp"
 
 using namespace std;

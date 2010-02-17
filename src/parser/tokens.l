@@ -1,7 +1,7 @@
 %option noyywrap
 %{
 #include <string>
-#include "node.hpp"
+#include "Node.hpp"
 #include "parser/grammar.tab.hpp"
 
 #define YY_DECL int yylex(nqp::parser::semantic_type *yylval, \
@@ -30,10 +30,10 @@ typedef nqp::parser::token token;
 "("         return TOKEN(token::T_LPAREN);
 ")"         return TOKEN(token::T_RPAREN);
 ","         return TOKEN(token::T_COMMA);
-"="         return TOKEN(token::T_EQUAL);
+"="         return TOKEN(token::T_EQ);
 ":="        return TOKEN(token::T_BIND);
-"=="        return TOKEN(token::T_CEQ);
-"!="        return TOKEN(token::T_CNE);
+"=="        return TOKEN(token::T_CN_EQ);
+"!="        return TOKEN(token::T_CN_NEQ);
 "+"         return TOKEN(token::T_PLUS);
 
 "return"    return TOKEN(token::T_RETURN);
@@ -45,7 +45,6 @@ typedef nqp::parser::token token;
 "sub"       return TOKEN(token::T_SUB);
 "method"    return TOKEN(token::T_METHOD);
 "submethod" return TOKEN(token::T_SUBMETHOD);
-"multi"     return TOKEN(token::T_MULTI);
 
 [$@%&]      SAVE_TOKEN; return token::T_SIGIL;
 [*\^.]      SAVE_TOKEN; return token::T_TWIGIL;

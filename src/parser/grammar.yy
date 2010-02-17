@@ -1,6 +1,6 @@
 %{
 
-#include "node.hpp"
+#include "Node.hpp"
 #include <cstdlib>
 
 void
@@ -21,40 +21,19 @@ yyerror (char const *s) {
 
 %union {
   std::string *string;
-  int token;
+  unsigned int token;
   NBlock *block;
   NStatement *stmt;
   NVariableDeclaration *var_decl;
   std::vector<NExpression*> *exprvec;
   NIdentifier *ident;
-/*    Node *node;
-    NBlock *block;
-    NExpression *expr;
-    NStatement *stmt;
-    NIdentifier *ident;
-    NVariableDeclaration *var_decl;
-    std::vector<NVariableDeclaration*> *varvec;
-    std::vector<NExpression*> *exprvec; */
 }
 
-/* Define our terminal symbols (tokens). This should
-   match our tokens.l lex file. We also define the node type
-   they represent.
- */
-/*
-%token <string> T_ID T_SIGIL T_TWIGIL T_INTEGER T_DOUBLE T_DIGIT
-%token <token> T_CEQ T_CNE T_CLT T_CLE T_CGT T_CGE T_EQUAL T_BIND
-%token <token> T_MY T_OUR T_HAS
-%token <token> T_LPAREN T_RPAREN T_LBRACE T_RBRACE T_COMMA T_DOT T_SEMICOLON
-%token <token> T_PLUS T_MINUS T_MUL T_DIV
-%token <token> T_SUB T_SUBMETHOD T_METHOD T_MULTI
-%token <token> T_RETURN
-*/
 /* ID of a var, func, class, etc.  */
-%token <string> T_ID
+%token <string> T_ID T_DIGIT
 
 /* variable sigil type */
-%token <token> T_SIGIL T_SCALAR_SIGIL T_LIST_SIGIL T_HASH_SIGIL T_CODE_SIGIL
+%token <token> T_SIGIL T_TWIGIL T_SCALAR_SIGIL T_LIST_SIGIL T_HASH_SIGIL T_CODE_SIGIL
 
 /* variable scope identifier my, our, has */
 %token <token> T_MY T_OUR T_HAS
@@ -63,7 +42,7 @@ yyerror (char const *s) {
 %token <token> T_EQ T_BIND T_RO_BIND
 
 /* package identifiers */
-%token <token> T_PACKAGE T_MODULE T_CLASS T_GRAMMAR
+%token <token> T_PACKAGE T_MODULE T_CLASS T_GRAMMAR T_ROL T_ROLE
 
 /* method identifiers sub, method, submethod, etc. */
 %token <token> T_SUB T_METHOD T_SUBMETHOD T_SPLAT
@@ -93,28 +72,19 @@ yyerror (char const *s) {
 /* eq ne lt le gt ge */
 %token <token> T_CS_EQ T_CS_NEQ T_CS_LT T_CS_GT T_CS_LTE T_CS_GTE T_CS_EQL
 /* other operatos */
-/* ~~ === eqv ! */
-%token <token> T_SMARTMATCH T_TRIPLE_EQ T_EQC T_NOT
+/* ~~ === eqv ! ** */
+%token <token> T_SMARTMATCH T_TRIPLE_EQ T_EQV T_NOT T_REPEATER
+/* math ops */
+/* + - * / */
+%token <token> T_PLUS T_MINUS T_MUL T_DIV
+/* string ops */
+/* ~ */
+%token <token> T_STITCH
 
 /* control structure tokens */
-%token <token> T_IF T_ELSE T_UNLESS T_FOR T_WHILE
-%token T_LBRACE T_RBRACE T_LPAREN T_RPAREN T_COMMA 
+%token <token> T_IF T_ELSE T_UNLESS T_FOR T_WHILE T_RETURN
+%token T_LBRACE T_RBRACE T_LPAREN T_RPAREN T_COMMA T_SEMICOLON T_DOT
 
-/* Define the type of node our nonterminal symbols represent.
-   The types refer to the %union declaration above. Ex: when
-   we call an ident (defined by union type ident) we are really
-   calling an (NIdentifier*). It makes the compiler happy.
- */
-
-/*
-%type <ident> ident variable
-%type <expr> numeric expr assignment
-%type <varvec> func_decl_args
-%type <exprvec> call_args
-%type <block> prog stmts block
-%type <stmt> stmt var_decl func_decl
-%type <token> comparison algerbra
-*/
 %type <block> prog stmts
 %type <stmt> stmt var_declarator func_declarator regex_declarator
 %type <ident> variable
