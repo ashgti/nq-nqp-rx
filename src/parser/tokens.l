@@ -14,6 +14,11 @@ typedef nqp::parser::token token;
 
 %}
 
+DQ_STRING       \"(\\.|[^"\\\n])*\"
+SQ_STRING       \'[^'\n]*\'
+STRINGCONSTANT  {DQ_STRING}|{SQ_STRING}
+REGEX           \{(\\.|)*\}
+
 %%
 
 %{
@@ -21,7 +26,7 @@ typedef nqp::parser::token token;
      yylloc->step();
 %}
 
-[ \t\n]     ;
+[ \t]     ;
 [0-9]+      { SAVE_TOKEN; return token::T_DIGIT; }
 ";"         return TOKEN(token::T_SEMICOLON);
 "{"         return TOKEN(token::T_LBRACE);
@@ -49,6 +54,8 @@ typedef nqp::parser::token token;
 [$@%&]      SAVE_TOKEN; return token::T_SIGIL;
 [*\^.]      SAVE_TOKEN; return token::T_TWIGIL;
 [a-zA-Z]+   { SAVE_TOKEN; return token::T_ID; }
+{STRINGCONSTANT}  {SAVE_TOKEN; return token:T_STRINGC; }
+[^}]*       { SAVE_TOKEN; return token:T_RBLOCK; }
 .           { printf("Unknown Token. %s\n", yytext); }
 
 %%

@@ -3,11 +3,6 @@
 #include "Node.hpp"
 #include <cstdlib>
 
-void
-yyerror (char const *s) {
-  fprintf (stderr, "%s\n", s);
-}
-
 %}
 
 %defines
@@ -30,7 +25,7 @@ yyerror (char const *s) {
 }
 
 /* ID of a var, func, class, etc.  */
-%token <string> T_ID T_DIGIT
+%token <string> T_ID T_DIGIT T_RBLOCK
 
 /* variable sigil type */
 %token <token> T_SIGIL T_TWIGIL T_SCALAR_SIGIL T_LIST_SIGIL T_HASH_SIGIL T_CODE_SIGIL
@@ -42,7 +37,7 @@ yyerror (char const *s) {
 %token <token> T_EQ T_BIND T_RO_BIND
 
 /* package identifiers */
-%token <token> T_PACKAGE T_MODULE T_CLASS T_GRAMMAR T_ROL T_ROLE
+%token <token> T_PACKAGE T_MODULE T_CLASS T_GRAMMAR T_ROLE
 
 /* method identifiers sub, method, submethod, etc. */
 %token <token> T_SUB T_METHOD T_SUBMETHOD T_SPLAT
@@ -86,7 +81,7 @@ yyerror (char const *s) {
 %token T_LBRACE T_RBRACE T_LPAREN T_RPAREN T_COMMA T_SEMICOLON T_DOT
 
 %type <block> prog stmts
-%type <stmt> stmt var_declarator func_declarator regex_declarator
+%type <stmt> stmt var_declarator func_declarator regex_declarator infix
 %type <ident> variable
 /* control structures */
 %type <exprvec> args_list
@@ -94,10 +89,8 @@ yyerror (char const *s) {
 %type <token> comparison
 
 /* Operator precedence for mathematical operators */
-/*
 %left T_PLUS T_MINUS
 %left T_MUL T_DIV
-*/
 
 %start prog
 
@@ -108,7 +101,7 @@ extern int yylex(nqp::parser::semantic_type* yylval,
 
 %initial-action {
  // Filename for locations here
- @$.begin.filename = @$.end.filename = new std::string("stdin");
+ // @$.begin.filename = @$.end.filename = new std::string("my file");
 }
 %%
 
@@ -119,22 +112,32 @@ stmts : stmt { $$ = new NBlock(); $$->statements.push_back($<stmt>1); }
       | stmts stmt { $1->statements.push_back($<stmt>2); }
       ;
 
-stmt : var_declarator { $$ = new NVariableDeclaration(); }
+stmt : var_declarator T_SEMICOLON { /* $$ = new NVariableDeclaration(); */ }
+     | package_declarator { printf("Packages NYI."); }
      | func_declarator { printf("func_decl NYI."); }
      | regex_declarator { printf("regex NYI."); }
      | stmt_control { printf("stmt_contrl NYI."); }
-     | methodop { printf("methodop NYI."); }
+     | methodop T_SEMICOLON { printf("methodop NYI."); }
+     | T_RETURN expr T_SEMICOLON { printf("Return statement NYI."); }
+     | expr T_SEMICOLON { printf("expression"); }
+     | T_SEMICOLON { /* noop */ }
      ;
 
-func_ident : T_ID { printf("function ID NYI.") }
+func_ident : T_ID { printf("function ID NYI."); }
            | T_CODE_SIGIL T_ID { printf("func_ident with & NYI."); }
            ;
+
+package_declarator : T_PACKAGE T_ID xblock { } 
+                   | T_MODULE T_ID xblock { } 
+                   | T_CLASS T_ID xblock { } 
+                   | T_GRAMMAR T_ID xblock { } 
+                   | T_ROLE T_ID xblock { }
+                   ;
 
 func_declarator  : T_SUB func_ident signature xblock { printf("sub NYI."); }
                  | T_METHOD func_ident signature xblock { printf("method NYI."); }
                  | T_SUBMETHOD func_ident signature xblock { printf("submethod NYI."); }
                  ;
-
 
 /*
     [
@@ -149,11 +152,15 @@ func_declarator  : T_SUB func_ident signature xblock { printf("sub NYI."); }
       '{'<p6regex=.LANG('Regex','nibbler')>'}'<?ENDSTMT>
     ]
 */
-regex_declarator : regex_type_identifier func_ident signature { printf("Regex needs work... NYI.") }
+regex_declarator : regex_type_identifier func_ident signature rblock { printf("Regex needs work... NYI."); }
                  ;
 
 regex_type_identifier : T_TOKEN | T_REGEX | T_RULE 
                       ;
+
+rblock : T_LBRACE '<...>' T_RBRACE { }
+       | T_LBRACE T_RBLOCK T_RBRACE { }
+       ;
 
 signature : T_LPAREN param_list T_RPAREN { printf("signature NYI."); }
           ;
@@ -179,8 +186,8 @@ named_param : ':' param_var { }
 
 
 var_declarator  : T_MY variable {  }
-         /* | T_MY variable '=' expr { } not going to do assignment on creation yet */
-         ;
+                | T_MY variable assignment expr { }
+                ;
 
 variable : T_SIGIL T_ID { }
          ;
@@ -203,7 +210,7 @@ for_stmt : T_FOR expr xblock { }
 while_stmt : T_WHILE expr xblock { }
            ;
 
-methodop : variable T_LPAREN args_list T_RPAREN { }
+methodop : func_ident T_LPAREN args_list T_RPAREN { }
          ;
 
 args_list : /* blank args */ {}
@@ -211,13 +218,42 @@ args_list : /* blank args */ {}
           | args_list T_COMMA expr { }
           ;
 
-xblock : T_LBRACE stmts T_RBRACE
+xblock : T_LBRACE T_RBRACE { }
+       | T_LBRACE stmts T_RBRACE { }
        ;
 
-expr : variable {}
-     | variable comparison variable {}
+expr : variable { }
+     | variable infix expr { }
+     | number { }
+     | number infix expr { }
+     | methodop { }
      | T_LPAREN expr T_RPAREN {}
      ;
+
+number : T_DIGIT { }
+       | T_DIGIT T_DOT T_DIGIT { }
+       ;
+
+infix : assignment { }
+      | comparison { }
+      | math_ops { }
+      | string_ops { }
+      | other_ops { }
+      ;
+
+assignment : T_BIND
+           | T_RO_BIND
+           ;
+
+other_ops : T_SMARTMATCH | T_TRIPLE_EQ | T_EQV | T_NOT | T_REPEATER
+          ;
+
+math_ops : T_PLUS | T_MINUS | T_MUL | T_DIV
+         ;
+
+string_ops : T_STITCH
+           ;
+
 
 comparison : T_CN_EQ | T_CN_NEQ | T_CN_LT | T_CN_GT | T_CN_LTE | T_CN_GTE 
            | T_CN_EQL | T_CS_EQ | T_CS_NEQ | T_CS_LT | T_CS_GT | T_CS_LTE 
