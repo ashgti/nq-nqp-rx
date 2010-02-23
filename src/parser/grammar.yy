@@ -25,7 +25,7 @@
 }
 
 /* ID of a var, func, class, etc.  */
-%token <string> T_ID T_DIGIT T_RBLOCK
+%token <string> T_ID T_DIGIT T_RBLOCK T_STRINGC
 
 /* variable sigil type */
 %token <token> T_SIGIL T_TWIGIL T_SCALAR_SIGIL T_LIST_SIGIL T_HASH_SIGIL T_CODE_SIGIL
@@ -70,8 +70,8 @@
 /* ~~ === eqv ! ** */
 %token <token> T_SMARTMATCH T_TRIPLE_EQ T_EQV T_NOT T_REPEATER
 /* math ops */
-/* + - * / */
-%token <token> T_PLUS T_MINUS T_MUL T_DIV
+/* + - * / % */
+%token <token> T_PLUS T_MINUS T_MUL T_DIV T_MOD
 /* string ops */
 /* ~ */
 %token <token> T_STITCH
@@ -112,24 +112,23 @@ stmts : stmt { $$ = new NBlock(); $$->statements.push_back($<stmt>1); }
       | stmts stmt { $1->statements.push_back($<stmt>2); }
       ;
 
-stmt : var_declarator T_SEMICOLON { /* $$ = new NVariableDeclaration(); */ }
+stmt : var_declarator { /* $$ = new NVariableDeclaration(); */ }
      | package_declarator { printf("Packages NYI."); }
      | func_declarator { printf("func_decl NYI."); }
      | regex_declarator { printf("regex NYI."); }
      | stmt_control { printf("stmt_contrl NYI."); }
-     | methodop T_SEMICOLON { printf("methodop NYI."); }
-     | T_RETURN expr T_SEMICOLON { printf("Return statement NYI."); }
-     | expr T_SEMICOLON { printf("expression"); }
+     | T_RETURN expr { printf("Return statement NYI."); }
+     | expr { printf("expression"); }
      | T_SEMICOLON { /* noop */ }
      ;
 
-func_ident : T_ID { printf("function ID NYI."); }
+func_ident : T_ID { printf("function ID NYI.\n"); }
            | T_CODE_SIGIL T_ID { printf("func_ident with & NYI."); }
            ;
 
 package_declarator : T_PACKAGE T_ID xblock { } 
                    | T_MODULE T_ID xblock { } 
-                   | T_CLASS T_ID xblock { } 
+                   | T_CLASS T_ID xblock { printf("Starting a class\n"); } 
                    | T_GRAMMAR T_ID xblock { } 
                    | T_ROLE T_ID xblock { }
                    ;
@@ -152,7 +151,7 @@ func_declarator  : T_SUB func_ident signature xblock { printf("sub NYI."); }
       '{'<p6regex=.LANG('Regex','nibbler')>'}'<?ENDSTMT>
     ]
 */
-regex_declarator : regex_type_identifier func_ident signature rblock { printf("Regex needs work... NYI."); }
+regex_declarator : regex_type_identifier func_ident rblock { printf("Regex needs work... NYI."); }
                  ;
 
 regex_type_identifier : T_TOKEN | T_REGEX | T_RULE 
@@ -211,6 +210,8 @@ while_stmt : T_WHILE expr xblock { }
            ;
 
 methodop : func_ident T_LPAREN args_list T_RPAREN { }
+         | variable T_DOT func_ident T_LPAREN args_list T_RPAREN { }
+         | T_ID T_DOT func_ident T_LPAREN args_list T_RPAREN { /* this ones for Class.methods() */ }
          ;
 
 args_list : /* blank args */ {}
@@ -218,14 +219,15 @@ args_list : /* blank args */ {}
           | args_list T_COMMA expr { }
           ;
 
-xblock : T_LBRACE T_RBRACE { }
-       | T_LBRACE stmts T_RBRACE { }
+xblock : T_LBRACE T_RBRACE { printf("xblock with no contents\n"); }
+       | T_LBRACE stmts T_RBRACE { printf("xblock with contents\n"); }
        ;
 
 expr : variable { }
      | variable infix expr { }
      | number { }
      | number infix expr { }
+     | stringc { }
      | methodop { }
      | T_LPAREN expr T_RPAREN {}
      ;
@@ -240,6 +242,9 @@ infix : assignment { }
       | string_ops { }
       | other_ops { }
       ;
+
+stringc : T_STRINGC { }
+        ;
 
 assignment : T_BIND
            | T_RO_BIND

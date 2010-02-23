@@ -16,7 +16,7 @@ class Foo {
   }
 }
 
-my $a := Foo.new;
+my $a := Foo.new();
 
 say($a.get_string());
 

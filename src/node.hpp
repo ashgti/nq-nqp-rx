@@ -25,17 +25,17 @@ class NExpression : public Node {
 class NStatement : public Node {
 };
 
-class NInteger : public NExpression {
+class NIntegerConstant : public NExpression {
   public:
     long long value;
-    NInteger(long long value) : value(value) { }
+    NIntegerConstant(long long value) : value(value) { }
     virtual llvm::Value* codeGen(CodeGenContext& context);
 };
 
-class NDouble : public NExpression {
+class NDoubleConstant : public NExpression {
 public:
     double value;
-    NDouble(double value) : value(value) { }
+    NDoubleConstant(double value) : value(value) { }
     virtual llvm::Value* codeGen(CodeGenContext& context);
 };
 

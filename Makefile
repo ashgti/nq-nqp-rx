@@ -9,36 +9,36 @@ SRC=src
 LIBS=-lLLVMX86AsmParser -L/opt/local/lib -lpthread -lffi -lm -lLLVMX86AsmPrinter -lLLVMX86CodeGen -lLLVMSelectionDAG -lLLVMAsmPrinter -lLLVMX86Info -lLLVMJIT -lLLVMExecutionEngine -lLLVMCodeGen -lLLVMScalarOpts -lLLVMTransformUtils -lLLVMipa -lLLVMAnalysis -lLLVMTarget -lLLVMMC -lLLVMCore -lLLVMSupport -lLLVMSystem
 INCLUDES=-I./$(SRC) -I./$(SRC)/parser -I./$(BUILD_DIR) -I/opt/local/include
 RM=rm
-OBJECTS=$(BUILD_DIR)/main.o $(BUILD_DIR)/node_builder.o $(BUILD_DIR)/codegen.o $(BUILD_DIR)/grammar.tab.o $(BUILD_DIR)/tokens.o
+OBJECTS=$(BUILD_DIR)/main.o $(BUILD_DIR)/node_builder.o $(BUILD_DIR)/codegen.o $(BUILD_DIR)/Grammar.tab.o $(BUILD_DIR)/Tokens.o
 
 all: test
 
 # $(BUILD_DIR)/builtins.o: $(SRC)/builtin/%.cpp
 #	 $(CXX) $(INCLUDES) $(CXXFLAGS) -c -o $@ $^
 
-$(BUILD_DIR)/%.o: $(SRC)/parser/%.c
+$(BUILD_DIR)/%.o: $(SRC)/Parser/%.c
 	$(CXX) $(INCLUDES) $(CXXFLAGS) -c -o $@ $^
 
-$(BUILD_DIR)/%.o: $(SRC)/parser/%.cpp
+$(BUILD_DIR)/%.o: $(SRC)/Parser/%.cpp
 	$(CXX) $(INCLUDES) $(CXXFLAGS) -c -o $@ $^
 
-$(BUILD_DIR)/main.o: $(SRC)/main.cpp $(SRC)/parser/grammar.tab.hh
+$(BUILD_DIR)/main.o: $(SRC)/main.cpp $(SRC)/Parser/Grammar.tab.hh
 	$(CXX) $(INCLUDES) $(CXXFLAGS) -c -o $@ $<
 
-$(BUILD_DIR)/node_builder.o: $(SRC)/Node_builder.cpp
+$(BUILD_DIR)/Node_builder.o: $(SRC)/Node_builder.cpp
 	$(CXX) $(INCLUDES) $(CXXFLAGS) -c -o $@ $^
 
 $(BUILD_DIR)/codegen.o: $(SRC)/Codegen.cpp
 	$(CXX) $(INCLUDES) $(CXXFLAGS) -c -o $@ $^
 
-$(SRC)/parser/grammar.tab.cpp: $(SRC)/parser/grammar.yy
+$(SRC)/Parser/Grammar.tab.cpp: $(SRC)/Parser/Grammar.yy
 	$(YACC) -d -o $@ $^
 
-$(SRC)/parser/grammar.tab.hh: $(SRC)/parser/grammar.tab.cpp
+$(SRC)/Parser/Grammar.tab.hh: $(SRC)/Parser/Grammar.tab.cpp
 
-$(SRC)/parser/tokens.c: $(SRC)/parser/tokens.l $(SRC)/parser/grammar.tab.hh
+$(SRC)/Parser/Tokens.c: $(SRC)/Parser/Tokens.l $(SRC)/Parser/Grammar.tab.hh
 	$(LEX) -o $@ $<
-
+	
 nqp-rx: $(OBJECTS)
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBS)
 

@@ -1,16 +1,17 @@
 #include "llvm/ADT/StringMap.h"
 
-namespace nqp {
+extern 'C' {
 
 /* P6opaque object is a very simple struct used to contain our basic objects.
  * this class is very liable to evolve as the project grows in complexity. */
 struct P6opaque {
- private:
- protected:
- public:
   llvm::StringMap<Value*> properties;
   std::string _class;
 };
+
+}
+
+namespace nqp {
 
 }
 
