@@ -1,0 +1,11 @@
+Contributors: 
+N: John Harrison 
+U: __ash__
+E: ash@greaterthaninfinity.com
+
+
+References:
+* Loren Segal for references on building a toy compiler with the llvm: http://gnuu.org/2009/09/18/writing-your-own-toy-compiler/
+  Used this as a groundwork for the initial work
+
+
