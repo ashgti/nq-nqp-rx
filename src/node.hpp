@@ -25,6 +25,7 @@ class NExpression : public Node {
 class NStatement : public Node {
 };
 
+/* Integer expressions */
 class NIntegerConstant : public NExpression {
   public:
     long long value;
@@ -32,11 +33,20 @@ class NIntegerConstant : public NExpression {
     virtual llvm::Value* codeGen(CodeGenContext& context);
 };
 
+/* Floating point number expressions */
 class NDoubleConstant : public NExpression {
 public:
     double value;
     NDoubleConstant(double value) : value(value) { }
     virtual llvm::Value* codeGen(CodeGenContext& context);
+};
+
+/* Boolean::True and Boolean::False constant values */
+class NBooleanConstant : public NExpression {
+};
+
+/* Constant String Expressions */
+class NStringConstant : public NExpression {
 };
 
 class NIdentifier : public NExpression {
@@ -98,10 +108,9 @@ class NBlockReturn : public NStatement {
     virtual llvm::Value* codeGen(CodeGenContext& context);
 };
 
-class Mu : public NIdentifier {
-public:
-  Mu() : NIdentifier(std::string("Mu")) {
-  }
+class MuRef : public NIdentifier {
+ public:
+  MuRef() : NIdentifier("Mu") { }
 };
 
 class NVariableDeclaration : public NStatement {
@@ -110,7 +119,7 @@ public:
     NIdentifier& id;
     NExpression *assignmentExpr;
     NVariableDeclaration(NIdentifier& id) :
-        type(Mu()), id(id) { }
+        type(MuRef()), id(id) { }
     NVariableDeclaration(const NIdentifier& type, NIdentifier& id) :
         type(type), id(id) { }
     NVariableDeclaration(const NIdentifier& type, NIdentifier& id, NExpression *assignmentExpr) :
@@ -132,5 +141,11 @@ public:
     virtual llvm::Value* codeGen(CodeGenContext& context);
 };
 
-}
+class NPackageDeclaration : public NStatement {
+};
+
+class NClassDeclaration : public NPackageDeclaration {
+};
+
+} // namespace nqp
 

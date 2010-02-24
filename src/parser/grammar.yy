@@ -3,6 +3,8 @@
 #include "Node.hpp"
 #include <cstdlib>
 
+using namespace std;
+
 %}
 
 %defines
@@ -109,16 +111,18 @@ prog : stmts { root_node = $1; }
      ;
 
 stmts : stmt { $$ = new NBlock(); $$->statements.push_back($<stmt>1); }
-      | stmts stmt { $1->statements.push_back($<stmt>2); }
+      | stmts stmt { $1->statements.push_back($<stmt>2);
+          cout << "Testing..." << endl; 
+        }
       ;
 
-stmt : var_declarator { /* $$ = new NVariableDeclaration(); */ }
+stmt : var_declarator
      | package_declarator { printf("Packages NYI."); }
      | func_declarator { printf("func_decl NYI."); }
      | regex_declarator { printf("regex NYI."); }
      | stmt_control { printf("stmt_contrl NYI."); }
      | T_RETURN expr { printf("Return statement NYI."); }
-     | expr { printf("expression"); }
+     | expr { printf("expression\n"); }
      | T_SEMICOLON { /* noop */ }
      ;
 
@@ -158,7 +162,7 @@ regex_type_identifier : T_TOKEN | T_REGEX | T_RULE
                       ;
 
 rblock : T_LBRACE '<...>' T_RBRACE { }
-       | T_LBRACE T_RBLOCK T_RBRACE { }
+       | T_LBRACE T_RBLOCK T_RBRACE { printf("Got a regex block %s\n", $<string>2->c_str()); }
        ;
 
 signature : T_LPAREN param_list T_RPAREN { printf("signature NYI."); }
@@ -184,7 +188,7 @@ named_param : ':' param_var { }
             ;
 
 
-var_declarator  : T_MY variable {  }
+var_declarator  : T_MY variable { $$ = new NVariableDeclaration(*$2);  }
                 | T_MY variable assignment expr { }
                 ;
 

@@ -22,7 +22,7 @@ $(BUILD_DIR)/%.o: $(SRC)/Parser/%.c
 $(BUILD_DIR)/%.o: $(SRC)/Parser/%.cpp
 	$(CXX) $(INCLUDES) $(CXXFLAGS) -c -o $@ $^
 
-$(BUILD_DIR)/main.o: $(SRC)/main.cpp $(SRC)/Parser/Grammar.tab.hh
+$(BUILD_DIR)/main.o: $(SRC)/main.cpp $(BUILD_DIR)/Grammar.tab.o
 	$(CXX) $(INCLUDES) $(CXXFLAGS) -c -o $@ $<
 
 $(BUILD_DIR)/Node_builder.o: $(SRC)/Node_builder.cpp
@@ -36,7 +36,7 @@ $(SRC)/Parser/Grammar.tab.cpp: $(SRC)/Parser/Grammar.yy
 
 $(SRC)/Parser/Grammar.tab.hh: $(SRC)/Parser/Grammar.tab.cpp
 
-$(SRC)/Parser/Tokens.c: $(SRC)/Parser/Tokens.l $(SRC)/Parser/Grammar.tab.hh
+$(SRC)/Parser/Tokens.c: $(SRC)/Parser/Tokens.l $(BUILD_DIR)/Grammar.tab.o
 	$(LEX) -o $@ $<
 	
 nqp-rx: $(OBJECTS)

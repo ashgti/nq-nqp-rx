@@ -1,0 +1,8 @@
+=head1 VM Roadmap:
+
+VM Interactions strategry:
+1. Build a set of C functions I can interact with from the llvm runtime. C functions are nice because they don't mangle the name of the function when they get compiled.
+  a. I need a 
+
+
+

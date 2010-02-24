@@ -18,6 +18,21 @@ void CodeGenContext::generateCode(NBlock& root)
   std::cout << "Generating code...\n";
 
   /* Create the top level interpreter function to call as entry */
+
+  std::cout << "nodes: " << root.statements.size() << "\n";
+
+  std::cout << "Iterating the statements\n";
+
+  vector<NStatement*>::iterator it;
+  
+  std::string *blah = new std::string("Blah");
+
+  std::cout << "New address is roughly: " << blah << "\n";
+
+  for (it = root.statements.begin(); it < root.statements.end(); it++) {
+    std::cout << "Pointer: " << *it << "\n";
+  }
+
   vector<const Type*> argTypes;
   FunctionType *ftype = FunctionType::get(Type::getVoidTy(getGlobalContext()), argTypes, false);
   mainFunction = Function::Create(ftype, GlobalValue::InternalLinkage, "main", module);
@@ -63,13 +78,13 @@ static const Type *typeOf(const NIdentifier& type)
 
 /* -- Code Generation -- */
 
-Value* NInteger::codeGen(CodeGenContext& context)
+Value* NIntegerConstant::codeGen(CodeGenContext& context)
 {
   std::cout << "Creating integer: " << value << endl;
   return ConstantInt::get(Type::getInt64Ty(getGlobalContext()), value, true);
 }
 
-Value* NDouble::codeGen(CodeGenContext& context)
+Value* NDoubleConstant::codeGen(CodeGenContext& context)
 {
   std::cout << "Creating double: " << value << endl;
   return ConstantFP::get(Type::getDoubleTy(getGlobalContext()), value);
