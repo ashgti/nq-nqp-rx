@@ -19,16 +19,12 @@ void CodeGenContext::generateCode(NBlock& root)
 
   /* Create the top level interpreter function to call as entry */
 
-  std::cout << "nodes: " << root.statements.size() << "\n";
+  std::cout << "Nodes: " << root.statements.size() << "\n";
 
   std::cout << "Iterating the statements\n";
 
   vector<NStatement*>::iterator it;
   
-  std::string *blah = new std::string("Blah");
-
-  std::cout << "New address is roughly: " << blah << "\n";
-
   for (it = root.statements.begin(); it < root.statements.end(); it++) {
     std::cout << "Pointer: " << *it << "\n";
   }

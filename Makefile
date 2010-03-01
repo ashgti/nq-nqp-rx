@@ -11,7 +11,7 @@ INCLUDES=-I./$(SRC) -I./$(SRC)/parser -I./$(BUILD_DIR) -I/opt/local/include
 RM=rm
 OBJECTS=$(BUILD_DIR)/main.o $(BUILD_DIR)/node_builder.o $(BUILD_DIR)/codegen.o $(BUILD_DIR)/Grammar.tab.o $(BUILD_DIR)/Tokens.o
 
-all: test
+all: nqp-rx
 
 # $(BUILD_DIR)/builtins.o: $(SRC)/builtin/%.cpp
 #	 $(CXX) $(INCLUDES) $(CXXFLAGS) -c -o $@ $^
@@ -43,7 +43,7 @@ nqp-rx: $(OBJECTS)
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBS)
 
 test: nqp-rx
-	./nqp-rx t/basics.nqp
+	./nqp-rx t/simple.nqp
 
 clean:
 	$(RM) nqp-rx $(BUILD_DIR)/*

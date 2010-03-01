@@ -110,9 +110,11 @@ extern int yylex(nqp::parser::semantic_type* yylval,
 prog : stmts { root_node = $1; }
      ;
 
-stmts : stmt { $$ = new NBlock(); $$->statements.push_back($<stmt>1); }
+stmts : stmt { $$ = new NBlock(); $$->statements.push_back($<stmt>1); 
+          cout << "Pusing back another statement\n";
+        }
       | stmts stmt { $1->statements.push_back($<stmt>2);
-          cout << "Testing..." << endl; 
+          cout << "push back...\n"; 
         }
       ;
 

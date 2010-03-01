@@ -1,0 +1,340 @@
+// !$*UTF8*$!
+{
+	08FB7793FE84155DC02AAC07 /* Project object */ = {
+		activeBuildConfigurationName = Debug;
+		activeExecutable = 527F04C4113B6AF600D76F79 /* Executable */;
+		activeTarget = 527F02A0113B68F600D76F79 /* nq-nqp */;
+		addToTargets = (
+			527F02A0113B68F600D76F79 /* nq-nqp */,
+		);
+		breakpoints = (
+			527F04DF113B6CB500D76F79 /* Codegen.cpp:99 */,
+			527F04E3113B6D0D00D76F79 /* Codegen.cpp:164 */,
+		);
+		codeSenseManager = 527F024F113B67D600D76F79 /* Code sense */;
+		executables = (
+			527F04C4113B6AF600D76F79 /* Executable */,
+		);
+		perUserDictionary = {
+			PBXConfiguration.PBXFileTableDataSource3.PBXExecutablesDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXExecutablesDataSource_NameID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					22,
+					300,
+					519,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXExecutablesDataSource_ActiveFlagID,
+					PBXExecutablesDataSource_NameID,
+					PBXExecutablesDataSource_CommentsID,
+				);
+			};
+			PBXConfiguration.PBXFileTableDataSource3.PBXFileTableDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					631,
+					20,
+					48,
+					43,
+					43,
+					20,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXFileDataSource_FiletypeID,
+					PBXFileDataSource_Filename_ColumnID,
+					PBXFileDataSource_Built_ColumnID,
+					PBXFileDataSource_ObjectSize_ColumnID,
+					PBXFileDataSource_Errors_ColumnID,
+					PBXFileDataSource_Warnings_ColumnID,
+					PBXFileDataSource_Target_ColumnID,
+				);
+			};
+			PBXConfiguration.PBXTargetDataSource.PBXTargetDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					591,
+					60,
+					20,
+					48,
+					43,
+					43,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXFileDataSource_FiletypeID,
+					PBXFileDataSource_Filename_ColumnID,
+					PBXTargetDataSource_PrimaryAttribute,
+					PBXFileDataSource_Built_ColumnID,
+					PBXFileDataSource_ObjectSize_ColumnID,
+					PBXFileDataSource_Errors_ColumnID,
+					PBXFileDataSource_Warnings_ColumnID,
+				);
+			};
+			PBXPerProjectTemplateStateSaveDate = 289105849;
+			PBXWorkspaceStateSaveDate = 289105849;
+		};
+		perUserProjectItems = {
+			527F04C2113B6A6E00D76F79 /* PBXTargetBookmark */ = 527F04C2113B6A6E00D76F79 /* PBXTargetBookmark */;
+			527F04D0113B6BD800D76F79 /* PBXTextBookmark */ = 527F04D0113B6BD800D76F79 /* PBXTextBookmark */;
+			527F04D1113B6BD800D76F79 /* PBXTargetBookmark */ = 527F04D1113B6BD800D76F79 /* PBXTargetBookmark */;
+			527F04EB113B6DA300D76F79 /* PBXTextBookmark */ = 527F04EB113B6DA300D76F79 /* PBXTextBookmark */;
+			527F04EC113B6DA300D76F79 /* PBXTextBookmark */ = 527F04EC113B6DA300D76F79 /* PBXTextBookmark */;
+			527F04ED113B6DA300D76F79 /* PBXTextBookmark */ = 527F04ED113B6DA300D76F79 /* PBXTextBookmark */;
+			527F04EE113B6DA300D76F79 /* PBXTextBookmark */ = 527F04EE113B6DA300D76F79 /* PBXTextBookmark */;
+			527F04F0113B6DA300D76F79 /* PBXTextBookmark */ = 527F04F0113B6DA300D76F79 /* PBXTextBookmark */;
+			527F04F2113B6DA300D76F79 /* PBXTargetBookmark */ = 527F04F2113B6DA300D76F79 /* PBXTargetBookmark */;
+		};
+		sourceControlManager = 527F024E113B67D600D76F79 /* Source Control */;
+		userBuildSettings = {
+			OBJROOT = "/Users/john/Projects/nq-nqp-rx/build";
+			SYMROOT = "/Users/john/Projects/nq-nqp-rx/build";
+		};
+	};
+	527F024E113B67D600D76F79 /* Source Control */ = {
+		isa = PBXSourceControlManager;
+		fallbackIsa = XCSourceControlManager;
+		isSCMEnabled = 0;
+		scmConfiguration = {
+			repositoryNamesForRoots = {
+				"" = "";
+			};
+		};
+	};
+	527F024F113B67D600D76F79 /* Code sense */ = {
+		isa = PBXCodeSenseManager;
+		indexTemplatePath = "";
+	};
+	527F02A0113B68F600D76F79 /* nq-nqp */ = {
+		activeExec = 0;
+	};
+	527F042D113B696600D76F79 /* Makefile */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {2224, 650}}";
+			sepNavSelRange = "{778, 0}";
+			sepNavVisRange = "{215, 1481}";
+		};
+	};
+	527F044E113B696700D76F79 /* Codegen.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {809, 2769}}";
+			sepNavSelRange = "{4796, 40}";
+			sepNavVisRange = "{4236, 1434}";
+		};
+	};
+	527F0451113B696700D76F79 /* Node.hpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {809, 2067}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRange = "{0, 1018}";
+		};
+	};
+	527F04C2113B6A6E00D76F79 /* PBXTargetBookmark */ = {
+		isa = PBXTargetBookmark;
+		trg = 527F02A0113B68F600D76F79 /* nq-nqp */;
+	};
+	527F04C4113B6AF600D76F79 /* Executable */ = {
+		isa = PBXExecutable;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		breakpointsEnabled = 1;
+		configStateDict = {
+			"PBXLSLaunchAction-0" = {
+				PBXLSLaunchAction = 0;
+				PBXLSLaunchStartAction = 1;
+				PBXLSLaunchStdioStyle = 2;
+				PBXLSLaunchStyle = 0;
+				class = PBXLSRunLaunchConfig;
+				commandLineArgs = (
+				);
+				displayName = "Executable Runner";
+				environment = {
+				};
+				identifier = com.apple.Xcode.launch.runConfig;
+				remoteHostInfo = "";
+				startActionInfo = "";
+			};
+		};
+		customDataFormattersEnabled = 1;
+		dataTipCustomDataFormattersEnabled = 1;
+		dataTipShowTypeColumn = 1;
+		dataTipSortType = 0;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		dylibVariantSuffix = "";
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		launchableReference = 527F04C5113B6AF600D76F79 /* nqp-rx */;
+		libgmallocEnabled = 0;
+		name = Executable;
+		savedGlobals = {
+		};
+		showTypeColumn = 0;
+		sourceDirectories = (
+		);
+		startupPath = "/Users/john/Projects/nq-nqp-rx";
+		variableFormatDictionary = {
+		};
+	};
+	527F04C5113B6AF600D76F79 /* nqp-rx */ = {
+		isa = PBXFileReference;
+		lastKnownFileType = "compiled.mach-o.executable";
+		name = "nqp-rx";
+		path = "../../nqp-rx";
+		sourceTree = SOURCE_ROOT;
+	};
+	527F04D0113B6BD800D76F79 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = C6859E8B029090EE04C91782 /* NQ-NQP_Xcode.1 */;
+		name = "NQ-NQP_Xcode.1: 1";
+		rLen = 0;
+		rLoc = 0;
+		rType = 0;
+		vrLen = 907;
+		vrLoc = 0;
+	};
+	527F04D1113B6BD800D76F79 /* PBXTargetBookmark */ = {
+		isa = PBXTargetBookmark;
+		trg = 527F02A0113B68F600D76F79 /* nq-nqp */;
+		uiCtxt = {
+			TOCViewDetailVisibleRect = "{{0, 0}, {593, 373}}";
+			TOCViewExpandedItems = (
+				"com.apple.target-editor-pane.settings",
+			);
+			TOCViewMasterVisibleRect = "{{0, 0}, {236, 373}}";
+			TOCViewSelectedItems = (
+				"com.apple.target-editor-pane.settings",
+			);
+		};
+	};
+	527F04DF113B6CB500D76F79 /* Codegen.cpp:99 */ = {
+		isa = PBXFileBreakpoint;
+		actions = (
+		);
+		breakpointStyle = 0;
+		continueAfterActions = 0;
+		countType = 0;
+		delayBeforeContinue = 0;
+		fileReference = 527F044E113B696700D76F79 /* Codegen.cpp */;
+		hitCount = 0;
+		ignoreCount = 0;
+		lineNumber = 99;
+		location = "nqp-rx";
+		modificationTime = 289107292.039187;
+		originalNumberOfMultipleMatches = 1;
+		state = 1;
+	};
+	527F04E3113B6D0D00D76F79 /* Codegen.cpp:164 */ = {
+		isa = PBXFileBreakpoint;
+		actions = (
+		);
+		breakpointStyle = 0;
+		continueAfterActions = 0;
+		countType = 0;
+		delayBeforeContinue = 0;
+		fileReference = 527F044E113B696700D76F79 /* Codegen.cpp */;
+		functionName = "NBlock::codeGen(CodeGenContext& context)";
+		hitCount = 1;
+		ignoreCount = 0;
+		lineNumber = 164;
+		location = "nqp-rx";
+		modificationTime = 289107338.676607;
+		originalNumberOfMultipleMatches = 1;
+		state = 1;
+	};
+	527F04EB113B6DA300D76F79 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 527F042D113B696600D76F79 /* Makefile */;
+		name = "Makefile: 14";
+		rLen = 0;
+		rLoc = 778;
+		rType = 0;
+		vrLen = 1481;
+		vrLoc = 215;
+	};
+	527F04EC113B6DA300D76F79 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 527F0451113B696700D76F79 /* Node.hpp */;
+		name = "Node.hpp: 1";
+		rLen = 0;
+		rLoc = 0;
+		rType = 0;
+		vrLen = 1018;
+		vrLoc = 0;
+	};
+	527F04ED113B6DA300D76F79 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 527F044E113B696700D76F79 /* Codegen.cpp */;
+		name = "Codegen.cpp: 161";
+		rLen = 40;
+		rLoc = 4796;
+		rType = 0;
+		vrLen = 1434;
+		vrLoc = 4236;
+	};
+	527F04EE113B6DA300D76F79 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 527F04EF113B6DA300D76F79 /* stl_vector.h */;
+		rLen = 0;
+		rLoc = 330;
+		rType = 1;
+	};
+	527F04EF113B6DA300D76F79 /* stl_vector.h */ = {
+		isa = PBXFileReference;
+		lastKnownFileType = sourcecode.c.h;
+		name = stl_vector.h;
+		path = "/usr/include/c++/4.2.1/bits/stl_vector.h";
+		sourceTree = "<absolute>";
+	};
+	527F04F0113B6DA300D76F79 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 527F04F1113B6DA300D76F79 /* stl_vector.h */;
+		name = "stl_vector.h: 331";
+		rLen = 0;
+		rLoc = 11926;
+		rType = 0;
+		vrLen = 1484;
+		vrLoc = 10958;
+	};
+	527F04F1113B6DA300D76F79 /* stl_vector.h */ = {
+		isa = PBXFileReference;
+		name = stl_vector.h;
+		path = "/usr/include/c++/4.2.1/bits/stl_vector.h";
+		sourceTree = "<absolute>";
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {809, 12623}}";
+			sepNavSelRange = "{11926, 0}";
+			sepNavVisRange = "{10958, 1484}";
+		};
+	};
+	527F04F2113B6DA300D76F79 /* PBXTargetBookmark */ = {
+		isa = PBXTargetBookmark;
+		trg = 527F02A0113B68F600D76F79 /* nq-nqp */;
+		uiCtxt = {
+			TOCViewDetailVisibleRect = "{{0, 0}, {835, 89}}";
+			TOCViewExpandedItems = (
+				"com.apple.target-editor-pane.settings",
+			);
+			TOCViewMasterVisibleRect = "{{0, 0}, {337, 532}}";
+			TOCViewSelectedItems = (
+				"<PBXBuildSettingsPaneSpecification:0x201af3260:'com.apple.target-editor-pane.settings.general':Default>",
+			);
+		};
+	};
+	C6859E8B029090EE04C91782 /* NQ-NQP_Xcode.1 */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {635, 975}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRange = "{0, 907}";
+		};
+	};
+}
