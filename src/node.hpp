@@ -14,10 +14,20 @@ typedef std::vector<NExpression*> ExpressionList;
 typedef std::vector<NVariableDeclaration*> VariableList;
 
 class Node {
-  public:
-    virtual ~Node() {};
-    virtual llvm::Value* codeGen(CodeGenContext& context) = 0;
+ public:
+  virtual ~Node() {};
+  virtual llvm::Value* codeGen(CodeGenContext& context) = 0;
+  virtual void printSelf() = 0;
+  virtual std::string str() = 0;
+
+  friend std::ostream& operator<<(std::ostream& out, const Node& node);
 };
+
+}
+
+std::ostream& operator<<(std::ostream& out, const nqp::Node& node);
+
+namespace nqp {
 
 class NExpression : public Node {
 };
@@ -86,10 +96,13 @@ public:
 };
 
 class NBlock : public NExpression {
-public:
-    StatementList statements;
-    NBlock() { }
-    virtual llvm::Value* codeGen(CodeGenContext& context);
+ public:
+  StatementList statements;
+  NBlock() { }
+  virtual llvm::Value* codeGen(CodeGenContext& context);
+  virtual void printSelf();
+  void print_tree();
+  virtual std::string str();
 };
 
 class NExpressionStatement : public NStatement {
@@ -115,16 +128,16 @@ class MuRef : public NIdentifier {
 
 class NVariableDeclaration : public NStatement {
 public:
-    const NIdentifier& type;
     NIdentifier& id;
+    int assignment;
     NExpression *assignmentExpr;
     NVariableDeclaration(NIdentifier& id) :
-        type(MuRef()), id(id) { }
-    NVariableDeclaration(const NIdentifier& type, NIdentifier& id) :
-        type(type), id(id) { }
-    NVariableDeclaration(const NIdentifier& type, NIdentifier& id, NExpression *assignmentExpr) :
-        type(type), id(id), assignmentExpr(assignmentExpr) { }
+        id(id) { }
+    NVariableDeclaration(NIdentifier& id, int assignment_token, NExpression *expr) :
+        id(id), assignment(assignment_token), assignmentExpr(expr) { }
     virtual llvm::Value* codeGen(CodeGenContext& context);
+    virtual void printSelf();
+    virtual std::string str();
 };
 
 class NFunctionDeclaration : public NStatement {

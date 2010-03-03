@@ -21,14 +21,6 @@ void CodeGenContext::generateCode(NBlock& root)
 
   std::cout << "Nodes: " << root.statements.size() << "\n";
 
-  std::cout << "Iterating the statements\n";
-
-  vector<NStatement*>::iterator it;
-  
-  for (it = root.statements.begin(); it < root.statements.end(); it++) {
-    std::cout << "Pointer: " << *it << "\n";
-  }
-
   vector<const Type*> argTypes;
   FunctionType *ftype = FunctionType::get(Type::getVoidTy(getGlobalContext()), argTypes, false);
   mainFunction = Function::Create(ftype, GlobalValue::InternalLinkage, "main", module);
@@ -148,8 +140,7 @@ Value* NBinaryOperator::codeGen(CodeGenContext& context)
     rhs.codeGen(context), "", context.currentBlock());
 }
 
-Value* NAssignment::codeGen(CodeGenContext& context)
-{
+Value* NAssignment::codeGen(CodeGenContext& context) {
   std::cout << "Creating assignment for " << lhs.name << endl;
   if (context.locals().find(lhs.name) == context.locals().end()) {
     std::cerr << "undeclared variable " << lhs.name << endl;
@@ -158,13 +149,15 @@ Value* NAssignment::codeGen(CodeGenContext& context)
   return new StoreInst(rhs.codeGen(context), context.locals()[lhs.name], false, context.currentBlock());
 }
 
-Value* NBlock::codeGen(CodeGenContext& context)
-{
+Value* NBlock::codeGen(CodeGenContext& context) {
   StatementList::const_iterator it;
   Value *last = NULL;
+  unsigned int count = 0;
   for (it = statements.begin(); it != statements.end(); it++) {
-    std::cout << "Generating code for " << typeid(**it).name() << endl;
-    last = (**it).codeGen(context);
+    //std::cout << "Generating code for " << typeid(**it).name() << endl;
+    //last = (**it).codeGen(context);
+    count++;
+    std::cout << "Generatoring code for " << count << endl;
   }
   std::cout << "Creating block" << endl;
   return last;
@@ -176,6 +169,7 @@ Value* NExpressionStatement::codeGen(CodeGenContext& context) {
 }
 
 Value* NVariableDeclaration::codeGen(CodeGenContext& context) {
+  /* 
   std::cout << "Creating variable declaration " << type.name << " " << id.name << endl;
   AllocaInst *alloc = new AllocaInst(typeOf(type), id.name.c_str(), context.currentBlock());
   context.locals()[id.name] = alloc;
@@ -183,6 +177,8 @@ Value* NVariableDeclaration::codeGen(CodeGenContext& context) {
     NAssignment assn(id, *assignmentExpr);
     assn.codeGen(context);
   }
+  return alloc; */
+  AllocaInst *alloc;
   return alloc;
 }
 
@@ -190,7 +186,7 @@ Value* NFunctionDeclaration::codeGen(CodeGenContext& context) {
   vector<const Type*> argTypes;
   VariableList::const_iterator it;
   for (it = arguments.begin(); it != arguments.end(); it++) {
-    argTypes.push_back(typeOf((**it).type));
+    //argTypes.push_back(typeOf((**it).type));
   }
   FunctionType *ftype = FunctionType::get(Type::getInt64Ty(getGlobalContext()), argTypes, false);
   Function *function = Function::Create(ftype, GlobalValue::InternalLinkage, id.name.c_str(), context.module);

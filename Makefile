@@ -2,14 +2,14 @@ LEX=flex
 YACC=bison -Wall -t -v -Lc++
 CC=gcc
 CXX=g++
-CFLAGS=-Wall -g -DNDEBUG -D_GNU_SOURCE -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS -DYYERROR_VERBOSE -O3  -fno-common 
+CFLAGS=-Wall -g -DNDEBUG -D_GNU_SOURCE -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS -DYYERROR_VERBOSE -fno-common # no -O3 for now
 CXXFLAGS=$(CFLAGS) -Woverloaded-virtual
 BUILD_DIR=build
 SRC=src
 LIBS=-lLLVMX86AsmParser -L/opt/local/lib -lpthread -lffi -lm -lLLVMX86AsmPrinter -lLLVMX86CodeGen -lLLVMSelectionDAG -lLLVMAsmPrinter -lLLVMX86Info -lLLVMJIT -lLLVMExecutionEngine -lLLVMCodeGen -lLLVMScalarOpts -lLLVMTransformUtils -lLLVMipa -lLLVMAnalysis -lLLVMTarget -lLLVMMC -lLLVMCore -lLLVMSupport -lLLVMSystem
 INCLUDES=-I./$(SRC) -I./$(SRC)/parser -I./$(BUILD_DIR) -I/opt/local/include
 RM=rm
-OBJECTS=$(BUILD_DIR)/main.o $(BUILD_DIR)/node_builder.o $(BUILD_DIR)/codegen.o $(BUILD_DIR)/Grammar.tab.o $(BUILD_DIR)/Tokens.o
+OBJECTS=$(BUILD_DIR)/main.o $(BUILD_DIR)/node_builder.o $(BUILD_DIR)/codegen.o $(BUILD_DIR)/Grammar.tab.o $(BUILD_DIR)/Tokens.o $(BUILD_DIR)/node.o
 
 all: nqp-rx
 
@@ -29,6 +29,9 @@ $(BUILD_DIR)/Node_builder.o: $(SRC)/Node_builder.cpp
 	$(CXX) $(INCLUDES) $(CXXFLAGS) -c -o $@ $^
 
 $(BUILD_DIR)/codegen.o: $(SRC)/Codegen.cpp
+	$(CXX) $(INCLUDES) $(CXXFLAGS) -c -o $@ $^
+
+$(BUILD_DIR)/node.o: $(SRC)/Node.cpp
 	$(CXX) $(INCLUDES) $(CXXFLAGS) -c -o $@ $^
 
 $(SRC)/Parser/Grammar.tab.cpp: $(SRC)/Parser/Grammar.yy

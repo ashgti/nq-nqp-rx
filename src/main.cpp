@@ -22,6 +22,9 @@ main(int argc, char **argv) {
   parser parser(root);
   parser.parse();
 
+
+  root->print_tree();
+
   CodeGenContext context;
   context.generateCode(*root);
   context.runCode();

@@ -4,6 +4,7 @@
 #include <cstdlib>
 
 using namespace std;
+using namespace nqp;
 
 %}
 
@@ -21,8 +22,9 @@ using namespace std;
   unsigned int token;
   NBlock *block;
   NStatement *stmt;
+  NExpression *expr;
   NVariableDeclaration *var_decl;
-  std::vector<NExpression*> *exprvec;
+  ExpressionList *exprvec;
   NIdentifier *ident;
 }
 
@@ -86,9 +88,10 @@ using namespace std;
 %type <stmt> stmt var_declarator func_declarator regex_declarator infix
 %type <ident> variable
 /* control structures */
-%type <exprvec> args_list
+%type <exprvec> args_list 
+%type <expr> expr
 %type <stmt> stmt_control if_stmt unless_stmt for_stmt while_stmt
-%type <token> comparison
+%type <token> comparison assignment
 
 /* Operator precedence for mathematical operators */
 %left T_PLUS T_MINUS
@@ -102,30 +105,27 @@ extern int yylex(nqp::parser::semantic_type* yylval,
 %}
 
 %initial-action {
- // Filename for locations here
- // @$.begin.filename = @$.end.filename = new std::string("my file");
 }
 %%
 
 prog : stmts { root_node = $1; }
      ;
 
-stmts : stmt { $$ = new NBlock(); $$->statements.push_back($<stmt>1); 
-          cout << "Pusing back another statement\n";
+stmts : stmt { 
+          $$ = new NBlock(); $$->statements.push_back($<stmt>1);
         }
-      | stmts stmt { $1->statements.push_back($<stmt>2);
-          cout << "push back...\n"; 
+      | stmts stmt { 
+          $1->statements.push_back($<stmt>2);
         }
       ;
 
-stmt : var_declarator
+stmt : var_declarator T_SEMICOLON
      | package_declarator { printf("Packages NYI."); }
      | func_declarator { printf("func_decl NYI."); }
      | regex_declarator { printf("regex NYI."); }
      | stmt_control { printf("stmt_contrl NYI."); }
      | T_RETURN expr { printf("Return statement NYI."); }
      | expr { printf("expression\n"); }
-     | T_SEMICOLON { /* noop */ }
      ;
 
 func_ident : T_ID { printf("function ID NYI.\n"); }
@@ -190,8 +190,14 @@ named_param : ':' param_var { }
             ;
 
 
-var_declarator  : T_MY variable { $$ = new NVariableDeclaration(*$2);  }
-                | T_MY variable assignment expr { }
+var_declarator  : T_MY variable { 
+                    $$ = new NVariableDeclaration(*$2); 
+                    printf("New Var %p\n", $$);
+                  }
+                | T_MY variable assignment expr { 
+                  $$ = new NVariableDeclaration(*$2, $3, $4);
+                  cout << "New Variable Declaration\n"; 
+                }
                 ;
 
 variable : T_SIGIL T_ID { }
@@ -254,6 +260,7 @@ stringc : T_STRINGC { }
 
 assignment : T_BIND
            | T_RO_BIND
+           | error
            ;
 
 other_ops : T_SMARTMATCH | T_TRIPLE_EQ | T_EQV | T_NOT | T_REPEATER
