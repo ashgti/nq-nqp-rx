@@ -108,11 +108,15 @@ extern int yylex(nqp::parser::semantic_type* yylval,
 }
 %%
 
-prog : stmts { root_node = $1; }
+prog : stmts { 
+        root_node = $1;
+        cout << "Rootnode set" << $1 << endl;
+      }
      ;
 
 stmts : stmt { 
-          $$ = new NBlock(); $$->statements.push_back($<stmt>1);
+          $$ = new NBlock(); $$->statements.push_back($1);
+          cout << "Added a statement... " << $$->statements.front() << endl;
         }
       | stmts stmt { 
           $1->statements.push_back($<stmt>2);
@@ -200,7 +204,7 @@ var_declarator  : T_MY variable {
                 }
                 ;
 
-variable : T_SIGIL T_ID { }
+variable : T_SIGIL T_ID { $$ = new NIdentifier($1, *$2); delete $2; }
          ;
 
 stmt_control : if_stmt { }

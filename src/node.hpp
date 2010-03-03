@@ -61,9 +61,12 @@ class NStringConstant : public NExpression {
 
 class NIdentifier : public NExpression {
 public:
+    int sigil;
     std::string name;
-    NIdentifier(const std::string& name) : name(name) { }
+    NIdentifier(const int sigil, const std::string& name) : sigil(sigil), name(name) { }
     virtual llvm::Value* codeGen(CodeGenContext& context);
+    virtual void printSelf();
+    virtual std::string str();
 };
 
 class NMethodCall : public NExpression {
@@ -123,7 +126,7 @@ class NBlockReturn : public NStatement {
 
 class MuRef : public NIdentifier {
  public:
-  MuRef() : NIdentifier("Mu") { }
+  MuRef() : NIdentifier(0, "Mu") { }
 };
 
 class NVariableDeclaration : public NStatement {
