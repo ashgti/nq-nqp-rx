@@ -7,21 +7,24 @@ namespace nqp {
 
 namespace Regex {
 
+Cursor::Cursor() {
+  
+}
+
 bool Cursor::compile() {
-  cin.getChar();
+  // cin.getChar();
   return true;
 }
 
 } // end namespace nqp::Regex
 
 // nqp::Grammar
-Grammar::Grammar(const std::istream &in_stream) {
+Grammar::Grammar() {
   cout << "Setting up grammar... \n";
-  istream = in_stream;
 }
 
 void Grammar::compile() {
-  while (!istream.eof()) {
+  while (!cin.eof()) {
   }
 }
 
@@ -29,7 +32,7 @@ void Grammar::compile() {
 
 int main(int argc, char **argv) {
   try {
-    nqp::Grammar *parser = new nqp::Grammar(cin);
+    nqp::Grammar *parser = new nqp::Grammar();
     parser->compile();
   }
   catch (std::exception &e) {

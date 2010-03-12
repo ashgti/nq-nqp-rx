@@ -121,7 +121,7 @@ class Cursor {
   unsigned int from;
   unsigned int pos;
   Regex::Match *match;
-  std::string 
+  // std::string 
   std::string *src;
   bool debug;
   // backtrack stack: bstack;
@@ -166,14 +166,13 @@ class Cursor {
 
 class Grammar {
  public:
-  Grammar(const std::istream&);
+  Grammar();
   ~Grammar();
 
   void compile();
  private:
-  std::istream *istream;
   unsigned int states;
-  Cursor cursor;
+  Regex::Cursor cursor;
 };
 
 class Actions {
