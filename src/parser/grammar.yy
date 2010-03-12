@@ -9,6 +9,7 @@ using namespace nqp;
 %}
 
 %defines
+%glr-parser
 %locations
 %error-verbose
 
@@ -54,7 +55,8 @@ using namespace nqp;
 %token <token> T_SLASH T_BSLASH
 
 /* specials */
-%token <token> T_LAMBDA T_LAMBDA_RW
+/* -> <-> .. */
+%token <token> T_LAMBDA T_LAMBDA_RW T_RANGE
 
 /* some default operators */
 /* 
@@ -128,8 +130,9 @@ stmt : var_declarator T_SEMICOLON
      | func_declarator { printf("func_decl NYI."); }
      | regex_declarator { printf("regex NYI."); }
      | stmt_control { printf("stmt_contrl NYI."); }
-     | T_RETURN expr { printf("Return statement NYI."); }
-     | expr { printf("expression\n"); }
+     | T_RETURN expr T_SEMICOLON { printf("Return statement NYI."); }
+     | expr T_SEMICOLON { printf("expression\n"); }
+     | expr { printf("Last expression, therefor a return-like statement;\n"); }
      ;
 
 func_ident : T_ID { printf("function ID NYI.\n"); }
@@ -240,17 +243,27 @@ xblock : T_LBRACE T_RBRACE { printf("xblock with no contents\n"); }
        ;
 
 expr : variable { }
+     | constants { }
      | variable infix expr { }
-     | number { }
-     | number infix expr { }
-     | stringc { }
+     | constants infix expr { }
      | methodop { }
      | T_LPAREN expr T_RPAREN {}
      ;
 
+p6regex : T_DIV nibbler T_DIV {  }
+        ;
+
+nibbler : T_STRINGC 
+        ;
+
 number : T_DIGIT { }
        | T_DIGIT T_DOT T_DIGIT { }
        ;
+
+constants : number { }
+          | stringc { }
+          | p6regex 
+          ;
 
 infix : assignment { }
       | comparison { }
@@ -264,10 +277,9 @@ stringc : T_STRINGC { }
 
 assignment : T_BIND
            | T_RO_BIND
-           | error
            ;
 
-other_ops : T_SMARTMATCH | T_TRIPLE_EQ | T_EQV | T_NOT | T_REPEATER
+other_ops : T_TRIPLE_EQ | T_EQV | T_NOT | T_REPEATER
           ;
 
 math_ops : T_PLUS | T_MINUS | T_MUL | T_DIV
@@ -279,7 +291,7 @@ string_ops : T_STITCH
 
 comparison : T_CN_EQ | T_CN_NEQ | T_CN_LT | T_CN_GT | T_CN_LTE | T_CN_GTE 
            | T_CN_EQL | T_CS_EQ | T_CS_NEQ | T_CS_LT | T_CS_GT | T_CS_LTE 
-           | T_CS_GTE | T_CS_EQL
+           | T_CS_GTE | T_CS_EQL | T_SMARTMATCH
            ;
 %%
 

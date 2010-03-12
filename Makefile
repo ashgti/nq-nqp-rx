@@ -11,6 +11,11 @@ INCLUDES=-I./$(SRC) -I./$(SRC)/parser -I./$(BUILD_DIR) -I/opt/local/include
 RM=rm
 OBJECTS=$(BUILD_DIR)/main.o $(BUILD_DIR)/node_builder.o $(BUILD_DIR)/codegen.o $(BUILD_DIR)/Grammar.tab.o $(BUILD_DIR)/Tokens.o $(BUILD_DIR)/node.o
 
+src/Regex.cpp: src/Regex.hpp
+
+regex: src/Regex.cpp
+	$(CXX) -o regex src/Regex.cpp -Isrc $(CXXFLAGS)
+
 all: nqp-rx
 
 # $(BUILD_DIR)/builtins.o: $(SRC)/builtin/%.cpp

@@ -51,6 +51,9 @@ REGEX           \{(\\.|)*\}
 "/"               return TOKEN(token::T_DIV);
 "%"               return TOKEN(token::T_MOD);
 
+"~"               return TOKEN(token::T_STITCH);
+"~~"              return TOKEN(token::T_SMARTMATCH);
+
 "return"          return TOKEN(token::T_RETURN);
 
 "my"              return TOKEN(token::T_MY);
