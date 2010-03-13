@@ -20,11 +20,16 @@ bool Cursor::compile() {
 
 // nqp::Grammar
 Grammar::Grammar() {
-  cout << "Setting up grammar... \n";
+  cout << "Reading Grammar... \n";
 }
 
 void Grammar::compile() {
   while (!cin.eof()) {
+    string ;
+    cin >> stuff;
+    if (stuff != "") {
+      cout << "Got something " << endl;
+    }
   }
 }
 
