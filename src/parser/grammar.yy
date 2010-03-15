@@ -250,7 +250,7 @@ expr : variable { }
      | T_LPAREN expr T_RPAREN {}
      ;
 
-p6regex : T_DIV nibbler T_DIV {  }
+p6regex : '/' nibbler '/' {  }
         ;
 
 nibbler : T_STRINGC 

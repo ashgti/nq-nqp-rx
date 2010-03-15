@@ -1,0 +1,16 @@
+
+start with a bootstrap
+
+the bootstrap needs to be able to read regular expressions? 
+
+the bootstrap needs to be able to translate regular expressions into llvm-ir code
+
+the bootstrap needs basic function, enough for actions. 
+* translation of actions into llvm-ir is needed too
+
+parser
+* needs to be able to parse a grammar
+* parse classes
+* parse basic stuff, variables + control flow
+* parse functions + methods
+

@@ -1,7 +1,7 @@
 #include <iostream>
 #include "Node.hpp"
 #include "Codegen.hpp"
-#include "parser/grammar.tab.hpp"
+#include "Parser/Grammar.hpp"
 
 using namespace std;
 using namespace nqp;

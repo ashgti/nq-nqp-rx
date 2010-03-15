@@ -2,7 +2,7 @@
 %{
 #include <string>
 #include "Node.hpp"
-#include "parser/grammar.tab.hpp"
+#include "Parser/Grammar.hpp"
 
 #define YY_DECL int yylex(nqp::parser::semantic_type *yylval, \
   nqp::parser::location_type *yylloc)
