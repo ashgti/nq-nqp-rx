@@ -1,6 +1,12 @@
 junk/*
+CMakeCache.txt
+CMakeFiles/*
+Makefile
+Makefile.bak
 nqp-rx
+nq-nqp
 *.DS_Store
+cmake_install.cmake
 src/parser/grammar.output
 src/parser/grammar.tab.cpp
 src/parser/grammar.tab.hpp
