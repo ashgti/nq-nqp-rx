@@ -25,11 +25,11 @@ link_directories(${LLVM_LIB_DIR})
 include_directories(src/Parser src ${LLVM_INCLUDE_DIR})
 
 SET(CMAKE_CXX_FLAGS ${LLVM_COMPILE_FLAGS})
-SET(CMAKE_SHARED_LINKER_FLAGS ${LLVM_LDFLAGS})
+# SET(CMAKE_SHARED_LINKER_FLAGS ${LLVM_LDFLAGS})
 
 add_executable(nq-nqp src/main.cpp src/Node.cpp src/Codegen.cpp src/Node_Builder.cpp ${BISON_NQPParser_OUTPUTS} ${FLEX_NQPScanner_OUTPUTS})
 
-TARGET_LINK_LIBRARIES(nq-nqp ${LLVM_LIBS_JIT})
+TARGET_LINK_LIBRARIES(nq-nqp ${LLVM_LIBS_JIT} ${LLVM_LDFLAGS})
 
 add_test(junk nq-nqp "t/simple.nqp")
 

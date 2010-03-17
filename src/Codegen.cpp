@@ -1,6 +1,7 @@
 #include "Node.hpp"
 #include "Codegen.hpp"
 #include "Parser/Grammar.hpp"
+#include <typeinfo>
 
 typedef nqp::parser::token token;
 using namespace std;
