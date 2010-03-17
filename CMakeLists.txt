@@ -12,6 +12,8 @@ set(LLVM_MIN_VERSION       "2006000")
 
 Find_Package(LLVM REQUIRED)
 
+ENABLE_TESTING()
+
 find_package(BISON)
 find_package(FLEX)
 
@@ -29,5 +31,5 @@ add_executable(nq-nqp src/main.cpp src/Node.cpp src/Codegen.cpp src/Node_Builder
 
 TARGET_LINK_LIBRARIES(nq-nqp ${LLVM_LIBS_JIT})
 
-
+add_test(junk nq-nqp "t/simple.nqp")
 

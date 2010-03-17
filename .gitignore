@@ -17,4 +17,6 @@ src/parser/tokens.c
 build/*
 *.swp
 *.bak
+Testing/*
+CTestTestfile.cmake
 
