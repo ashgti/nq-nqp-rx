@@ -3,6 +3,7 @@
 #include <string>
 #include "Node.hpp"
 #include "Parser/Grammar.hpp"
+#include "stdio.h"
 
 #define YY_DECL int yylex(nqp::parser::semantic_type *yylval, \
   nqp::parser::location_type *yylloc)
@@ -33,7 +34,9 @@ REGEX           \{(\\.|)*\}
 <comment>{
   [^\n]*          /* ignore comments. */
 }
-<*>"\n"           { yylloc->lines(); /* keep track of newlines properly */ }
+<*>"\n"           { yylloc->lines(); /* keep track of newlines properly */ 
+                    BEGIN(INITIAL);
+                  }
 [0-9]+            { SAVE_TOKEN; return token::T_DIGIT; }
 ";"               return TOKEN(token::T_SEMICOLON);
 "{"               return TOKEN(token::T_LBRACE);
@@ -42,8 +45,9 @@ REGEX           \{(\\.|)*\}
 "("               return TOKEN(token::T_LPAREN);
 ")"               return TOKEN(token::T_RPAREN);
 ","               return TOKEN(token::T_COMMA);
-"="               { printf("Wrong assignment"); return TOKEN(token::T_EQ); }
+"="               return TOKEN(token::T_EQ);
 ":="              return TOKEN(token::T_BIND);
+"::="             return TOKEN(token::T_RO_BIND);
 "=="              return TOKEN(token::T_CN_EQ);
 "!="              return TOKEN(token::T_CN_NEQ);
 "+"               return TOKEN(token::T_PLUS);
@@ -51,8 +55,8 @@ REGEX           \{(\\.|)*\}
 "/"               return TOKEN(token::T_DIV);
 "%"               return TOKEN(token::T_MOD);
 
-"~"               return TOKEN(token::T_STITCH);
 "~~"              return TOKEN(token::T_SMARTMATCH);
+"~"               return TOKEN(token::T_STITCH);
 
 "return"          return TOKEN(token::T_RETURN);
 

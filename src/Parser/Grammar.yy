@@ -1,6 +1,7 @@
 %{
 
 #include "Node.hpp"
+#include <sstream>
 #include <cstdlib>
 
 using namespace std;
@@ -9,31 +10,32 @@ using namespace nqp;
 %}
 
 %defines
-%glr-parser
 %locations
 %error-verbose
 
 %define namespace "nqp"
 
-%parse-param { NBlock * &root_node }
+%parse-param { Block * &root_node }
 /*  %lex-param   { NBLock &ctx } */
 
 %union {
   std::string *string;
   unsigned int token;
-  NBlock *block;
-  NStatement *stmt;
-  NExpression *expr;
-  NVariableDeclaration *var_decl;
+  Block *block;
+  Statement *stmt;
+  Expression *expr;
+  VariableDeclaration *var_decl;
   ExpressionList *exprvec;
-  NIdentifier *ident;
+  Identifier *ident;
 }
 
 /* ID of a var, func, class, etc.  */
 %token <string> T_ID T_DIGIT T_RBLOCK T_STRINGC
 
 /* variable sigil type */
-%token <token> T_SIGIL T_TWIGIL T_SCALAR_SIGIL T_LIST_SIGIL T_HASH_SIGIL T_CODE_SIGIL
+/* %token <token>  T_TWIGIL T_SCALAR_SIGIL T_LIST_SIGIL T_HASH_SIGIL T_CODE_SIGIL */
+
+%token <string> T_SIGIL T_TWIGIL 
 
 /* variable scope identifier my, our, has */
 %token <token> T_MY T_OUR T_HAS
@@ -87,13 +89,13 @@ using namespace nqp;
 %token T_LBRACE T_RBRACE T_LPAREN T_RPAREN T_COMMA T_SEMICOLON T_DOT
 
 %type <block> prog stmts
-%type <stmt> stmt var_declarator func_declarator regex_declarator infix
+%type <stmt> stmt var_declarator func_declarator regex_declarator
 %type <ident> variable
 /* control structures */
 %type <exprvec> args_list 
-%type <expr> expr
+%type <expr> expr number stringc
 %type <stmt> stmt_control if_stmt unless_stmt for_stmt while_stmt
-%type <token> comparison assignment
+%type <token> comparison assignment infix
 
 /* Operator precedence for mathematical operators */
 %left T_PLUS T_MINUS
@@ -112,13 +114,11 @@ extern int yylex(nqp::parser::semantic_type* yylval,
 
 prog : stmts { 
         root_node = $1;
-        cout << "Rootnode set" << $1 << endl;
       }
      ;
 
 stmts : stmt { 
-          $$ = new NBlock(); $$->statements.push_back($1);
-          cout << "Added a statement... " << $$->statements.front() << endl;
+          $$ = new Block(); $$->statements.push_back($1);
         }
       | stmts stmt { 
           $1->statements.push_back($<stmt>2);
@@ -130,13 +130,19 @@ stmt : var_declarator T_SEMICOLON
      | func_declarator { printf("func_decl NYI."); }
      | regex_declarator { printf("regex NYI."); }
      | stmt_control { printf("stmt_contrl NYI."); }
-     | T_RETURN expr T_SEMICOLON { printf("Return statement NYI."); }
-     | expr T_SEMICOLON { printf("expression\n"); }
-     | expr { printf("Last expression, therefor a return-like statement;\n"); }
+     | T_RETURN expr T_SEMICOLON { 
+       $$ = new BlockReturn(*$2); 
+     }
+     | expr T_SEMICOLON {
+       $$ = new ExpressionStatement(*$1);
+     }
+     | expr { 
+       $$ = new BlockReturn(*$1);
+       // Last expression, therefor a return-like statement 
+     }
      ;
 
 func_ident : T_ID { printf("function ID NYI.\n"); }
-           | T_CODE_SIGIL T_ID { printf("func_ident with & NYI."); }
            ;
 
 package_declarator : T_PACKAGE T_ID xblock { } 
@@ -151,19 +157,6 @@ func_declarator  : T_SUB func_ident signature xblock { printf("sub NYI."); }
                  | T_SUBMETHOD func_ident signature xblock { printf("submethod NYI."); }
                  ;
 
-/*
-    [
-    | $<proto>=[proto] [regex|token|rule]
-      <deflongname>
-      '{' '<...>' '}'<?ENDSTMT>
-    | $<sym>=[regex|token|rule]
-      <deflongname>
-      <.newpad>
-      [ '(' <signature> ')' ]?
-      {*} #= open
-      '{'<p6regex=.LANG('Regex','nibbler')>'}'<?ENDSTMT>
-    ]
-*/
 regex_declarator : regex_type_identifier func_ident rblock { printf("Regex needs work... NYI."); }
                  ;
 
@@ -198,16 +191,18 @@ named_param : ':' param_var { }
 
 
 var_declarator  : T_MY variable { 
-                    $$ = new NVariableDeclaration(*$2); 
-                    printf("New Var %p\n", $$);
+                    $$ = new VariableDeclaration(*$2); 
                   }
                 | T_MY variable assignment expr { 
-                  $$ = new NVariableDeclaration(*$2, $3, $4);
-                  cout << "New Variable Declaration\n"; 
+                  $$ = new VariableDeclaration(*$2, $3, $4);
                 }
                 ;
 
-variable : T_SIGIL T_ID { $$ = new NIdentifier($1, *$2); delete $2; }
+variable : T_SIGIL T_ID {
+           $$ = new Identifier(*$1, *$2); 
+           delete $1; 
+           delete $2;
+         }
          ;
 
 stmt_control : if_stmt { }
@@ -242,21 +237,37 @@ xblock : T_LBRACE T_RBRACE { printf("xblock with no contents\n"); }
        | T_LBRACE stmts T_RBRACE { printf("xblock with contents\n"); }
        ;
 
-expr : variable { }
-     | constants { }
-     | variable infix expr { }
-     | constants infix expr { }
+expr : variable assignment expr {
+       $$ = new Assignment(*$<ident>1, $2, *$3);
+     }
+     | variable infix expr {
+       cout << "Basic op? " << endl;
+       $$ = new BasicOp(*$1, $2, *$3);
+     }
+     | constants infix expr {
+       
+     }
      | methodop { }
      | T_LPAREN expr T_RPAREN {}
+     | constants
+     | variable
      ;
 
 p6regex : '/' nibbler '/' {  }
         ;
 
 nibbler : T_STRINGC 
+        | '|' T_STRINGC
         ;
 
-number : T_DIGIT { }
+number : T_DIGIT { 
+         istringstream buffer(*$1);
+         long long val;
+         buffer >> val;
+         cout << "constant " << val;
+         $$ = new IntegerConstant(val);
+         delete $1;
+       }
        | T_DIGIT T_DOT T_DIGIT { }
        ;
 
@@ -265,14 +276,15 @@ constants : number { }
           | p6regex 
           ;
 
-infix : assignment { }
-      | comparison { }
+infix : comparison { }
       | math_ops { }
       | string_ops { }
       | other_ops { }
       ;
 
-stringc : T_STRINGC { }
+stringc : T_STRINGC {
+          $$ = new StringConstant(*$1);
+        }
         ;
 
 assignment : T_BIND
@@ -282,7 +294,9 @@ assignment : T_BIND
 other_ops : T_TRIPLE_EQ | T_EQV | T_NOT | T_REPEATER
           ;
 
-math_ops : T_PLUS | T_MINUS | T_MUL | T_DIV
+math_ops : T_PLUS {
+           cout << "plus" << endl;
+         } | T_MINUS | T_MUL | T_DIV
          ;
 
 string_ops : T_STITCH

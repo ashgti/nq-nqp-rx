@@ -37,7 +37,7 @@ public:
     Module *module;
     CodeGenContext();
 
-    void generateCode(NBlock& root);
+    void generateCode(Block& root);
     GenericValue runCode();
     std::map<std::string , Value*>& locals() { return blocks.top()->locals; }
     BasicBlock *currentBlock() { return blocks.top()->block; }

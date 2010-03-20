@@ -1,3 +1,6 @@
+#ifndef NQP_NODE_H_
+#define NQP_NODE_H_
+
 #include <iostream>
 #include <vector>
 #include <llvm/Value.h>
@@ -5,163 +8,172 @@
 namespace nqp {
 
 class CodeGenContext;
-class NStatement;
-class NExpression;
-class NVariableDeclaration;
+class Statement;
+class Expression;
+class VariableDeclaration;
 
-typedef std::vector<NStatement*> StatementList;
-typedef std::vector<NExpression*> ExpressionList;
-typedef std::vector<NVariableDeclaration*> VariableList;
+typedef std::vector<Statement*> StatementList;
+typedef std::vector<Expression*> ExpressionList;
+typedef std::vector<VariableDeclaration*> VariableList;
 
 class Node {
  public:
   virtual ~Node() {};
   virtual llvm::Value* codeGen(CodeGenContext& context) = 0;
-  virtual void printSelf() = 0;
   virtual std::string str() = 0;
 
-  friend std::ostream& operator<<(std::ostream& out, const Node& node);
+  friend std::ostream& operator<< (std::ostream& o, const Node& b);
 };
 
 }
 
-std::ostream& operator<<(std::ostream& out, const nqp::Node& node);
+inline std::ostream& operator<<(std::ostream& out, const nqp::Node& node);
 
 namespace nqp {
 
-class NExpression : public Node {
+class Expression : public Node {
 };
 
-class NStatement : public Node {
+class Statement : public Node {
 };
 
 /* Integer expressions */
-class NIntegerConstant : public NExpression {
-  public:
-    long long value;
-    NIntegerConstant(long long value) : value(value) { }
-    virtual llvm::Value* codeGen(CodeGenContext& context);
-};
-
-/* Floating point number expressions */
-class NDoubleConstant : public NExpression {
-public:
-    double value;
-    NDoubleConstant(double value) : value(value) { }
-    virtual llvm::Value* codeGen(CodeGenContext& context);
-};
-
-/* Boolean::True and Boolean::False constant values */
-class NBooleanConstant : public NExpression {
-};
-
-/* Constant String Expressions */
-class NStringConstant : public NExpression {
-};
-
-class NIdentifier : public NExpression {
-public:
-    int sigil;
-    std::string name;
-    NIdentifier(const int sigil, const std::string& name) : sigil(sigil), name(name) { }
-    virtual llvm::Value* codeGen(CodeGenContext& context);
-    virtual void printSelf();
-    virtual std::string str();
-};
-
-class NMethodCall : public NExpression {
-public:
-    const NIdentifier& id;
-    ExpressionList arguments;
-    NMethodCall(const NIdentifier& id, ExpressionList& arguments) :
-        id(id), arguments(arguments) { }
-    NMethodCall(const NIdentifier& id) : id(id) { }
-    virtual llvm::Value* codeGen(CodeGenContext& context);
-};
-
-class NBinaryOperator : public NExpression {
-public:
-    int op;
-    NExpression& lhs;
-    NExpression& rhs;
-    NBinaryOperator(NExpression& lhs, int op, NExpression& rhs) :
-        op(op), lhs(lhs), rhs(rhs) {  }
-    virtual llvm::Value* codeGen(CodeGenContext& context);
-};
-
-class NAssignment : public NExpression {
-public:
-    NIdentifier& lhs;
-    NExpression& rhs;
-    NAssignment(NIdentifier& lhs, NExpression& rhs) :
-        lhs(lhs), rhs(rhs) { }
-    virtual llvm::Value* codeGen(CodeGenContext& context);
-};
-
-class NBlock : public NExpression {
+class IntegerConstant : public Expression {
  public:
-  StatementList statements;
-  NBlock() { }
+  long long value;
+  IntegerConstant(long long value) : value(value) { }
   virtual llvm::Value* codeGen(CodeGenContext& context);
-  virtual void printSelf();
-  void print_tree();
   virtual std::string str();
 };
 
-class NExpressionStatement : public NStatement {
-public:
-    NExpression& expression;
-    NExpressionStatement(NExpression& expression) :
-        expression(expression) { }
-    virtual llvm::Value* codeGen(CodeGenContext& context);
-};
-
-class NBlockReturn : public NStatement {
-  public:
-    NExpression& expression;
-    NBlockReturn(NExpression& expression) :
-        expression(expression) { }
-    virtual llvm::Value* codeGen(CodeGenContext& context);
-};
-
-class MuRef : public NIdentifier {
+/* Floating point number expressions */
+class DoubleConstant : public Expression {
  public:
-  MuRef() : NIdentifier(0, "Mu") { }
+  double value;
+  DoubleConstant(double value) : value(value) { }
+  virtual llvm::Value* codeGen(CodeGenContext& context);
+  virtual std::string str();
 };
 
-class NVariableDeclaration : public NStatement {
-public:
-    NIdentifier& id;
-    int assignment;
-    NExpression *assignmentExpr;
-    NVariableDeclaration(NIdentifier& id) :
-        id(id) { }
-    NVariableDeclaration(NIdentifier& id, int assignment_token, NExpression *expr) :
-        id(id), assignment(assignment_token), assignmentExpr(expr) { }
-    virtual llvm::Value* codeGen(CodeGenContext& context);
-    virtual void printSelf();
-    virtual std::string str();
+/* Boolean::True and Boolean::False constant values */
+class BooleanConstant : public Expression {
 };
 
-class NFunctionDeclaration : public NStatement {
-public:
-    // const NIdentifier& type;
-    const NIdentifier& id;
-    VariableList arguments;
-    NBlock& block;
-    NFunctionDeclaration(const NIdentifier& id, NBlock& block) :
-        id(id), block(block) { }
-    NFunctionDeclaration(const NIdentifier& id,
-            const VariableList& arguments, NBlock& block) :
-        id(id), arguments(arguments), block(block) { }
-    virtual llvm::Value* codeGen(CodeGenContext& context);
+/* Constant String Expressions */
+class StringConstant : public Expression {
+ public:
+  std::string value;
+  StringConstant(const std::string& value) : value(value) { }
+  virtual llvm::Value* codeGen(CodeGenContext& context);
+  virtual std::string str();  
 };
 
-class NPackageDeclaration : public NStatement {
+class Identifier : public Expression {
+ public:
+  std::string sigil;
+  std::string name;
+  Identifier(const std::string& sigil, const std::string& name) : sigil(sigil), name(name) { }
+  virtual llvm::Value* codeGen(CodeGenContext& context);
+  virtual std::string str();
 };
 
-class NClassDeclaration : public NPackageDeclaration {
+class MethodCall : public Expression {
+ public:
+  const Identifier& id;
+  ExpressionList arguments;
+  MethodCall(const Identifier& id, ExpressionList& arguments) :
+      id(id), arguments(arguments) { }
+  MethodCall(const Identifier& id) : id(id) { }
+  virtual llvm::Value* codeGen(CodeGenContext& context);
+};
+
+class BasicOp : public Expression {
+ public:
+  Expression& lhs;
+  int op;
+  Expression& rhs;
+  BasicOp(Expression& lhs, int op, Expression& rhs) :
+      lhs(lhs), op(op), rhs(rhs) {  }
+  virtual llvm::Value* codeGen(CodeGenContext& context);
+  virtual std::string str();
+};
+
+class Assignment : public Expression {
+ public:
+  Identifier& lhs;
+  unsigned int type;
+  Expression& rhs;
+  Assignment(Identifier& lhs, unsigned int type, Expression& rhs) :
+    lhs(lhs), type(type), rhs(rhs) { }
+  virtual llvm::Value* codeGen(CodeGenContext& context);
+  virtual std::string str();
+};
+
+class Block : public Expression {
+ public:
+  StatementList statements;
+  Block() { }
+  virtual llvm::Value* codeGen(CodeGenContext& context);
+  virtual std::string str();
+};
+
+class ExpressionStatement : public Statement {
+ public:
+  Expression& expression;
+  ExpressionStatement(Expression& expression) :
+      expression(expression) { }
+  virtual std::string str();
+  virtual llvm::Value* codeGen(CodeGenContext& context);
+};
+
+class BlockReturn : public Statement {
+ public:
+  Expression& expression;
+  BlockReturn(Expression& expression) :
+      expression(expression) { }
+  virtual std::string str();
+  virtual llvm::Value* codeGen(CodeGenContext& context);
+};
+
+class MuRef : public Identifier {
+ public:
+  MuRef() : Identifier(0, "Mu") { }
+};
+
+class VariableDeclaration : public Statement {
+ public:
+  Identifier& id;
+  int assignment;
+  Expression *assignmentExpr;
+  VariableDeclaration(Identifier& id) :
+      id(id) { }
+  VariableDeclaration(Identifier& id, int assignment_token, Expression *expr) :
+      id(id), assignment(assignment_token), assignmentExpr(expr) { }
+  virtual llvm::Value* codeGen(CodeGenContext& context);
+  virtual std::string str();
+};
+
+class FunctionDeclaration : public Statement {
+ public:
+  // const NIdentifier& type;
+  const Identifier& id;
+  VariableList arguments;
+  Block& block;
+  FunctionDeclaration(const Identifier& id, Block& block) :
+      id(id), block(block) { }
+  FunctionDeclaration(const Identifier& id,
+          const VariableList& arguments, Block& block) :
+      id(id), arguments(arguments), block(block) { }
+  virtual llvm::Value* codeGen(CodeGenContext& context);
+  virtual std::string str();
+};
+
+class PackageDeclaration : public Statement {
+};
+
+class ClassDeclaration : public PackageDeclaration {
 };
 
 } // namespace nqp
 
+#endif // NQP_NODE_H_

@@ -4,7 +4,6 @@
 #include "Parser/Grammar.hpp"
 
 using namespace std;
-using namespace nqp;
 
 extern int yyparse();
 extern FILE *yyin;
@@ -18,16 +17,17 @@ main(int argc, char **argv) {
     yyin = stdin;
 
   llvm::InitializeNativeTarget();
-  NBlock *root;
-  parser parser(root);
+  nqp::Block *root;
+  nqp::parser parser(root);
   parser.parse();
 
+  std::cout << "Root:\n\t" << root->str();
 
-  root->print_tree();
-
+  /*
   CodeGenContext context;
   context.generateCode(*root);
   context.runCode();
+  */
 
   return 0;  
 }
