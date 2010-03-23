@@ -60,6 +60,21 @@ REGEX           \{(\\.|)*\}
 
 "return"          return TOKEN(token::T_RETURN);
 
+"if"              return TOKEN(token::T_IF);
+"elsif"           return TOKEN(token::T_ELSIF);
+"else"            return TOKEN(token::T_ELSE);
+"unless"          return TOKEN(token::T_UNLESS);
+"for"             return TOKEN(token::T_FOR);
+"while"           return TOKEN(token::T_WHILE);
+"given"           return TOKEN(token::T_GIVEN);
+"when"            return TOKEN(token::T_WHEN);
+
+"->"              return TOKEN(token::T_LAMBDA);
+"<->"             return TOKEN(token::T_LAMBDA_RW);
+
+"..."             return TOKEN(token::T_ELLIPSES);
+".."              return TOKEN(token::T_RANGE);
+
 "my"              return TOKEN(token::T_MY);
 "our"             return TOKEN(token::T_OUR);
 "has"             return TOKEN(token::T_HAS);
@@ -92,7 +107,6 @@ REGEX           \{(\\.|)*\}
 }
 }
 "rule"            return TOKEN(token::T_RULE);
-"/"               return TOKEN(token::T_SLASH);
 
 "class"           return TOKEN(token::T_CLASS);
 "package"         return TOKEN(token::T_PACKAGE);

@@ -79,6 +79,28 @@ std::string BasicOp::str() {
   return o.str();
 }
 
+std::string MethodCall::str() {
+  std::ostringstream o;
+
+  o << "MethodCall #" << this << " on " << id.str();
+  if (this->obj != NULL) {
+    o << "Obj: " << obj->str();
+  } 
+  if (arguments != NULL) {
+    ExpressionList::iterator it; 
+    if (arguments->size() > 0) {
+      o << "with: " << arguments->size() << " vals: " << std::endl;
+      for (it = arguments->begin(); it != arguments->end(); it++) {
+        o << (*it)->str() << " ";
+      }
+    }
+  }
+
+  o << std::endl;
+
+  return o.str();
+}
+
 std::string Assignment::str() {
   std::ostringstream o;
   o << "<Assignment #" << this << "> " << lhs.str();

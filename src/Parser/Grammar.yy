@@ -57,8 +57,8 @@ using namespace nqp;
 %token <token> T_SLASH T_BSLASH
 
 /* specials */
-/* -> <-> .. */
-%token <token> T_LAMBDA T_LAMBDA_RW T_RANGE
+/* -> <-> .. ... */
+%token <token> T_LAMBDA T_LAMBDA_RW T_RANGE T_ELLIPSES
 
 /* some default operators */
 /* 
@@ -85,16 +85,16 @@ using namespace nqp;
 %token <token> T_STITCH
 
 /* control structure tokens */
-%token <token> T_IF T_ELSE T_UNLESS T_FOR T_WHILE T_RETURN
+%token <token> T_IF T_ELSIF T_ELSE T_UNLESS T_FOR T_WHILE T_RETURN T_GIVEN T_WHEN
 %token T_LBRACE T_RBRACE T_LPAREN T_RPAREN T_COMMA T_SEMICOLON T_DOT
 
 %type <block> prog stmts
 %type <stmt> stmt var_declarator func_declarator regex_declarator
-%type <ident> variable
+%type <ident> variable func_ident
 /* control structures */
 %type <exprvec> args_list 
-%type <expr> expr number stringc
-%type <stmt> stmt_control if_stmt unless_stmt for_stmt while_stmt
+%type <expr> expr number stringc constants methodop
+%type <stmt> stmt_control if_stmt elsif_stmt unless_stmt for_stmt while_stmt
 %type <token> comparison assignment infix
 
 /* Operator precedence for mathematical operators */
@@ -142,7 +142,14 @@ stmt : var_declarator T_SEMICOLON
      }
      ;
 
-func_ident : T_ID { printf("function ID NYI.\n"); }
+func_ident : T_ID {
+             $$ = new Identifier("&", *$1);
+             delete $1;
+           }
+           | '&' T_ID {
+             $$ = new Identifier("&", *$2);
+             delete $2;
+           }
            ;
 
 package_declarator : T_PACKAGE T_ID xblock { } 
@@ -212,7 +219,14 @@ stmt_control : if_stmt { }
              ;
 
 if_stmt : T_IF expr xblock  { }
+        | T_IF expr xblock T_ELSE xblock { }
+        | T_IF expr xblock elsif_stmt { }
+        | T_IF expr xblock elsif_stmt T_ELSE xblock { }
         ;
+
+elsif_stmt : T_ELSIF xblock { }
+           | elsif_stmt T_ELSIF xblock { }
+           ;
 
 unless_stmt : T_UNLESS expr xblock { printf("unless NYI."); }
 
@@ -223,14 +237,24 @@ for_stmt : T_FOR expr xblock { }
 while_stmt : T_WHILE expr xblock { }
            ;
 
-methodop : func_ident T_LPAREN args_list T_RPAREN { }
-         | variable T_DOT func_ident T_LPAREN args_list T_RPAREN { }
+methodop : func_ident T_LPAREN args_list T_RPAREN {
+           $$ = new MethodCall(*$1, $3);
+         }
+         | variable T_DOT func_ident T_LPAREN args_list T_RPAREN {
+           $$ = new MethodCall($1, *$3, $5);
+         }
          | T_ID T_DOT func_ident T_LPAREN args_list T_RPAREN { /* this ones for Class.methods() */ }
          ;
 
-args_list : /* blank args */ {}
-          | expr { }
-          | args_list T_COMMA expr { }
+args_list : /* blank args */ {
+            $$ = new ExpressionList();
+          }
+          | expr {
+            $$ = new ExpressionList(); $$->push_back($1);
+          }
+          | args_list T_COMMA expr {
+            $1->push_back($3);
+          }
           ;
 
 xblock : T_LBRACE T_RBRACE { printf("xblock with no contents\n"); }
@@ -241,13 +265,12 @@ expr : variable assignment expr {
        $$ = new Assignment(*$<ident>1, $2, *$3);
      }
      | variable infix expr {
-       cout << "Basic op? " << endl;
        $$ = new BasicOp(*$1, $2, *$3);
      }
      | constants infix expr {
-       
+       $$ = new BasicOp(*$1, $2, *$3);
      }
-     | methodop { }
+     | methodop 
      | T_LPAREN expr T_RPAREN {}
      | constants
      | variable
@@ -264,7 +287,6 @@ number : T_DIGIT {
          istringstream buffer(*$1);
          long long val;
          buffer >> val;
-         cout << "constant " << val;
          $$ = new IntegerConstant(val);
          delete $1;
        }
@@ -294,9 +316,7 @@ assignment : T_BIND
 other_ops : T_TRIPLE_EQ | T_EQV | T_NOT | T_REPEATER
           ;
 
-math_ops : T_PLUS {
-           cout << "plus" << endl;
-         } | T_MINUS | T_MUL | T_DIV
+math_ops : T_PLUS | T_MINUS | T_MUL | T_DIV
          ;
 
 string_ops : T_STITCH

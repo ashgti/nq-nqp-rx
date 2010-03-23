@@ -79,12 +79,16 @@ class Identifier : public Expression {
 
 class MethodCall : public Expression {
  public:
-  const Identifier& id;
-  ExpressionList arguments;
-  MethodCall(const Identifier& id, ExpressionList& arguments) :
-      id(id), arguments(arguments) { }
-  MethodCall(const Identifier& id) : id(id) { }
+  Identifier* obj;
+  Identifier& id;
+  ExpressionList *arguments;
+  MethodCall(Identifier& id, ExpressionList* arguments) :
+      id(id), arguments(arguments) { obj = NULL; }
+  MethodCall(Identifier& id) : id(id) { }
+  MethodCall(Identifier* obj, Identifier& id, ExpressionList* args) :
+      obj(obj), id(id), arguments(args) { obj = NULL; }
   virtual llvm::Value* codeGen(CodeGenContext& context);
+  virtual std::string str();
 };
 
 class BasicOp : public Expression {

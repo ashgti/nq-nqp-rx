@@ -45,8 +45,8 @@ void CodeGenContext::generateCode(Block& root)
 /* Executes the AST by running the main function */
 GenericValue CodeGenContext::runCode() {
   std::cout << "Running code...\n";
-  ExistingModuleProvider *mp = new ExistingModuleProvider(module);
-  ExecutionEngine *ee = ExecutionEngine::create(mp, false);
+  //ExistingModuleProvider *mp = new ExistingModuleProvider(module);
+  ExecutionEngine *ee = ExecutionEngine::create(module, false);
   vector<GenericValue> noargs;
   GenericValue v = ee->runFunction(mainFunction, noargs);
   std::cout << "Code was run.\n";
@@ -110,7 +110,7 @@ Value* MethodCall::codeGen(CodeGenContext& context)
   }
   std::vector<Value*> args;
   ExpressionList::const_iterator it;
-  for (it = arguments.begin(); it != arguments.end(); it++) {
+  for (it = arguments->begin(); it != arguments->end(); it++) {
     args.push_back((**it).codeGen(context));
   }
   CallInst *call = CallInst::Create(function, args.begin(), args.end(), "", context.currentBlock());
