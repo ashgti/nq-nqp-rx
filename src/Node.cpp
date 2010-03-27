@@ -107,11 +107,11 @@ std::string VariableDeclaration::str() {
 
 std::string ParameterDeclaration::str() {
   std::ostringstream o;
-  o << "<ParameterDeclaration #" << this << "> id: " << var.id.str();
+  o << "<ParameterDeclaration #" << this << "> id: "; // << var.id.str();
 
-  if (var.assignmentExpr != NULL) {
-    o << "\n\t" << var.assignmentExpr->str();
-  }
+//  if (var.assignmentExpr != NULL) {
+//    o << "\n\t" << var.assignmentExpr->str();
+//  }
 
   return o.str();
 }

@@ -1,5 +1,5 @@
-#ifndef NQP_NODE_H_
-#define NQP_NODE_H_
+// #ifndef NQP_NODE_H_
+// #define NQP_NODE_H_
 
 #include <iostream>
 #include <vector>
@@ -163,17 +163,6 @@ class VariableDeclaration : public Statement {
   virtual std::string str();
 };
 
-class ParameterDeclaration : public Statement {
- public:
-  VariableDeclaration& var;
-  bool optional;
-  bool named;
-  bool slurpy;
-  //ParameterDeclaration(VariableDeclaration& var, bool named, bool optional, bool slurpy) : var(var), named(named), optional(optional), slurpy(slurpy) { }
-  virtual llvm::Value* codeGen(CodeGenContext& context);   
-  virtual std::string str();
-};
-
 class FunctionDeclaration : public Statement {
  public:
   // const NIdentifier& type;
@@ -187,6 +176,17 @@ class FunctionDeclaration : public Statement {
   virtual std::string str();
 };
 
+class ParameterDeclaration : public Statement {
+ public:
+  VariableDeclaration& var;
+  bool optional;
+  bool named;
+  bool slurpy;
+  ParameterDeclaration(VariableDeclaration& var) : var(var) { } // , bool named, bool optional, bool slurpy);
+  llvm::Value* codeGen(CodeGenContext& context);   
+  std::string str();
+};
+
 class PackageDeclaration : public Statement {
 };
 
@@ -195,5 +195,5 @@ class ClassDeclaration : public PackageDeclaration {
 
 } // namespace nqp
 
-#endif // NQP_NODE_H_
+// #endif // NQP_NODE_H_
 

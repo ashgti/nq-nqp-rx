@@ -196,20 +196,20 @@ param_list : /* blank */ {
            ;
 
 parameter : param_variable {
-            $$ = new ParameterDeclaration(*$1, false, false, false); 
+            $$ = new ParameterDeclaration(*$1); // , false, false, false); 
           }
           | T_SPLAT param_variable /* slurpy? */ {
-            $$ = new ParameterDeclaration(*$2, false, true, true);
+            $$ = new ParameterDeclaration(*$2); //, false, true, true);
           } 
           | param_variable '?' { 
-            $$ = new ParameterDeclaration(*$1, false, true, false);
+            $$ = new ParameterDeclaration(*$1); //, false, true, false);
           }
           /* | param_var '!' { } not sure if this is needed */
           | named_param {
-            $$ = new ParameterDeclaration(*$1, true, true, false);
+            $$ = new ParameterDeclaration(*$1); //, true, true, false);
           }
           | T_SPLAT named_param {
-            $$ = new ParameterDeclaration(*$2, true, true, false);
+            $$ = new ParameterDeclaration(*$2); // , true, true, false);
           }
           ;
 
