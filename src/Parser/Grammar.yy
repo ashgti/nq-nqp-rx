@@ -133,7 +133,7 @@ stmt : var_declarator T_SEMICOLON
      | package_declarator { printf("Packages NYI."); }
      | func_declarator
      | regex_declarator { printf("regex NYI."); }
-     | stmt_control { printf("stmt_contrl NYI."); }
+     | stmt_control
      | T_RETURN expr T_SEMICOLON { 
        $$ = new BlockReturn(*$2); 
      }
@@ -196,20 +196,17 @@ param_list : /* blank */ {
            ;
 
 parameter : param_variable {
-            $$ = new ParameterDeclaration(*$1); // , false, false, false); 
+            $$ = new ParameterDeclaration(*$1);
           }
-          | T_SPLAT param_variable /* slurpy? */ {
-            $$ = new ParameterDeclaration(*$2); //, false, true, true);
+          | T_MUL param_variable /* slurpy? */ {
+            $$ = new ParameterDeclaration(*$2, false, true, true);
           } 
           | param_variable '?' { 
-            $$ = new ParameterDeclaration(*$1); //, false, true, false);
+            $$ = new ParameterDeclaration(*$1, false, true);
           }
           /* | param_var '!' { } not sure if this is needed */
           | named_param {
-            $$ = new ParameterDeclaration(*$1); //, true, true, false);
-          }
-          | T_SPLAT named_param {
-            $$ = new ParameterDeclaration(*$2); // , true, true, false);
+            $$ = new ParameterDeclaration(*$1, true, true);
           }
           ;
 
@@ -248,6 +245,7 @@ stmt_control : if_stmt
              ;
 
 if_stmt : T_IF expr xblock {
+          $$ = new IfBlock(*$2, *$3); 
         }
         | T_IF expr xblock T_ELSE xblock { }
         | T_IF expr xblock elsif_stmt { }

@@ -52,8 +52,7 @@ REGEX           \{(\\.|)*\}
 "!="              return TOKEN(token::T_CN_NEQ);
 "+"               return TOKEN(token::T_PLUS);
 "*"               return TOKEN(token::T_MUL);
-"/"               return TOKEN(token::T_DIV);
-"%"               return TOKEN(token::T_MOD);
+"/"               return TOKEN(token::T_DIV); // "%"               return TOKEN(token::T_MOD);
 
 "~~"              return TOKEN(token::T_SMARTMATCH);
 "~"               return TOKEN(token::T_STITCH);

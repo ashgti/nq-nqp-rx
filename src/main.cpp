@@ -21,7 +21,7 @@ main(int argc, char **argv) {
   nqp::parser parser(root);
   parser.parse();
 
-  std::cout << "Root:\n\t" << root->str();
+  std::cout << "Root:\n\n" << root->str("");
 
   /*
   CodeGenContext context;

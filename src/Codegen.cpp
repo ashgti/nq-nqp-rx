@@ -187,6 +187,11 @@ Value* VariableDeclaration::codeGen(CodeGenContext& context) {
   return alloc;
 }
 
+Value* ParameterDeclaration::codeGen(CodeGenContext& context) {
+  AllocaInst *alloc;
+  return alloc;
+}
+
 Value* FunctionDeclaration::codeGen(CodeGenContext& context) {
   vector<const Type*> argTypes;
   ParameterList::const_iterator it;
