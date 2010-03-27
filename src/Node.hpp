@@ -11,10 +11,12 @@ class CodeGenContext;
 class Statement;
 class Expression;
 class VariableDeclaration;
+class ParameterDeclaration;
 
 typedef std::vector<Statement*> StatementList;
 typedef std::vector<Expression*> ExpressionList;
 typedef std::vector<VariableDeclaration*> VariableList;
+typedef std::vector<ParameterDeclaration*> ParameterList;
 
 class Node {
  public:
@@ -41,7 +43,7 @@ class Statement : public Node {
 class IntegerConstant : public Expression {
  public:
   long long value;
-  IntegerConstant(long long value) : value(value) { }
+  IntegerConstant(long long value);
   virtual llvm::Value* codeGen(CodeGenContext& context);
   virtual std::string str();
 };
@@ -50,7 +52,7 @@ class IntegerConstant : public Expression {
 class DoubleConstant : public Expression {
  public:
   double value;
-  DoubleConstant(double value) : value(value) { }
+  DoubleConstant(double value);
   virtual llvm::Value* codeGen(CodeGenContext& context);
   virtual std::string str();
 };
@@ -63,7 +65,7 @@ class BooleanConstant : public Expression {
 class StringConstant : public Expression {
  public:
   std::string value;
-  StringConstant(const std::string& value) : value(value) { }
+  StringConstant(const std::string& value);
   virtual llvm::Value* codeGen(CodeGenContext& context);
   virtual std::string str();  
 };
@@ -72,7 +74,7 @@ class Identifier : public Expression {
  public:
   std::string sigil;
   std::string name;
-  Identifier(const std::string& sigil, const std::string& name) : sigil(sigil), name(name) { }
+  Identifier(const std::string& sigil, const std::string& name);
   virtual llvm::Value* codeGen(CodeGenContext& context);
   virtual std::string str();
 };
@@ -82,11 +84,9 @@ class MethodCall : public Expression {
   Identifier* obj;
   Identifier& id;
   ExpressionList *arguments;
-  MethodCall(Identifier& id, ExpressionList* arguments) :
-      id(id), arguments(arguments) { obj = NULL; }
-  MethodCall(Identifier& id) : id(id) { }
-  MethodCall(Identifier* obj, Identifier& id, ExpressionList* args) :
-      obj(obj), id(id), arguments(args) { obj = NULL; }
+  MethodCall(Identifier& id);
+  MethodCall(Identifier& id, ExpressionList* arguments);
+  MethodCall(Identifier* obj, Identifier& id, ExpressionList* args);
   virtual llvm::Value* codeGen(CodeGenContext& context);
   virtual std::string str();
 };
@@ -96,8 +96,7 @@ class BasicOp : public Expression {
   Expression& lhs;
   int op;
   Expression& rhs;
-  BasicOp(Expression& lhs, int op, Expression& rhs) :
-      lhs(lhs), op(op), rhs(rhs) {  }
+  BasicOp(Expression& lhs, int op, Expression& rhs);
   virtual llvm::Value* codeGen(CodeGenContext& context);
   virtual std::string str();
 };
@@ -107,8 +106,7 @@ class Assignment : public Expression {
   Identifier& lhs;
   unsigned int type;
   Expression& rhs;
-  Assignment(Identifier& lhs, unsigned int type, Expression& rhs) :
-    lhs(lhs), type(type), rhs(rhs) { }
+  Assignment(Identifier& lhs, unsigned int type, Expression& rhs);
   virtual llvm::Value* codeGen(CodeGenContext& context);
   virtual std::string str();
 };
@@ -116,7 +114,7 @@ class Assignment : public Expression {
 class Block : public Expression {
  public:
   StatementList statements;
-  Block() { }
+  Block();
   virtual llvm::Value* codeGen(CodeGenContext& context);
   virtual std::string str();
 };
@@ -124,50 +122,67 @@ class Block : public Expression {
 class ExpressionStatement : public Statement {
  public:
   Expression& expression;
-  ExpressionStatement(Expression& expression) :
-      expression(expression) { }
+  ExpressionStatement(Expression& expression);
   virtual std::string str();
   virtual llvm::Value* codeGen(CodeGenContext& context);
 };
+
+class IfBlock : public Statement {
+ public:
+  Expression& expression;
+  Block& true_block;
+  IfBlock(Expression& expression, Block& true_block);
+  virtual std::string str();
+  virtual llvm::Value* codeGen(CodeGenContext& context);
+};
+
 
 class BlockReturn : public Statement {
  public:
   Expression& expression;
-  BlockReturn(Expression& expression) :
-      expression(expression) { }
+  BlockReturn(Expression& expression);
   virtual std::string str();
   virtual llvm::Value* codeGen(CodeGenContext& context);
 };
 
+/* 
 class MuRef : public Identifier {
  public:
   MuRef() : Identifier(0, "Mu") { }
 };
+*/
 
 class VariableDeclaration : public Statement {
  public:
   Identifier& id;
   int assignment;
   Expression *assignmentExpr;
-  VariableDeclaration(Identifier& id) :
-      id(id) { }
-  VariableDeclaration(Identifier& id, int assignment_token, Expression *expr) :
-      id(id), assignment(assignment_token), assignmentExpr(expr) { }
+  VariableDeclaration(Identifier& id);
+  VariableDeclaration(Identifier& id, int assignment_token, Expression *expr);
   virtual llvm::Value* codeGen(CodeGenContext& context);
+  virtual std::string str();
+};
+
+class ParameterDeclaration : public Statement {
+ public:
+  VariableDeclaration& var;
+  bool optional;
+  bool named;
+  bool slurpy;
+  //ParameterDeclaration(VariableDeclaration& var, bool named, bool optional, bool slurpy) : var(var), named(named), optional(optional), slurpy(slurpy) { }
+  virtual llvm::Value* codeGen(CodeGenContext& context);   
   virtual std::string str();
 };
 
 class FunctionDeclaration : public Statement {
  public:
   // const NIdentifier& type;
-  const Identifier& id;
-  VariableList arguments;
+  Identifier& id;
+  ParameterList arguments;
   Block& block;
-  FunctionDeclaration(const Identifier& id, Block& block) :
-      id(id), block(block) { }
-  FunctionDeclaration(const Identifier& id,
-          const VariableList& arguments, Block& block) :
-      id(id), arguments(arguments), block(block) { }
+  FunctionDeclaration(Identifier& id, 
+                      ParameterList& arguments, 
+                      Block& block);
   virtual llvm::Value* codeGen(CodeGenContext& context);
   virtual std::string str();
 };
@@ -181,3 +196,4 @@ class ClassDeclaration : public PackageDeclaration {
 } // namespace nqp
 
 #endif // NQP_NODE_H_
+

@@ -189,7 +189,7 @@ Value* VariableDeclaration::codeGen(CodeGenContext& context) {
 
 Value* FunctionDeclaration::codeGen(CodeGenContext& context) {
   vector<const Type*> argTypes;
-  VariableList::const_iterator it;
+  ParameterList::const_iterator it;
   for (it = arguments.begin(); it != arguments.end(); it++) {
     //argTypes.push_back(typeOf((**it).type));
   }
@@ -210,5 +210,10 @@ Value* FunctionDeclaration::codeGen(CodeGenContext& context) {
   std::cout << "Creating function: " << id.name << endl;
   return function;
 }
+
+Value* IfBlock::codeGen(CodeGenContext& context) {
+  return NULL;
+}
+
 
 } /* end namespace nqp */ 

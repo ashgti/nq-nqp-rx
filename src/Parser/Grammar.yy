@@ -25,6 +25,8 @@ using namespace nqp;
   Statement *stmt;
   Expression *expr;
   VariableDeclaration *var_decl;
+  ParameterList *param_list;
+  ParameterDeclaration *param_var;
   ExpressionList *exprvec;
   Identifier *ident;
 }
@@ -88,10 +90,12 @@ using namespace nqp;
 %token <token> T_IF T_ELSIF T_ELSE T_UNLESS T_FOR T_WHILE T_RETURN T_GIVEN T_WHEN
 %token T_LBRACE T_RBRACE T_LPAREN T_RPAREN T_COMMA T_SEMICOLON T_DOT
 
-%type <block> prog stmts
+%type <block> prog stmts xblock
 %type <stmt> stmt var_declarator func_declarator regex_declarator
 %type <ident> variable func_ident
-/* control structures */
+%type <param_list> signature param_list
+%type <param_var> parameter
+%type <var_decl> param_variable named_param
 %type <exprvec> args_list 
 %type <expr> expr number stringc constants methodop
 %type <stmt> stmt_control if_stmt elsif_stmt unless_stmt for_stmt while_stmt
@@ -127,7 +131,7 @@ stmts : stmt {
 
 stmt : var_declarator T_SEMICOLON
      | package_declarator { printf("Packages NYI."); }
-     | func_declarator { printf("func_decl NYI."); }
+     | func_declarator
      | regex_declarator { printf("regex NYI."); }
      | stmt_control { printf("stmt_contrl NYI."); }
      | T_RETURN expr T_SEMICOLON { 
@@ -136,10 +140,10 @@ stmt : var_declarator T_SEMICOLON
      | expr T_SEMICOLON {
        $$ = new ExpressionStatement(*$1);
      }
-     | expr { 
+/*     | expr { 
        $$ = new BlockReturn(*$1);
        // Last expression, therefor a return-like statement 
-     }
+     } */
      ;
 
 func_ident : T_ID {
@@ -159,7 +163,9 @@ package_declarator : T_PACKAGE T_ID xblock { }
                    | T_ROLE T_ID xblock { }
                    ;
 
-func_declarator  : T_SUB func_ident signature xblock { printf("sub NYI."); }
+func_declarator  : T_SUB func_ident signature xblock { 
+                   $$ = new FunctionDeclaration(*$2, *$3, *$4); 
+                 }
                  | T_METHOD func_ident signature xblock { printf("method NYI."); }
                  | T_SUBMETHOD func_ident signature xblock { printf("submethod NYI."); }
                  ;
@@ -174,26 +180,48 @@ rblock : T_LBRACE '<...>' T_RBRACE { }
        | T_LBRACE T_RBLOCK T_RBRACE { printf("Got a regex block %s\n", $<string>2->c_str()); }
        ;
 
-signature : T_LPAREN param_list T_RPAREN { printf("signature NYI."); }
+signature : T_LPAREN param_list T_RPAREN { $$ = $2; }
           ;
 
-param_list : /* blank */
-           | parameter { printf("param_list NYI."); }
-           | param_list T_COMMA parameter { printf("param_list NYI."); }
+param_list : /* blank */ {
+             $$ = new ParameterList();
+           }
+           | parameter {
+             $$ = new ParameterList(); 
+             $$->push_back($1);
+           }
+           | param_list T_COMMA parameter {
+             $1->push_back($3);
+           }
            ;
 
-parameter : param_var { }
-          | T_SPLAT param_var /* slurpy? */ { } 
-          | param_var '?' { }
+parameter : param_variable {
+            $$ = new ParameterDeclaration(*$1, false, false, false); 
+          }
+          | T_SPLAT param_variable /* slurpy? */ {
+            $$ = new ParameterDeclaration(*$2, false, true, true);
+          } 
+          | param_variable '?' { 
+            $$ = new ParameterDeclaration(*$1, false, true, false);
+          }
           /* | param_var '!' { } not sure if this is needed */
-          | named_param { }
-          | T_SPLAT named_param { }
+          | named_param {
+            $$ = new ParameterDeclaration(*$1, true, true, false);
+          }
+          | T_SPLAT named_param {
+            $$ = new ParameterDeclaration(*$2, true, true, false);
+          }
           ;
 
-param_var : variable { }
-          ;
+param_variable : variable { 
+                 $$ = new VariableDeclaration(*$1); 
+               }
+               | variable assignment expr {
+                 $$ = new VariableDeclaration(*$1, $2, $3);
+               }
+               ;
 
-named_param : ':' param_var { }
+named_param : ':' param_variable { $$ = $2; }
             ;
 
 
@@ -212,13 +240,15 @@ variable : T_SIGIL T_ID {
          }
          ;
 
-stmt_control : if_stmt { }
-             | unless_stmt { }
-             | for_stmt { }
-             | while_stmt { }
+stmt_control : if_stmt
+             | unless_stmt
+             | for_stmt
+             | for_inline_stmt
+             | while_stmt
              ;
 
-if_stmt : T_IF expr xblock  { }
+if_stmt : T_IF expr xblock {
+        }
         | T_IF expr xblock T_ELSE xblock { }
         | T_IF expr xblock elsif_stmt { }
         | T_IF expr xblock elsif_stmt T_ELSE xblock { }
@@ -230,11 +260,17 @@ elsif_stmt : T_ELSIF xblock { }
 
 unless_stmt : T_UNLESS expr xblock { printf("unless NYI."); }
 
-for_stmt : T_FOR expr xblock { }
-        /* | expr T_FOR expr {} */
+for_stmt : T_FOR expr xblock {
+         }
          ;
 
-while_stmt : T_WHILE expr xblock { }
+for_inline_stmt : expr T_FOR expr T_SEMICOLON {
+                  /* */
+                }
+                ;
+
+while_stmt : T_WHILE expr xblock {
+           }
            ;
 
 methodop : func_ident T_LPAREN args_list T_RPAREN {
@@ -243,7 +279,9 @@ methodop : func_ident T_LPAREN args_list T_RPAREN {
          | variable T_DOT func_ident T_LPAREN args_list T_RPAREN {
            $$ = new MethodCall($1, *$3, $5);
          }
-         | T_ID T_DOT func_ident T_LPAREN args_list T_RPAREN { /* this ones for Class.methods() */ }
+         | T_ID T_DOT func_ident T_LPAREN args_list T_RPAREN { 
+           /* this ones for Class.methods() */ 
+         }
          ;
 
 args_list : /* blank args */ {
@@ -257,8 +295,12 @@ args_list : /* blank args */ {
           }
           ;
 
-xblock : T_LBRACE T_RBRACE { printf("xblock with no contents\n"); }
-       | T_LBRACE stmts T_RBRACE { printf("xblock with contents\n"); }
+xblock : T_LBRACE T_RBRACE {
+         $$ = new Block();
+       }
+       | T_LBRACE stmts T_RBRACE { 
+         $$ = $2;
+       }
        ;
 
 expr : variable assignment expr {
