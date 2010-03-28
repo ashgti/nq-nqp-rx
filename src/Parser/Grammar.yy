@@ -3,6 +3,7 @@
 #include "Node.hpp"
 #include <sstream>
 #include <cstdlib>
+#include <cstrio>
 
 using namespace std;
 using namespace nqp;
