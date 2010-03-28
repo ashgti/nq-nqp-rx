@@ -34,6 +34,8 @@ inline std::ostream& operator<<(std::ostream& out, const nqp::Node& node);
 namespace nqp {
 
 class Expression : public Node {
+ public:
+  ExpressionList compound_expr;
 };
 
 class Statement : public Node {

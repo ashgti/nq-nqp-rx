@@ -100,7 +100,7 @@ std::string Block::str(std::string prefix) {
     o << (*it)->str(prefix + "\t") << "\n";
   }
 
-  o << prefix << "</Block>\n";
+  o << prefix << "</Block>";
 
   return o.str();
 }
@@ -112,6 +112,7 @@ std::string VariableDeclaration::str(std::string prefix) {
 
   if (assignmentExpr != NULL) {
     o << prefix << "\t<Expr>\n";
+    o << prefix << "length: " << assignmentExpr->compound_expr.size() << "\n";
     o << assignmentExpr->str(prefix+"\t\t") << "\n";
     o << prefix << "\t</Expr>\n";
   }
@@ -148,6 +149,7 @@ std::string ParameterDeclaration::str(std::string prefix) {
 
 std::string IntegerConstant::str(std::string prefix) {
   std::ostringstream o;
+  
   o << prefix << "<IntegerConstant ptr=\"" << this << "\">\n";
   o << prefix << "\t<value>" << value << "</value>\n";
   o << prefix << "</IntegerConstant>";
@@ -171,8 +173,9 @@ std::string StringConstant::str(std::string prefix) {
 
 std::string ExpressionStatement::str(std::string prefix) {
   std::ostringstream o;
-  o << "<ExpressionStatement #" << this << "> Expression:";
-  o << "\t" << expression.str() << std::endl;
+  o << prefix << "<ExpressionStatement ptr=\"" << this << "\">\n";
+  o << expression.str(prefix + "\t") << "\n";
+  o << prefix << "</ExpressionStatement>";
 
   return o.str();
 }
@@ -221,17 +224,27 @@ std::string MethodCall::str(std::string prefix) {
 
 std::string Assignment::str(std::string prefix) {
   std::ostringstream o;
-  o << "<Assignment #" << this << "> " << lhs.str();
-  o << "\n\ttype: "; 
+  o << prefix << "<Assignment ptr=\"" << this << "\">\n";
+  o << prefix << "\t<lhs>\n";
+  o << lhs.str(prefix + "\t\t") << "\n";
+  o << prefix << "\t</lhs>\n";
+  o << prefix << "\t<type>"; 
   // this is bad but the following values are copied out of the 
   //      T_BIND = 268,
   //      T_RO_BIND = 269,
-  if (type == 268) {
-    o << ":=";
-  } else if (type == 269) {
-    o << "::= ";
+  switch(type) {
+    case 268:
+      o << ":=";
+      break;
+    case 269:
+      o << "::=";
+      break;
   }
-  o << "\n\texp: " << rhs.str();
+  o << "</type>\n";
+  o << prefix << "\t<expr>\n";
+  o << rhs.str(prefix + "\t\t") << "\n";
+  o << prefix << "\t</expr>\n";
+  o << prefix << "</Assignment>";
   return o.str();
 }
 

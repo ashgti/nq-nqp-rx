@@ -97,7 +97,7 @@ using namespace nqp;
 %type <param_var> parameter
 %type <var_decl> param_variable named_param
 %type <exprvec> args_list 
-%type <expr> expr number stringc constants methodop
+%type <expr> expr_list expr number stringc constants methodop
 %type <stmt> stmt_control if_stmt elsif_stmt unless_stmt for_stmt while_stmt
 %type <token> comparison assignment infix
 
@@ -134,10 +134,10 @@ stmt : var_declarator T_SEMICOLON
      | func_declarator
      | regex_declarator { printf("regex NYI."); }
      | stmt_control
-     | T_RETURN expr T_SEMICOLON { 
+     | T_RETURN expr_list T_SEMICOLON { 
        $$ = new BlockReturn(*$2); 
      }
-     | expr T_SEMICOLON {
+     | expr_list T_SEMICOLON {
        $$ = new ExpressionStatement(*$1);
      }
 /*     | expr { 
@@ -225,7 +225,7 @@ named_param : ':' param_variable { $$ = $2; }
 var_declarator  : T_MY variable { 
                     $$ = new VariableDeclaration(*$2); 
                   }
-                | T_MY variable assignment expr { 
+                | T_MY variable assignment expr_list { 
                   $$ = new VariableDeclaration(*$2, $3, $4);
                 }
                 ;
@@ -244,30 +244,30 @@ stmt_control : if_stmt
              | while_stmt
              ;
 
-if_stmt : T_IF expr xblock {
+if_stmt : T_IF expr_list xblock {
           $$ = new IfBlock(*$2, *$3); 
         }
-        | T_IF expr xblock T_ELSE xblock { }
-        | T_IF expr xblock elsif_stmt { }
-        | T_IF expr xblock elsif_stmt T_ELSE xblock { }
+        | T_IF expr_list xblock T_ELSE xblock { }
+        | T_IF expr_list xblock elsif_stmt { }
+        | T_IF expr_list xblock elsif_stmt T_ELSE xblock { }
         ;
 
 elsif_stmt : T_ELSIF xblock { }
            | elsif_stmt T_ELSIF xblock { }
            ;
 
-unless_stmt : T_UNLESS expr xblock { printf("unless NYI."); }
+unless_stmt : T_UNLESS expr_list xblock { printf("unless NYI."); }
 
-for_stmt : T_FOR expr xblock {
+for_stmt : T_FOR expr_list xblock {
          }
          ;
 
-for_inline_stmt : expr T_FOR expr T_SEMICOLON {
+for_inline_stmt : expr_list T_FOR expr_list T_SEMICOLON {
                   /* */
                 }
                 ;
 
-while_stmt : T_WHILE expr xblock {
+while_stmt : T_WHILE expr_list xblock {
            }
            ;
 
@@ -300,6 +300,12 @@ xblock : T_LBRACE T_RBRACE {
          $$ = $2;
        }
        ;
+
+expr_list : expr 
+          | expr_list T_COMMA expr {
+            $1->compound_expr.push_back($3);
+          }
+          ;
 
 expr : variable assignment expr {
        $$ = new Assignment(*$<ident>1, $2, *$3);
@@ -349,7 +355,8 @@ stringc : T_STRINGC {
         }
         ;
 
-assignment : T_BIND
+assignment : T_EQ
+           | T_BIND
            | T_RO_BIND
            ;
 

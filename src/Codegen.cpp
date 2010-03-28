@@ -8,9 +8,8 @@ using namespace std;
 
 namespace nqp {
 
-CodeGenContext::CodeGenContext() { 
-  LLVMContext &Context = getGlobalContext();
-  module = new Module("main", Context); 
+CodeGenContext::CodeGenContext(LLVMContext &context) : context(context) { 
+  module = new Module(StringRef("main"), context); 
 }
 
 /* Compile the AST into a module */

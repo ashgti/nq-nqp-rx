@@ -21,13 +21,11 @@ main(int argc, char **argv) {
   nqp::parser parser(root);
   parser.parse();
 
-  std::cout << "Root:\n\n" << root->str("");
-
-  /*
-  CodeGenContext context;
+  std::cout << "Root:\n\n" << root->str("") << "\n";
+  
+  nqp::CodeGenContext context(getGlobalContext());
   context.generateCode(*root);
   context.runCode();
-  */
 
   return 0;  
 }
