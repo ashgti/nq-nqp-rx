@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstdio>
 #include "Node.hpp"
 #include "Codegen.hpp"
 #include "Parser/Grammar.hpp"

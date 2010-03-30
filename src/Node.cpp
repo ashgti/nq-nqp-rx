@@ -265,7 +265,13 @@ std::string FunctionDeclaration::str(std::string prefix) {
 }
 
 std::string BlockReturn::str(std::string prefix) {
-  return "testing...";
+  std::ostringstream o;
+
+  o << prefix << "<BlockReturn ptr=\"" << this << "\">\n";
+  o << expression.str(prefix + "\t") << "\n"; 
+  o << prefix << "</BlockReturn>";
+
+  return o.str();
 }
 
 std::string IfBlock::str(std::string prefix) {
