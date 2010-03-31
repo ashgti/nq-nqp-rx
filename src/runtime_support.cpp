@@ -57,14 +57,13 @@ class P6opaque {
     properties[attr_name] = attr;
   }
 
-//  const P6opaque& getHOW();
-//  static const P6opaque& getHOW();
+  virtual P6opaque* _bless(_Hash* hash) = 0;
 };
 
 class _Mu : public P6opaque {
- private:
+ protected:
   /* Attributes */
-  static P6opaque* HOW;
+  _Mu* HOW;
   
  public:
   /* Constructors */
@@ -73,46 +72,53 @@ class _Mu : public P6opaque {
   }
 
   /* Some general methods */
-  //bool does(_Role* role);
-  //bool can(_Role* role);
   _Str* Str();
 
   virtual P6opaque* create() {
     return new _Mu();
   }
 
-  static P6opaque* _new(_Hash* args) {
-    P6opaque* candidate = _Mu::_CREATE("P6opaque");
-    return result->_bless(args);
+  static P6opaque* _new(_Hash* args = NULL) {
+    P6opaque* candidate = _Mu::_CREATE("*");
+    return candidate->_bless(args);
   }
 
   virtual P6opaque& get_HOW() {
-    return _Mu::_get_HOW();
+    return *HOW;
   }
 
-  static P6opaque& _get_HOW();
+  virtual void _BUILD();
+  virtual P6opaque* _CREATE() {
 
-  static void _BUILD();
-  static P6opaque* _CREATE() {
-    return new P6opaque();
+    return new _Mu();
   }
 
   static P6opaque* _CREATE(string repr) {
     if ("*" == repr) {
-      return new P6opaque("Mu()");
+      return new _Mu("Mu()");
     }
+    return NULL;
   }
+
+  static P6opaque* _CREATE(_Str* repr);
 
   virtual P6opaque* _bless(_Hash* hash) {
-    //call CREATE
-    _Mu* result = _new();
-    _Hash::iterator it;
-    for (it = _Hash.begin(); it != _Hash.end(); it++) {
-      
-    }
-
+    // BUILDALL
+    return this;
   }
 };
+
+_Mu* _GLOBAL_Mu = new _Mu;
+
+/* do i want a kernel object? 
+class _Kernel : public _Mu {
+ private:
+ public:
+  _Kernel(string name="Kernel()");
+};
+
+_Mu* _GKernel = new _Kernel();
+*/
 
 class _Any : public _Mu {
  public:
@@ -120,6 +126,17 @@ class _Any : public _Mu {
       _Mu(arg) {
   }
 };
+
+_Mu* _GLOBAL_Any = new _Any();
+
+class _Whatever : public _Any {
+ private:
+  _Mu* HOW;
+ public:
+
+};
+
+_Mu* _GLOBAL_Whatever = new _Whatever();
 
 /*
 
@@ -139,25 +156,33 @@ class _Iterable : public _Any {
 };
 */
 
-/* 
-
 class _Str : public _Any {
  private:
-  std::string& value;
+  std::string* value;
+  static _Mu* HOW;
 
  public:
-  _Str() : _Mu("Str()") {
+  _Str(string arg = "Str()") : _Any(arg) {
   }
 
-  _Str(std::string value) : 
-      _Mu("Str()"), value(value) {
+  _Str(string arg = "Str()", std::string value = "Str()") : 
+      _Any(arg), value(new string(value)) {
+  }
+
+  ~_Str() {
+    delete value;
+  }
+
+  static _Str* create(string value) {
+    return new _Str("Str()", value);
   }
 
   string& str() {
-    return value;
+    return *value;
   }
 };
 
+/*
 class _Int : public _Any {
  private:
   long long value;
@@ -194,12 +219,12 @@ class _Grammar : public _Mu {
 };
 */
 
-class _Bool : public _Any {
- private:
-  bool value;
- public:
-
-};
+//class _Bool : public _Any {
+// private:
+//  bool value;
+// public:
+//
+//};
 
 /*
 _Role _Code = _Role::create("Code()",
@@ -237,28 +262,27 @@ class _Hash : _Any {
 _Mu* _say(int num_args, ...) {
   _Mu* val;
   va_list vl;
-  va_start(vl,num_args);
+  va_start(vl, num_args);
   
-  for (i = 0; i < num_args; i++) {
-    cout << val->Str().str();
+  for (int i = 0; i < num_args; i++) {
+    cout << val->Str()->str();
   }
   
   cout << "\n";
 
-  return new Mu;
+  return new _Mu;
 }
 
 int main() {
   try {
-    P6opaque *a = new _Any();
-    P6opaque *instance = a->_new();
-    say(1, instance);
+    P6opaque *instance = _GLOBAL_Any->_new();
+    _say(1, instance);
     //P6opaque *b = a->dispatch(".^methods"); // .^methods should return an Array of methods.
     //cout << b->dispatch(".WHAT"); // .WHAT returns a Str which says "Array()".
     //cout << b;
   }
   catch (MethodNotFoundException e) {
-    cerr << "MethodNotFoundException: " << e.getErr() << endl;
+    cerr << "MethodNotFoundException: " << e.what() << endl;
   }
   catch (...) {
     cerr << "Uncaught exception" << endl;
@@ -268,19 +292,23 @@ int main() {
 }
 
 _Str* _Mu::Str() {
-  return new _Str("Mu()");
+  return _Str::create("Mu()");
 }
 
-P6opague& _Mu::getHOW() {
-  return 
+P6opaque* _Mu::_CREATE(_Str* repr) {
+  return _Mu::_CREATE(repr->str());
 }
 
-static P6opaque& _Mu::_get_HOW() {
-  if (HOW == NULL) {
-    HOW = new _ClassHOW();
-  }
 
-  return *HOW;
-}
+//P6opaque& _Mu::getHOW() {
+//}
+
+// P6opaque& _Mu::_get_HOW() {
+//  if (HOW == NULL) {
+//    HOW = new _ClassHOW();
+//  }
+//
+//  return *HOW;
+//}
 
 
