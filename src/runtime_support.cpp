@@ -4,15 +4,16 @@
 #include <map>
 #include <cstdarg>
 #include <exception>
+#include <gc_cpp.h>
 
 using namespace std;
 
-class MethodNotFoundException { //: public exception {
+class MethodNotFoundException : public gc_cleanup, public exception {
  private:
   string arg;
  public:
   MethodNotFoundException(string arg = "") : arg(arg) { }
-  ~MethodNotFoundException() { }
+  ~MethodNotFoundException() throw() { }
   virtual const char* what() const throw() {
     return (string("abc ") + arg).c_str();
   }
@@ -20,23 +21,29 @@ class MethodNotFoundException { //: public exception {
 
 class _Stash;
 
-class Kernel {
+class Kernel : public gc_cleanup {
  private: 
   static Kernel _instance;
   stack<_Stash> lex_pads;
+  Kernel() { }
+  ~Kernel() { }
+
+  Kernel(const Kernel&);                 // Prevent copy-construction
+  Kernel& operator=(const Kernel&);      // Prevent assignment
+
  public:
   static const _Stash& getCurrent();
 
-}
+};
 
-static Kernel Kernel::_instance;
+Kernel Kernel::_instance;
 
 class _Str;
 class _Role;
 class _ClassHOW;
 class _Hash;
 
-class P6opaque {
+class P6opaque : public gc_cleanup {
  private:
 
  protected:
@@ -72,6 +79,7 @@ class P6opaque {
 
   virtual P6opaque* _bless(_Hash* hash) = 0;
 };
+
 
 class _Mu : public P6opaque {
  protected:
@@ -120,14 +128,34 @@ class _Mu : public P6opaque {
   virtual P6opaque* _bless(_Hash* hash); 
 };
 
-//_Mu* _GLOBAL_Mu = new _Mu;
+
+class _Scalar : public _Mu {
+ private:
+  string id;
+  P6opaque* constraint_type;
+  P6opaque* value;
+
+ public:
+  _Scalar(string id, P6opaque* constraint_type, string name="Scalar()") : 
+      _Mu(name), id(id), constraint_type(constraint_type) { }
+
+  bool assign(P6opaque* new_value) {
+    // if (new_value of type constraint_type) {
+      value = new_value;
+    // }
+    // else {
+    //   die("Type check failed for assignment");x
+    // }
+  }
+};
+
 
 class _Stash : public _Mu {
  private:
   map<string, P6opaque*> values;
  public:
   _Stash(string name="Stash()") : _Mu(name) { }
-  P6opaque* operator ()(const std::string& s) {
+  P6opaque* get_val(const std::string& s) {
 //    OUTER::
 //    !file
 //    !line
@@ -142,8 +170,31 @@ class _Stash : public _Mu {
     return result;
   }
 
+  P6opaque* operator() (const std::string& s) {
+    return this->get_val(s);
+  }
+
   void insert(pair<string, P6opaque*> arg) {
     this->set_attr(arg.first, arg.second);
+  }
+
+  P6opaque* get(string name, P6opaque* constraint) {
+    P6opaque* result;
+    switch (name[0]) {
+      case '$':
+        result = new _Scalar(name, constraint);
+        break;
+      case '@':
+        break;
+      case '%':
+        break;
+      case '&':
+        break;
+      default:
+        throw "Bad variable name : "  + name;
+    }
+
+    return result;
   }
 };
 
@@ -197,29 +248,28 @@ class _Str : public _Any {
     }
   }
 
-//  static _Str* create(string value) {
-//    return new _Str("Str()", value);
-//  }
+  static _Str* create(string value) {
+    return new _Str(value);
+  }
 
   string* str() {
     return value;
   }
 };
 
-/*
+
 class _Int : public _Any {
  private:
   long long value;
 
  public:
-  _Int() :
-      _Mu("Int()") {
+  _Int() : _Any("Int()"), value(0) {
   }
 
   _Int(long long value) : 
-      _Mu("Int()"), value(value) {
+      _Any("Int()"), value(value) {
   }
-}; */
+};
 
 /* 
 class _Num : public _Any {
@@ -319,7 +369,7 @@ _Mu* _say(_Stash* curpad, int num_args, ...) {
   return static_cast<_Mu*>(static_cast<_Mu*>(mu)->_new());
 }
 
-_Stash& settings() {
+_Stash* settings() {
   _Stash* settings = new _Stash; 
 
   P6opaque* glb = new _Mu;
@@ -334,15 +384,18 @@ _Stash& settings() {
   glb->set_attr(".HOW", new _ClassHOW());
   static_cast<_Stash*>(settings)->insert(pair<string, P6opaque*>("Any", glb));
 
-  return *settings;
+  return settings;
 }
 
 int main() {
   try {
-    _Stash &curpad = settings();
-    P6opaque *any = curpad("Any"); 
-    P6opaque *instance = static_cast<_Any*>(any)->_new();
-    _say(&curpad, 1, instance);
+    GC_INIT();  
+    Kernel kernel();
+    _Stash* curpad = settings();
+    _Scalar* a = (_Scalar*)curpad->get("$a", (P6opaque*)curpad->get_val("Any"));
+    _Int* p6int = (_Int*)curpad->get_val("Int");
+    a->assign(p6int->_new(7));
+    //_say(&curpad, 1, instance);
     //P6opaque *b = a->dispatch(".^methods"); // .^methods should return an Array of methods.
     //cout << b->dispatch(".WHAT"); // .WHAT returns a Str which says "Array()".
     //cout << b;
