@@ -2,6 +2,7 @@
 #include <string>
 #include <stack>
 #include <map>
+#include <vectory>
 #include <cstdarg>
 #include <exception>
 #include <gc_cpp.h>
@@ -33,28 +34,55 @@ class Kernel : public gc_cleanup {
 
  public:
   static const _Stash& getCurrent();
-
+  static Kernel &getInstance() {
+    return _instance;
+  }
 };
 
 Kernel Kernel::_instance;
 
+class P6opaque;
 class _Str;
 class _Role;
 class _ClassHOW;
 class _Hash;
 
-class P6opaque : public gc_cleanup {
- private:
+typedef P6opaque* (*MethodPtr)(P6opaque*, ...);
+typedef P6opaque* (*SubMethodPtr)(P6opaque*, ...);
+typedef P6opaque* (*SubPtr)(...);
+typedef P6opaque* (*PhaserPtr)(...);
 
- protected:
+enum sub_type_t {
+  sub = 0,
+  method = 1,
+  submethod = 2,
+  phaser = 3
+};
+
+/* method table */
+struct mt_table {
+  sub_type_t sub_type;
+  union {
+    MethodPtr method;
+    SubMethodPtr submethod;
+    SubPtr sub;
+  };
+  signed int argc;
+};
+
+struct P6opaque : public gc_cleanup {
+  string *klass;  
+  vector<P6opaque*> parents;
   map<string, P6opaque*> properties;
-  const std::string &_class;
+  map<string, mt_table*> method_table;
+};
 
- public:
-  /* Constructors */
+/*
+ *
+  * Constructors * /
   P6opaque(const std::string& _class);
 
-  /* methods */
+  * methods * /
   P6opaque* dispatch(std::string arg) {
     P6opaque* result = properties[arg];
     if (result) {
@@ -78,7 +106,10 @@ class P6opaque : public gc_cleanup {
   }
 
   virtual P6opaque* _bless(_Hash* hash) = 0;
-};
+  */
+
+//_Mu_CREATE(P6opaque*)
+
 
 
 class _Mu : public P6opaque {
@@ -111,6 +142,15 @@ class _Mu : public P6opaque {
   
   }
 
+  virtual P6opaque* dispatch(string function, P6opaque* variables) {
+    //parent::iterator it;
+
+    //for (it=parent.begin(); it != parent.end(); it++) {
+    //  parent.get_attribute()
+    //}
+    return 0;
+  }
+
   virtual P6opaque* _CREATE() {
 
     return new _Mu();
@@ -125,7 +165,10 @@ class _Mu : public P6opaque {
 
   static P6opaque* _CREATE(_Str* repr);
 
-  virtual P6opaque* _bless(_Hash* hash); 
+  virtual P6opaque* _bless(_Hash* hash);
+  virtual P6opaque* _bless() {
+    return this;
+  }
 };
 
 
@@ -144,8 +187,9 @@ class _Scalar : public _Mu {
       value = new_value;
     // }
     // else {
-    //   die("Type check failed for assignment");x
+    //   throw exception ("Type check failed for assignment");
     // }
+    return true;
   }
 };
 
@@ -263,11 +307,17 @@ class _Int : public _Any {
   long long value;
 
  public:
-  _Int() : _Any("Int()"), value(0) {
+  _Int(string name = "Int()") : _Any(name), value(0) {
   }
 
-  _Int(long long value) : 
-      _Any("Int()"), value(value) {
+  _Int(long long value, string name="Int()") : 
+      _Any(name), value(value) {
+  }
+
+  P6opaque* _new(long long value) {
+    _Int* result = new _Int(7);
+    result->_bless();
+    return (P6opaque*)result;
   }
 };
 
@@ -307,8 +357,9 @@ _Role _Code = _Role::create("Code()",
 */
 
 /* role Code */
-/*
+/* 
 class _Code : public _Any {
+
 };
 
 class _Block : public _Any {
@@ -317,20 +368,23 @@ class _Block : public _Any {
 class _Parcel : public _Any {
 };
 
-enum _Routine_t {
-  _Sub,
-  _Method,
-  _Submethod,
-  _Macro,
-};
-
 class _Routine : public _Code {
-
+ public:
+  _Routine(string name="Sub()") : _Code(name) { }
 };
+
+typedef _Routine _Sub;
+typedef _Routine _Method;
+typedef _Routine _Submethod;
+typedef _Routine _Macro;
 
 */
 
-class _Hash : _Any {
+class _Array : public _Any {
+
+};
+
+class _Hash : public _Any {
  private:
   map<string, P6opaque*> values;
 
@@ -347,7 +401,8 @@ class _Hash : _Any {
 };
 
 extern "C"
-_Mu* _say(_Stash* curpad, int num_args, ...) {
+_Mu* _say(int num_args, ...) {
+  _Stash curpad = Kernel::getCurrent();
   va_list vl;
   _Mu* val;
   va_start(vl, num_args);
@@ -365,9 +420,16 @@ _Mu* _say(_Stash* curpad, int num_args, ...) {
   
   cout << "\n";
 
-  P6opaque *mu = (*curpad)("Mu");
+  P6opaque *mu = curpad("Mu");
   return static_cast<_Mu*>(static_cast<_Mu*>(mu)->_new());
 }
+
+extern "C"
+P6opaque* _self_say(P6opaque* self, ...) {
+  cout << "blah " << self << endl;
+  return self;
+}
+
 
 _Stash* settings() {
   _Stash* settings = new _Stash; 
@@ -390,11 +452,27 @@ _Stash* settings() {
 int main() {
   try {
     GC_INIT();  
-    Kernel kernel();
+/* 
+    Kernel kernel;
     _Stash* curpad = settings();
     _Scalar* a = (_Scalar*)curpad->get("$a", (P6opaque*)curpad->get_val("Any"));
     _Int* p6int = (_Int*)curpad->get_val("Int");
-    a->assign(p6int->_new(7));
+    a->assign(p6int->_new(7)); */
+    //_Mu* foo = new _Mu();
+    _Mu foo;
+    cout << "foo is: " << &foo << " " << foo.get_class() << endl;
+    mt_table self_say; 
+    self_say.method = *_self_say;
+    self_say.argc = -1;
+    foo.method_table["say"] = &self_say;
+
+//    self_say.method(foo);
+
+    foo.method_table.find("say")->second->method(&foo);
+
+    cout << "foo: " << foo.get_class() << endl;
+
+//    cout << meth << endl;
     //_say(&curpad, 1, instance);
     //P6opaque *b = a->dispatch(".^methods"); // .^methods should return an Array of methods.
     //cout << b->dispatch(".WHAT"); // .WHAT returns a Str which says "Array()".
@@ -446,6 +524,10 @@ void _Mu::_BUILD() {
 }
 
 
+const _Stash& Kernel::getCurrent() {
+  Kernel &that = getInstance();
+  return that.lex_pads.top();
+}
 
 //P6opaque& _Mu::getHOW() {
 //}
