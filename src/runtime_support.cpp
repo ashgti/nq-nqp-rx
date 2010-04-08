@@ -34,6 +34,9 @@ class Kernel : public gc_cleanup {
 
  public:
   static const _Stash& getCurrent();
+  static Stash* top();
+  static void push();
+  static void pop();
   static Kernel &getInstance() {
     return _instance;
   }
