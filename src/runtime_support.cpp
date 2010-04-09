@@ -6,6 +6,7 @@
 #include <cstdarg>
 #include <exception>
 #include <gc_cpp.h>
+#include <llvm/ADT/StringMap.h>
 
 /*
  * my $c := 5; 
@@ -24,17 +25,7 @@
 
 
 using namespace std;
-
-class MethodNotFoundException : public gc_cleanup, public exception {
- private:
-  string arg;
- public:
-  MethodNotFoundException(string arg = "") : arg(arg) { }
-  ~MethodNotFoundException() throw() { }
-  virtual const char* what() const throw() {
-    return (string("abc ") + arg).c_str();
-  }
-};
+using namespace llvm;
 
 class Stash;
 
@@ -42,7 +33,6 @@ class Kernel : public gc_cleanup {
  private: 
   static Kernel _instance;
   Stash *lex_pad;
-  map<string, Stash*> lookup;
   Kernel() { }
   ~Kernel() { }
 
@@ -75,8 +65,8 @@ enum sub_type_t {
   phaser = 3
 };
 
-/* method table */
-struct mt_table {
+/* method entry */
+struct mt_entry {
   sub_type_t sub_type;
   Stash* scope;
   union {
@@ -91,8 +81,8 @@ struct P6opaque : public gc {
   string klass;  
   vector<P6opaque*> parents;
   void* constant_value;
-  map<string, P6opaque*> properties;
-  map<string, mt_table*> method_table;
+  StringMap<P6opaque*> properties;
+  StringMap<mt_entry*> method_table;
 };
 
 inline P6opaque* construct_int(int v) {
@@ -105,11 +95,11 @@ inline P6opaque* construct_int(int v) {
 class Stash : public gc {
  public:
   Stash() { }
-  map<string, P6opaque*> values;
+  StringMap<P6opaque*> values;
   Stash* OUTER;
 
   P6opaque* find(string name) {
-    map<string, P6opaque*>::iterator it = values.find(name);
+    StringMap<P6opaque*>::iterator it = values.find(name);
     if (it == values.end()) {
       if (OUTER == NULL) {
         throw "Error Value not found";
@@ -138,7 +128,6 @@ extern "C"
 P6opaque* _f(Stash* lex, P6opaque* b) {
   Kernel::push();
   Stash* stack = Kernel::top();
-  //P6opaque* result = new P6opaque;
 
   P6opaque* c = lex->find("$c");
 
@@ -150,14 +139,19 @@ P6opaque* _f(Stash* lex, P6opaque* b) {
   P6opaque *z = stack->find("$*z");
   cout << "and " << *static_cast<int*>(b->constant_value) + 
                            *static_cast<int*>(z->constant_value) << endl;
-  //Kernel::pop();
+  Kernel::pop();
   return result;
 }
 
 
-#define dispatch(r, f, ...) do {\
-    mt_table *sub_table = f->method_table["postcircumfix:<( )>"];\
+#define dispatch_sub(r, f, ...) do {\
+    mt_entry *sub_table = f->method_table["postcircumfix:<( )>"];\
     r = sub_table->sub(sub_table->scope, __VA_ARGS__);\
+  } while(0);
+
+
+// TODO: Figure out the dispatch macro for methods
+#define dispatch_method(r, f, ...) do {\ 
   } while(0);
 
 extern "C" 
@@ -179,13 +173,12 @@ P6opaque* _g(Stash* lex) {
   return result;
 }
 
-
-
+extern "C"
 P6opaque* construct_sub(Stash *lex_scope, SubPtr sub_ptr, int argc) {
   P6opaque* result = new P6opaque;
   result->klass = "Sub()";
 
-  mt_table *sub_table = new mt_table;
+  mt_entry *sub_table = new mt_entry;
   sub_table->sub = sub_ptr;
   sub_table->argc = argc;
   sub_table->sub_type = sub;
@@ -214,12 +207,10 @@ int main() {
     cout << "f is : " << f << endl;
 
     cout << "$foo is: " << &foo << " " << foo.klass << " $c is " << *static_cast<int*>(c.constant_value) << endl;
-    mt_table self_say;
+    mt_entry self_say;
     self_say.method = *_self_say;
     self_say.argc = -1;
     foo.method_table["say"] = &self_say;
-    //dispatch(foo.method_table.find("say")->second, &foo)
-    //foo.method_table.find("say")->second->method(scope, &foo);
 
     cout << "HI?" << endl;
 
@@ -228,9 +219,6 @@ int main() {
     cout << "$foo: " << foo.klass << endl;
     scope->find("$blah");
     Kernel::pop();
-  }
-  catch (MethodNotFoundException e) {
-    cerr << "MethodNotFoundException: " << e.what() << endl;
   }
   catch (...) {
     cerr << "Uncaught exception" << endl;
