@@ -78,6 +78,7 @@ enum sub_type_t {
 /* method table */
 struct mt_table {
   sub_type_t sub_type;
+  Stash* scope;
   union {
     MethodPtr method;
     SubMethodPtr submethod;
@@ -133,10 +134,10 @@ P6opaque* _self_say(Stash* lex, P6opaque* self, ...) {
   return self;
 }
 
-extern "C" 
+extern "C"
 P6opaque* _f(Stash* lex, P6opaque* b) {
-  //Kernel::push();
-  //Stash* stack = Kernel::top();
+  Kernel::push();
+  Stash* stack = Kernel::top();
   //P6opaque* result = new P6opaque;
 
   P6opaque* c = lex->find("$c");
@@ -144,10 +145,20 @@ P6opaque* _f(Stash* lex, P6opaque* b) {
   P6opaque* result = construct_int(*static_cast<int*>(b->constant_value) + 
                            *static_cast<int*>(c->constant_value));
 
+  cout << "result is: " << *static_cast<int*>(result->constant_value) << endl;
+
+  P6opaque *z = stack->find("$*z");
+  cout << "and " << *static_cast<int*>(b->constant_value) + 
+                           *static_cast<int*>(z->constant_value) << endl;
   //Kernel::pop();
   return result;
 }
 
+
+#define dispatch(r, f, ...) do {\
+    mt_table *sub_table = f->method_table["postcircumfix:<( )>"];\
+    r = sub_table->sub(sub_table->scope, __VA_ARGS__);\
+  } while(0);
 
 extern "C" 
 P6opaque* _g(Stash* lex) {
@@ -157,14 +168,20 @@ P6opaque* _g(Stash* lex) {
   P6opaque *c = construct_int(4);
   stack->values["$c"] = c;
 
+  stack->values["$*z"] = c;
+
   P6opaque *val = construct_int(4);
-  P6opaque *result = dispatch(stack->values["f"], val);
+  P6opaque *result;
+
+  dispatch(result, lex->values["f"], val);
 
   Kernel::pop();
   return result;
 }
 
-P6opaque* construct_sub(SubPtr sub_ptr, int argc) {
+
+
+P6opaque* construct_sub(Stash *lex_scope, SubPtr sub_ptr, int argc) {
   P6opaque* result = new P6opaque;
   result->klass = "Sub()";
 
@@ -172,8 +189,9 @@ P6opaque* construct_sub(SubPtr sub_ptr, int argc) {
   sub_table->sub = sub_ptr;
   sub_table->argc = argc;
   sub_table->sub_type = sub;
+  sub_table->scope = lex_scope;
 
-  result->method_table["invoke"] = sub_table;
+  result->method_table["postcircumfix:<( )>"] = sub_table;
 
   return result;
 }
@@ -186,17 +204,29 @@ int main() {
     P6opaque foo;
     P6opaque c = *construct_int(5); 
     foo.klass = string("Foo");
-    scope->values["foo"] = &foo;
+    scope->values["$foo"] = &foo;
     scope->values["$c"] = &c;
-    cout << "foo is: " << &foo << " " << foo.klass << " C is " << *static_cast<int*>(c.constant_value) << endl;
+    scope->values["$*z"] = &c;
+
+    P6opaque *f = construct_sub(scope, (SubPtr)*_f, 1);
+    scope->values["f"] = f;
+
+    cout << "f is : " << f << endl;
+
+    cout << "$foo is: " << &foo << " " << foo.klass << " $c is " << *static_cast<int*>(c.constant_value) << endl;
     mt_table self_say;
     self_say.method = *_self_say;
     self_say.argc = -1;
     foo.method_table["say"] = &self_say;
-    foo.method_table.find("say")->second->method(&foo);
+    //dispatch(foo.method_table.find("say")->second, &foo)
+    //foo.method_table.find("say")->second->method(scope, &foo);
 
-    cout << "foo: " << foo.klass << endl;
-    scope->find("blah");
+    cout << "HI?" << endl;
+
+    f = _g(scope);
+    cout << "result was: " << *static_cast<int*>(f->constant_value) << endl;
+    cout << "$foo: " << foo.klass << endl;
+    scope->find("$blah");
     Kernel::pop();
   }
   catch (MethodNotFoundException e) {
