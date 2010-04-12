@@ -1,12 +1,23 @@
 #include "Node.hpp"
 #include "Codegen.hpp"
 #include "Parser/Grammar.hpp"
+#include "types.h"
+#include <llvm/DerivedTypes.h>
+#include <llvm/LLVMContext.h>
+#include <llvm/Module.h>
+#include <llvm/Analysis/Verifier.h>
+#include <llvm/Support/IRBuilder.h>
 #include <typeinfo>
 
 typedef nqp::parser::token token;
 using namespace std;
+using namespace llvm;
 
 namespace nqp {
+
+static IRBuilder<> Builder(getGlobalContext());
+static const PointerType *GenericPointerType = Type::getInt8PtrTy(getGlobalContext(), 0);
+static Function *construct_int;
 
 CodeGenContext::CodeGenContext(LLVMContext &context) : context(context) { 
   module = new Module(StringRef("main"), context); 
@@ -16,11 +27,9 @@ CodeGenContext::CodeGenContext(LLVMContext &context) : context(context) {
 void CodeGenContext::generateCode(Block& root)
 {
   std::cout << "Generating code...\n";
-
-  /* Create the top level interpreter function to call as entry */
-
   std::cout << "Nodes: " << root.statements.size() << "\n";
 
+  /* Create the top level interpreter function to call as entry */
   vector<const Type*> argTypes;
   FunctionType *ftype = FunctionType::get(Type::getVoidTy(getGlobalContext()), argTypes, false);
   mainFunction = Function::Create(ftype, GlobalValue::InternalLinkage, "main", module);
@@ -69,7 +78,16 @@ static const Type *typeOf(const Identifier& type)
 Value* IntegerConstant::codeGen(CodeGenContext& context)
 {
   std::cout << "Creating integer: " << value << endl;
-  return ConstantInt::get(Type::getInt64Ty(getGlobalContext()), value, true);
+
+  vector<const Type*> Args(1, Type::getInt64Ty(getGlobalContext()));
+  FunctionType *FT = FunctionType::get(GenericPointerType, Args, false);
+  construct_int = Function::Create(FT, Function::ExternalLinkage, "construct_int", context.module);
+
+  std::vector<Value*> ArgsV;
+
+  ArgsV.push_back(ConstantInt::get(Type::getInt64Ty(getGlobalContext()), value, true));
+
+  return Builder.CreateCall(construct_int, ArgsV.begin(), ArgsV.end(), "calltmp");
 }
 
 Value* DoubleConstant::codeGen(CodeGenContext& context)
@@ -158,8 +176,8 @@ Value* Block::codeGen(CodeGenContext& context) {
   Value *last = NULL;
   unsigned int count = 0;
   for (it = statements.begin(); it != statements.end(); it++) {
-    //std::cout << "Generating code for " << typeid(**it).name() << endl;
-    //last = (**it).codeGen(context);
+    std::cout << "Generating code for " << typeid(**it).name() << endl;
+    last = (**it).codeGen(context);
     count++;
     std::cout << "Generatoring code for " << count << endl;
   }
@@ -173,17 +191,14 @@ Value* ExpressionStatement::codeGen(CodeGenContext& context) {
 }
 
 Value* VariableDeclaration::codeGen(CodeGenContext& context) {
-  /* 
-  std::cout << "Creating variable declaration " << type.name << " " << id.name << endl;
-  AllocaInst *alloc = new AllocaInst(typeOf(type), id.name.c_str(), context.currentBlock());
+  std::cout << "Creating variable declaration " << id.name << endl;
+  AllocaInst *alloc = new AllocaInst(GenericPointerType, id.name.c_str(), context.currentBlock());
   context.locals()[id.name] = alloc;
   if (assignmentExpr != NULL) {
-    NAssignment assn(id, *assignmentExpr);
+    Assignment assn(id, assignment, *assignmentExpr);
     assn.codeGen(context);
   }
-  return alloc; */
-  AllocaInst *alloc;
-  return alloc;
+  return alloc; 
 }
 
 Value* ParameterDeclaration::codeGen(CodeGenContext& context) {

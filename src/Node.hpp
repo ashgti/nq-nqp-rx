@@ -20,7 +20,7 @@ typedef std::vector<ParameterDeclaration*> ParameterList;
 
 class Node {
  public:
-  virtual ~Node() {};
+  virtual ~Node() {}
   virtual llvm::Value* codeGen(CodeGenContext& context) = 0;
   virtual std::string str(std::string prefix = "") = 0;
 
