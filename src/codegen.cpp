@@ -5,6 +5,7 @@
 #include <llvm/DerivedTypes.h>
 #include <llvm/LLVMContext.h>
 #include <llvm/Module.h>
+#include <llvm/Support/MemoryBuffer.h>
 #include <llvm/Analysis/Verifier.h>
 #include <llvm/Support/IRBuilder.h>
 #include <typeinfo>
@@ -17,10 +18,34 @@ namespace nqp {
 
 static IRBuilder<> Builder(getGlobalContext());
 static const PointerType *GenericPointerType = Type::getInt8PtrTy(getGlobalContext(), 0);
-static Function *construct_int;
 
 CodeGenContext::CodeGenContext(LLVMContext &context) : context(context) { 
-  module = new Module(StringRef("main"), context); 
+  module = new Module(StringRef("main"), context);
+
+  Kernel::push();
+  Stash *settings = Kernel::top();
+
+  vector<const Type*> Args = vector<const Type*>(1, Type::getInt64Ty(getGlobalContext()));
+  FunctionType *FT = FunctionType::get(GenericPointerType, Args, false);
+  Function::Create(FT, Function::ExternalLinkage, "construct_int", module);
+
+  P6opaque *subs = construct_sub(settings, reinterpret_cast<SubPtr>(_say), -1);
+  settings->values["&say"] = subs;
+
+//  Args = vector<const Type*>(1, Type::getInt64Ty(getGlobalContext()));
+//  FT = FunctionType::get(GenericPointerType, Args, true);
+//  Function::Create(FT, Function::ExternalLinkage, "_say", module);
+
+  FT = FunctionType::get(GenericPointerType, false);
+  Function::Create(FT, Function::ExternalLinkage, "kernel_top", module);
+
+  FT = FunctionType::get(GenericPointerType, false);
+  Function::Create(FT, Function::ExternalLinkage, "kernel_pop", module);
+
+  FT = FunctionType::get(GenericPointerType, false);
+  Function::Create(FT, Function::ExternalLinkage, "kernel_push", module);
+
+
 }
 
 /* Compile the AST into a module */
@@ -79,15 +104,22 @@ Value* IntegerConstant::codeGen(CodeGenContext& context)
 {
   std::cout << "Creating integer: " << value << endl;
 
-  vector<const Type*> Args(1, Type::getInt64Ty(getGlobalContext()));
-  FunctionType *FT = FunctionType::get(GenericPointerType, Args, false);
-  construct_int = Function::Create(FT, Function::ExternalLinkage, "construct_int", context.module);
+  Function *construct_int = context.module->getFunction("construct_int");
+
+  if (construct_int == NULL) {
+    std::cerr << "Bad construct int" << endl;
+  }
 
   std::vector<Value*> ArgsV;
 
   ArgsV.push_back(ConstantInt::get(Type::getInt64Ty(getGlobalContext()), value, true));
 
-  return Builder.CreateCall(construct_int, ArgsV.begin(), ArgsV.end(), "calltmp");
+  cout << "value is: " << value << endl;
+
+  CallInst *call = CallInst::Create(construct_int, ArgsV.begin(), ArgsV.end(), "calltmp", context.currentBlock());  
+  // Builder.CreateCall(construct_int, ArgsV.begin(), ArgsV.end(), "calltmp");
+
+  return call;
 }
 
 Value* DoubleConstant::codeGen(CodeGenContext& context)
@@ -121,12 +153,23 @@ Value* BlockReturn::codeGen(CodeGenContext& context) {
 
 Value* MethodCall::codeGen(CodeGenContext& context)
 {
-  Function *function = context.module->getFunction(id.name.c_str());
-  if (function == NULL) {
-    std::cerr << "no such function " << id.name << endl;
-  }
+  // Function *function = context.module->getFunction(id.name.c_str());
+  // Stash stack = Kernel::top();
+  // P6opaque *func = stash->find(id.name);
+  //  Function *function = context.module->getFunction;
+  //if (function == NULL) {
+  //  std::cerr << "no such function " << id.name << endl;
+  //}
+
+  Function *kernel_top = context.module->getFunction("kernel_top");
+
+  CallInst *call = CallInst::Create(kernel_top, ArgsV.begin(), ArgsV.end(), "", context.currentBlock());
+
+  
+
   std::vector<Value*> args;
   ExpressionList::const_iterator it;
+
   for (it = arguments->begin(); it != arguments->end(); it++) {
     args.push_back((**it).codeGen(context));
   }
@@ -168,12 +211,15 @@ Value* Assignment::codeGen(CodeGenContext& context) {
     std::cerr << "undeclared variable " << lhs.name << endl;
     return NULL;
   }
-  return new StoreInst(rhs.codeGen(context), context.locals()[lhs.name], false, context.currentBlock());
+  return Builder.CreateStore(rhs.codeGen(context), context.locals()[lhs.name]); // new StoreInst(rhs.codeGen(context), context.locals()[lhs.name], false, context.currentBlock());
 }
 
 Value* Block::codeGen(CodeGenContext& context) {
   StatementList::const_iterator it;
   Value *last = NULL;
+
+  // create
+
   unsigned int count = 0;
   for (it = statements.begin(); it != statements.end(); it++) {
     std::cout << "Generating code for " << typeid(**it).name() << endl;
@@ -236,3 +282,4 @@ Value* IfBlock::codeGen(CodeGenContext& context) {
 
 
 } /* end namespace nqp */ 
+
