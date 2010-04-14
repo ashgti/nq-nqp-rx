@@ -1,8 +1,8 @@
 #include <iostream>
 #include <cstdio>
-#include "Node.hpp"
-#include "Codegen.hpp"
-#include "Parser/Grammar.hpp"
+#include "node.h"
+#include "codegen.h"
+#include "parser/grammar.hpp"
 #include <gc/gc_cpp.h>
 
 using namespace std;

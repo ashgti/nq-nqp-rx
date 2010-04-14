@@ -1,8 +1,8 @@
 %option noyywrap stack
 %{
 #include <string>
-#include "Node.hpp"
-#include "Parser/Grammar.hpp"
+#include "node.h"
+#include "parser/grammar.hpp"
 #include "stdio.h"
 
 #define YY_DECL int yylex(nqp::parser::semantic_type *yylval, \

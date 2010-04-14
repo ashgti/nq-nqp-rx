@@ -1,6 +1,6 @@
-#include "Node.hpp"
-#include "Codegen.hpp"
-#include "Parser/Grammar.hpp"
+#include "node.h"
+#include "codegen.h"
+#include "parser/grammar.hpp"
 #include "types.h"
 #include <llvm/DerivedTypes.h>
 #include <llvm/LLVMContext.h>
@@ -29,8 +29,8 @@ CodeGenContext::CodeGenContext(LLVMContext &context) : context(context) {
   FunctionType *FT = FunctionType::get(GenericPointerType, Args, false);
   Function::Create(FT, Function::ExternalLinkage, "construct_int", module);
 
-  P6opaque *subs = construct_sub(settings, reinterpret_cast<SubPtr>(_say), -1);
-  settings->values["&say"] = subs;
+  //P6opaque *subs = construct_sub(settings, reinterpret_cast<SubPtr>(_say), -1);
+  //settings->values["&say"] = subs;
 
 //  Args = vector<const Type*>(1, Type::getInt64Ty(getGlobalContext()));
 //  FT = FunctionType::get(GenericPointerType, Args, true);
@@ -156,16 +156,14 @@ Value* MethodCall::codeGen(CodeGenContext& context)
   // Function *function = context.module->getFunction(id.name.c_str());
   // Stash stack = Kernel::top();
   // P6opaque *func = stash->find(id.name);
-  //  Function *function = context.module->getFunction;
+  Function *function = context.module->getFunction(id.name.c_str());
   //if (function == NULL) {
   //  std::cerr << "no such function " << id.name << endl;
   //}
 
-  Function *kernel_top = context.module->getFunction("kernel_top");
+  //Function *kernel_top = context.module->getFunction("kernel_top");
 
-  CallInst *call = CallInst::Create(kernel_top, ArgsV.begin(), ArgsV.end(), "", context.currentBlock());
-
-  
+  //CallInst *call = CallInst::Create(kernel_top, ArgsV.begin(), ArgsV.end(), "", context.currentBlock());
 
   std::vector<Value*> args;
   ExpressionList::const_iterator it;

@@ -1,4 +1,4 @@
-#include "Node.hpp"
+#include "node.h"
 #include <llvm/BasicBlock.h>
 
 using namespace std;

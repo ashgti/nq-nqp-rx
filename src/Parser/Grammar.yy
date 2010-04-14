@@ -1,6 +1,6 @@
 %{
 
-#include "Node.hpp"
+#include "node.h"
 #include <sstream>
 #include <cstdlib>
 #include <cstdio>

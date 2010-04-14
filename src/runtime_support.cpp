@@ -42,7 +42,7 @@ P6opaque* construct_int(long long v) {
 }
 
 extern "C"
-P6opaque* _say(Stash* lex, argv) {
+P6opaque* _say(Stash* lex, int argc, ...) {
   Kernel::push();
   Stash *stack = Kernel::top();
   cout << "blah and " << endl;

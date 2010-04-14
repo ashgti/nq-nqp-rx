@@ -2,9 +2,9 @@
 #include <iterator>
 #include <string>
 #include <sstream>
-#include "Node.hpp"
+#include "node.h"
 #include <typeinfo>
-#include "Parser/Grammar.hpp"
+#include "parser/grammar.hpp"
 
 std::ostream& operator<<(std::ostream& out, nqp::Node& node) {
   out << node.str();
