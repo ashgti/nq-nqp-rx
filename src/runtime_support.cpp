@@ -5,7 +5,7 @@
 #include <vector>
 #include <cstdarg>
 #include <exception>
-#include <gc_cpp.h>
+// #include <gc_cpp.h>
 #include "types.h"
 
 using namespace std;
@@ -17,6 +17,21 @@ Kernel& Kernel::getInstance() {
   return _instance;
 }
 
+extern "C" 
+Stash *kernel_top() {
+  return Kernel::top();
+}
+
+extern "C"
+void kernel_push() {
+  Kernel::push();
+}
+
+extern "C"
+void kernel_pop() {
+  Kernel::pop();
+}
+
 extern "C"
 P6opaque* construct_int(long long v) {
   P6opaque* result = new P6opaque;
@@ -26,6 +41,14 @@ P6opaque* construct_int(long long v) {
   return result;
 }
 
+extern "C"
+P6opaque* _say(Stash* lex, argv) {
+  Kernel::push();
+  Stash *stack = Kernel::top();
+  cout << "blah and " << endl;
+  Kernel::pop();
+  return NULL;
+}
 
 extern "C"
 P6opaque* _self_say(Stash* lex, P6opaque* self, ...) {
@@ -36,6 +59,9 @@ P6opaque* _self_say(Stash* lex, P6opaque* self, ...) {
   Kernel::pop();
   return self;
 }
+
+//P6opaque *stash_find(Stash *stack, char* name) {
+//}
 
 /* 
 extern "C"
@@ -58,6 +84,7 @@ P6opaque* _f(Stash* lex, P6opaque* b) {
 }
 */
 
+/* 
 #define dispatch_sub(r, f, ...) do {\
     mt_entry *sub_table = f->method_table["postcircumfix:<( )>"];\
     r = sub_table->sub(sub_table->scope, __VA_ARGS__);\
@@ -66,6 +93,8 @@ P6opaque* _f(Stash* lex, P6opaque* b) {
 // TODO: Figure out the dispatch macro for methods
 #define dispatch_method(r, f, ...) do {\
   } while(0);
+
+*/
 
 /* 
 extern "C" 
@@ -88,7 +117,7 @@ P6opaque* _g(Stash* lex) {
 } */
 
 extern "C"
-P6opaque* construct_sub(Stash *lex_scope, SubPtr sub_ptr, int argc) {
+P6opaque* construct_sub(Stash *lex_scope, char* name, SubPtr sub_ptr, int argc) {
   P6opaque* result = new P6opaque;
   result->klass_name = "Sub()";
   

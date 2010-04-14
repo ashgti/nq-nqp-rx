@@ -3,6 +3,7 @@
 #include "Node.hpp"
 #include "Codegen.hpp"
 #include "Parser/Grammar.hpp"
+#include <gc/gc_cpp.h>
 
 using namespace std;
 
@@ -18,6 +19,8 @@ main(int argc, char **argv) {
     yyin = stdin;
 
   llvm::InitializeNativeTarget();
+
+  GC_INIT();
   nqp::Block *root;
   nqp::parser parser(root);
   parser.parse();

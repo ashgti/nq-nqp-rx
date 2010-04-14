@@ -100,6 +100,9 @@ struct P6opaque : public gc {
   StringMap<mt_entry*> *method_table;
 };
 
+P6opaque* _say(Stash* lex, long long argc, ...);
+P6opaque* construct_int(long long v);
+P6opaque* construct_sub(Stash *lex_scope, SubPtr sub_ptr, int argc);
 
 #ifdef __cplusplus
 }
