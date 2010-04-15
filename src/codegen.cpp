@@ -29,8 +29,8 @@ CodeGenContext::CodeGenContext(LLVMContext &context) : context(context) {
   FunctionType *FT = FunctionType::get(GenericPointerType, Args, false);
   Function::Create(FT, Function::ExternalLinkage, "construct_int", module);
 
-  //P6opaque *subs = construct_sub(settings, reinterpret_cast<SubPtr>(_say), -1);
-  //settings->values["&say"] = subs;
+  P6opaque *subs = construct_sub(settings, reinterpret_cast<SubPtr>(_say), -1);
+  settings->values["&say"] = subs;
 
 //  Args = vector<const Type*>(1, Type::getInt64Ty(getGlobalContext()));
 //  FT = FunctionType::get(GenericPointerType, Args, true);
@@ -151,12 +151,30 @@ Value* BlockReturn::codeGen(CodeGenContext& context) {
   return ret;
 }
 
-Value* MethodCall::codeGen(CodeGenContext& context)
-{
+Value* MethodCall::codeGen(CodeGenContext& context) {
+  /* 
+   To call a function do: 
+
+   P6opaque *sub_obj = stack->find(id.name.c_str()); 
+   method = sub_obj->method_table->GetOrCreateValue("postcircumfix:<( )>); 
+
+   if (method) {
+    switch (method->sub_type) {
+      case sub:
+        sub_entry->sub(__ARGS__);
+        break;
+    }
+   }
+   else {
+    thorw error;
+   }
+   
+   */
+
   // Function *function = context.module->getFunction(id.name.c_str());
   // Stash stack = Kernel::top();
   // P6opaque *func = stash->find(id.name);
-  Function *function = context.module->getFunction(id.name.c_str());
+  // Function *function = context.module->getFunction(id.name.c_str());
   //if (function == NULL) {
   //  std::cerr << "no such function " << id.name << endl;
   //}
@@ -209,7 +227,7 @@ Value* Assignment::codeGen(CodeGenContext& context) {
     std::cerr << "undeclared variable " << lhs.name << endl;
     return NULL;
   }
-  return Builder.CreateStore(rhs.codeGen(context), context.locals()[lhs.name]); // new StoreInst(rhs.codeGen(context), context.locals()[lhs.name], false, context.currentBlock());
+  return new StoreInst(rhs.codeGen(context), context.locals()[lhs.name], false, context.currentBlock());
 }
 
 Value* Block::codeGen(CodeGenContext& context) {

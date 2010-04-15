@@ -120,16 +120,33 @@ extern "C"
 P6opaque* construct_sub(Stash *lex_scope, char* name, SubPtr sub_ptr, int argc) {
   P6opaque* result = new P6opaque;
   result->klass_name = "Sub()";
+  result->method_table = new StringMap<mt_entry*>;
   
-  mt_entry *sub_table = new mt_entry;
-  sub_table->sub = sub_ptr;
-  sub_table->argc = argc;
-  sub_table->sub_type = sub;
-  sub_table->scope = lex_scope;
-  result->method_table->GetOrCreateValue("postcircumfix:<( )>", sub_table);
+  mt_entry *sub_entry = result->method_table->GetOrCreateValue("postcircumfix:<( )>", new mt_entry).second; 
+  sub_entry->sub = sub_ptr;
+  sub_entry->argc = argc;
+  sub_entry->sub_type = sub;
+  sub_entry->scope = lex_scope;
 
   return result;
 }
+
+extern "C"
+P6opaque* invoke_sub(Stash *lex_scope, char* name, SubPtr sub_ptr, int argc) {
+  P6opaque* result = new P6opaque;
+  result->klass_name = "Sub()";
+  result->method_table = new StringMap<mt_entry*>;
+  
+  mt_entry *sub_entry = result->method_table->GetOrCreateValue("postcircumfix:<( )>", new mt_entry).second; // .second; // = new mt_entry;
+  sub_entry->sub = sub_ptr;
+  sub_entry->argc = argc;
+  sub_entry->sub_type = sub;
+  sub_entry->scope = lex_scope;
+  // result->method_table->GetOrCreateValue("postcircumfix:<( )>", sub_entry);
+
+  return result;
+}
+
 
 /*
 int main() {
@@ -154,8 +171,6 @@ int main() {
     self_say.method = *_self_say;
     self_say.argc = -1;
     foo.method_table["say"] = &self_say;
-
-    cout << "HI?" << endl;
 
     f = _g(scope);
     cout << "result was: " << *static_cast<int*>(f->constant_value) << endl;
