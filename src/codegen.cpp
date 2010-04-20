@@ -104,6 +104,8 @@ Value* IntegerConstant::codeGen(CodeGenContext& context)
 {
   std::cout << "Creating integer: " << value << endl;
 
+  return ConstantInt::get(Type::getInt64Ty(getGlobalContext()), value, true);
+
   Function *construct_int = context.module->getFunction("construct_int");
 
   if (construct_int == NULL) {
@@ -167,11 +169,10 @@ Value* MethodCall::codeGen(CodeGenContext& context) {
    }
    else {
     thorw error;
-   }
-   
+   } 
    */
 
-  // Function *function = context.module->getFunction(id.name.c_str());
+  Function *function = context.module->getFunction(id.name.c_str());
   // Stash stack = Kernel::top();
   // P6opaque *func = stash->find(id.name);
   // Function *function = context.module->getFunction(id.name.c_str());
@@ -254,7 +255,7 @@ Value* ExpressionStatement::codeGen(CodeGenContext& context) {
 
 Value* VariableDeclaration::codeGen(CodeGenContext& context) {
   std::cout << "Creating variable declaration " << id.name << endl;
-  AllocaInst *alloc = new AllocaInst(GenericPointerType, id.name.c_str(), context.currentBlock());
+  AllocaInst *alloc = new AllocaInst(Type::getInt64Ty(getGlobalContext()), id.name.c_str(), context.currentBlock());
   context.locals()[id.name] = alloc;
   if (assignmentExpr != NULL) {
     Assignment assn(id, assignment, *assignmentExpr);

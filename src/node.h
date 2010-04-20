@@ -1,5 +1,5 @@
-// #ifndef NQP_NODE_H_
-// #define NQP_NODE_H_
+#ifndef NQP_NODE_H_
+#define NQP_NODE_H_
 
 #include <iostream>
 #include <vector>
@@ -20,6 +20,7 @@ typedef std::vector<ParameterDeclaration*> ParameterList;
 
 class Node {
  public:
+  string type_hint;
   virtual ~Node() {}
   virtual llvm::Value* codeGen(CodeGenContext& context) = 0;
   virtual std::string str(std::string prefix = "") = 0;
@@ -197,5 +198,5 @@ class ClassDeclaration : public PackageDeclaration {
 
 } // namespace nqp
 
-// #endif // NQP_NODE_H_
+#endif // NQP_NODE_H_
 

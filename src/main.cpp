@@ -4,6 +4,7 @@
 #include "codegen.h"
 #include "parser/grammar.hpp"
 #include <gc/gc_cpp.h>
+#include "ast_pass.h"
 
 using namespace std;
 
@@ -24,6 +25,8 @@ main(int argc, char **argv) {
   nqp::Block *root;
   nqp::parser parser(root);
   parser.parse();
+
+  nqp::TypeInferencePass(root);
 
   std::cerr << "Root:\n\n" << root->str("") << "\n";
   
