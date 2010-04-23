@@ -123,6 +123,7 @@ using namespace nqp;
     NQP::Grammar.O(':prec<e=>, :assoc<unary>', '%list_prefix');
 */
 
+%nonassoc T_DOT
 %right T_EQ T_BIND T_RO_BIND
 %left T_PLUS T_MINUS
 %left T_MUL T_DIV

@@ -6,7 +6,6 @@
  *    Description:  The actual VM that is going to sit on top of the llvm.
  *
  *        Version:  1.0
- *        Created:  04/19/2010 19:48:04
  *       Revision:  none
  *       Compiler:  gcc
  *
@@ -15,27 +14,54 @@
  *
  * =====================================================================================
  */
+#include "types.h"
+#include <vector>
 
-
-extern "C" {
-
-void fast_add(P6opaque* )
-
-}
+using namespace std;
 
 namespace nqp {
 
-// One global core, should be thread safe (when its time to care about threads)
-class Core {
- public:
-  static Core *shared;
-};
+Stash::Stash() {
+}
 
-// One VM per thread
-class VM {
- public:
-  static VM *main; // main VM thread
-};
+P6opaque* Stash::find(string name) {
+  StringMap<P6opaque*>::iterator it = values.find(name);
+  if (it == values.end()) {
+    if (OUTER == NULL) {
+      throw "Error Value not found";
+    }
+    else {
+      return OUTER->find(name);
+    }
+  }
+  else {
+    return it->second;
+  }
+}
+
+Stash* NqpVM::top() {
+  return this->lex_pad;
+}
+
+NqpVM* NqpVM::main = NULL;
+
+inline
+NqpVM* NqpVM::current(void) {
+  // Potentially add other VM's for other threads 
+  return NqpVM::main;
+}
+
+Stash* NqpVM::push() {
+  Stash *new_lex = new Stash();
+  new_lex->OUTER = this->lex_pad;
+  this->lex_pad = new_lex;
+  return this->lex_pad;
+}
+
+void NqpVM::pop() {
+  this->lex_pad = this->lex_pad->OUTER;
+}
+
 
 } // end namespace nqp
 

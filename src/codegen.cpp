@@ -22,15 +22,9 @@ static const PointerType *GenericPointerType = Type::getInt8PtrTy(getGlobalConte
 CodeGenContext::CodeGenContext(LLVMContext &context) : context(context) { 
   module = new Module(StringRef("main"), context);
 
-  Kernel::push();
-  Stash *settings = Kernel::top();
-
   vector<const Type*> Args = vector<const Type*>(1, Type::getInt64Ty(getGlobalContext()));
   FunctionType *FT = FunctionType::get(GenericPointerType, Args, false);
   Function::Create(FT, Function::ExternalLinkage, "construct_int", module);
-
-  P6opaque *subs = construct_sub(settings, reinterpret_cast<SubPtr>(_say), -1);
-  settings->values["&say"] = subs;
 
 //  Args = vector<const Type*>(1, Type::getInt64Ty(getGlobalContext()));
 //  FT = FunctionType::get(GenericPointerType, Args, true);

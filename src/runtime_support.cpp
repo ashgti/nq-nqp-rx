@@ -1,3 +1,21 @@
+/*
+ * =====================================================================================
+ *
+ *       Filename:  runtime_support.cpp
+ *
+ *    Description:  Links to the C++ implemented components that need access from the LLVM
+ *
+ *        Version:  1.0
+ *       Revision:  none
+ *       Compiler:  gcc
+ *
+ *         Author:  John Harrison (ash), ash@greaterthaninfinity.com
+ *        Company:  
+ *
+ * =====================================================================================
+ */
+
+
 #include <iostream>
 #include <string>
 #include <stack>
@@ -7,29 +25,41 @@
 #include <exception>
 // #include <gc_cpp.h>
 #include "types.h"
+#include "runtime_support.h"
 
 using namespace std;
 using namespace llvm;
 
-Kernel Kernel::_instance;
+namespace nqp {
 
-Kernel& Kernel::getInstance() {
-  return _instance;
+extern "C"
+void
+init_nqp() {
+  settings();
+}
+
+extern "C"
+void settings() {
+  GET_VM()->push();
+  Stash *stack = GET_VM()->top(); 
+
+  P6opaque *subs = construct_sub(stack, reinterpret_cast<SubPtr>(_say), -1);
+  stack->values["&say"] = subs;
 }
 
 extern "C" 
-Stash *kernel_top() {
-  return Kernel::top();
+Stash *vm_stack_top() {
+  return GET_VM()->top();
 }
 
 extern "C"
-void kernel_push() {
-  Kernel::push();
+void vm_stack_push() {
+  GET_VM()->push();
 }
 
 extern "C"
-void kernel_pop() {
-  Kernel::pop();
+void vm_stack_pop() {
+  GET_VM()->pop();
 }
 
 extern "C"
@@ -42,23 +72,22 @@ P6opaque* construct_int(long long v) {
 }
 
 extern "C"
-P6opaque* _say(Stash* lex, int argc, ...) {
-  Kernel::push();
-  Stash *stack = Kernel::top();
+P6opaque* _say(Stash* lex, long long argc) {
+  GET_VM()->push();
+  Stash *stack = GET_VM()->top();
   cout << "blah and " << endl;
-  Kernel::pop();
+  GET_VM()->pop();
   return NULL;
 }
 
+/* 
 extern "C"
-P6opaque* _self_say(Stash* lex, P6opaque* self, ...) {
-  Kernel::push();
-  Stash *stack = Kernel::top();
-  P6opaque bar = *(stack->find("foo"));
-  cout << "blah " << self << " and " << bar.klass_name << endl;
-  Kernel::pop();
+P6opaque* _self_say(Stash* lex, P6opaque* self) {
+//  P6opaque bar = *(stack->find("foo"));
+// cout << "blah " << self << " and " << bar.klass_name << endl;
   return self;
 }
+*/
 
 extern "C"
 P6opaque* construct_sub(Stash *lex_scope, char* name, SubPtr sub_ptr, int argc) {
@@ -91,21 +120,5 @@ P6opaque* invoke_sub(Stash *lex_scope, char* name, SubPtr sub_ptr, int argc) {
   return result;
 }
 
-Stash* Kernel::top() {
-  Kernel &that = getInstance();
-  return that.lex_pad;
-}
-
-void Kernel::push() {
-  Kernel &that = getInstance();
-  Stash *new_lex = new Stash();
-  new_lex->OUTER = that.lex_pad;
-  that.lex_pad = new_lex;
-}
-
-void Kernel::pop() {
-  Kernel &that = getInstance();
-  that.lex_pad = that.lex_pad->OUTER;
-}
-
+} // end namespace nqp
 

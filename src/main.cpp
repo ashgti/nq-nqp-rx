@@ -26,7 +26,7 @@ main(int argc, char **argv) {
   nqp::parser parser(root);
   parser.parse();
 
-  nqp::TypeInferencePass(root);
+  // nqp::TypeInferencePass(root);
 
   std::cerr << "Root:\n\n" << root->str("") << "\n";
   

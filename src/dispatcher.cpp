@@ -20,3 +20,12 @@ extern "C"
 nqp_vm_dispatch() {
 
 }
+
+
+
+int main() {
+  nqp_vm vm = get_nqp_vm();
+  TO_B(vm->dispatch("say", INT(1), ARRAY("A", "B", 3)));
+
+
+}
