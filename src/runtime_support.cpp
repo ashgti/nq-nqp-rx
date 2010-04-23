@@ -23,46 +23,52 @@
 #include <vector>
 #include <cstdarg>
 #include <exception>
-// #include <gc_cpp.h>
+#include <gc/gc_cpp.h>
+#include <llvm/ADT/StringMap.h>
 #include "types.h"
 #include "runtime_support.h"
 
 using namespace std;
 using namespace llvm;
 
-namespace nqp {
+namespace nqp { 
 
-extern "C"
+#ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
+extern "C" {
+#endif
+
 void
-init_nqp() {
+nqp_init() {
+  GC_INIT();
+  NqpVM::main_vm = new NqpVM();
   settings();
 }
 
-extern "C"
 void settings() {
-  GET_VM()->push();
   Stash *stack = GET_VM()->top(); 
 
+  ArgsTy say_args = construct_args(1, "*@a", MuRef);
   P6opaque *subs = construct_sub(stack, reinterpret_cast<SubPtr>(_say), -1);
   stack->values["&say"] = subs;
 }
 
-extern "C" 
 Stash *vm_stack_top() {
-  return GET_VM()->top();
+  return NqpVM::current()->top();
 }
 
-extern "C"
 void vm_stack_push() {
   GET_VM()->push();
 }
 
-extern "C"
 void vm_stack_pop() {
   GET_VM()->pop();
 }
 
-extern "C"
+ArgsTy construct_args(int argc, ...) {
+  ArgsTy result = new ArgsTy;
+  
+}
+
 P6opaque* construct_int(long long v) {
   P6opaque* result = new P6opaque;
   result->content_ptr = static_cast<void*>(new int(v));
@@ -71,17 +77,17 @@ P6opaque* construct_int(long long v) {
   return result;
 }
 
-extern "C"
-P6opaque* _say(Stash* lex, long long argc) {
-  GET_VM()->push();
+P6opaque* _say(Stash* lex) {
   Stash *stack = GET_VM()->top();
+
+  for (StringMap<P6opaque*>::iterator it = stack->values.begin(); it != stack->values.end(); ++it) {
+    cout << it->first() << " and " << *((int*)(it->second)->content_ptr) << endl;
+  }
   cout << "blah and " << endl;
-  GET_VM()->pop();
   return NULL;
 }
 
 /* 
-extern "C"
 P6opaque* _self_say(Stash* lex, P6opaque* self) {
 //  P6opaque bar = *(stack->find("foo"));
 // cout << "blah " << self << " and " << bar.klass_name << endl;
@@ -89,13 +95,12 @@ P6opaque* _self_say(Stash* lex, P6opaque* self) {
 }
 */
 
-extern "C"
-P6opaque* construct_sub(Stash *lex_scope, char* name, SubPtr sub_ptr, int argc) {
+P6opaque* construct_sub(Stash *lex_scope, SubPtr sub_ptr, int argc, ...) {
   P6opaque* result = new P6opaque;
   result->klass_name = "Sub()";
   result->method_table = new StringMap<mt_entry*>;
   
-  mt_entry *sub_entry = result->method_table->GetOrCreateValue("postcircumfix:<( )>", new mt_entry).second; 
+  mt_entry *sub_entry = result->method_table->GetOrCreateValue("postcircumfix:<( )>", new mt_entry).second;
   sub_entry->sub = sub_ptr;
   sub_entry->argc = argc;
   sub_entry->sub_type = sub;
@@ -104,13 +109,13 @@ P6opaque* construct_sub(Stash *lex_scope, char* name, SubPtr sub_ptr, int argc) 
   return result;
 }
 
-extern "C"
+/* 
 P6opaque* invoke_sub(Stash *lex_scope, char* name, SubPtr sub_ptr, int argc) {
   P6opaque* result = new P6opaque;
   result->klass_name = "Sub()";
   result->method_table = new StringMap<mt_entry*>;
   
-  mt_entry *sub_entry = result->method_table->GetOrCreateValue("postcircumfix:<( )>", new mt_entry).second; // .second; // = new mt_entry;
+  mt_entry *sub_entry = result->method_table->lookup("postcircumfix:<( )>", new mt_entry).second; // .second; // = new mt_entry;
   sub_entry->sub = sub_ptr;
   sub_entry->argc = argc;
   sub_entry->sub_type = sub;
@@ -119,6 +124,12 @@ P6opaque* invoke_sub(Stash *lex_scope, char* name, SubPtr sub_ptr, int argc) {
 
   return result;
 }
+*/
 
-} // end namespace nqp
+#ifdef __cplusplus /* If this is a C++ compiler, end C linkage */
+}
+#endif
+
+
+}
 

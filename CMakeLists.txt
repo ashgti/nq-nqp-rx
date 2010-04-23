@@ -17,7 +17,7 @@ ENABLE_TESTING()
 find_package(BISON)
 find_package(FLEX)
 
-# set(CMAKE_CXX_COMPILER "clang++")
+set(CMAKE_CXX_COMPILER "clang++")
 
 BISON_TARGET(NQPParser src/parser/grammar.yy src/parser/grammar.cpp COMPILE_FLAGS "-Wall -t -v -Lc++")
 FLEX_TARGET(NQPScanner src/parser/tokens.l  src/parser/tokens.cpp)
