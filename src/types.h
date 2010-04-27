@@ -7,56 +7,17 @@
 #include <vector>
 #include <string>
 
-using namespace std;
-using namespace llvm;
-
-namespace nqp { 
-
-struct P6opaque;
-// struct container;
-
-class Stash : public gc {
- public:
-  Stash();
-  StringMap<P6opaque*> values;
-  Stash* OUTER;
-  P6opaque* find(string name);
-};
-
-class NqpCore : public gc {
- public:
-  static NqpCore *shared;
-};
-
-#define GET_CORE() (NqpCore::shared)
-
-class NqpVM : public gc_cleanup {
- private: 
-  Stash* lex_pad;
-
- public:
-  NqpVM();
-  ~NqpVM();
-
-  // The main VM Component, one per thread, in theory
-  static NqpVM* main_vm;
-
-  Stash* top();
-  Stash* push();
-  void pop();
-
-  P6opaque* dispatch(P6opaque* code, int argc, ...);
-  P6opaque* dispatch(const char* name, int argc, ...);
-
-  static NqpVM* current(void);
-};
-
-#define GET_VM() (nqp::NqpVM::current())
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+struct P6opaque;
+typedef P6opaque* P6opaquePtr;
+struct Stash;
+struct ParamTy;
+typedef ParamTy* ParamTyPtr;
+
+/* Function pointer definitions. */
 typedef P6opaque* (*MethodPtr)(Stash*);
 typedef P6opaque* (*SubMethodPtr)(Stash*);
 typedef P6opaque* (*SubPtr)(Stash*);
@@ -70,7 +31,7 @@ enum sub_type_t {
 };
 
 /* method entry */
-struct mt_entry {
+struct mt_entry : public gc {
   sub_type_t sub_type;
   Stash* scope;
   union {
@@ -78,21 +39,24 @@ struct mt_entry {
     SubMethodPtr submethod;
     SubPtr sub;
   };
-  signed int argc;
-  vector<string> sig_names;
+  ParamTyPtr sig;
 };
 
-enum built_in_types_t {
-  mu_type = 0,
-  int_type,
-  num_type,
-  string_type,
-  bool_type,
-  other_type
+enum BuiltInTypes {
+  kBUILT_IN_MU = 0,
+  kBUILT_IN_INT,
+  kBUILT_IN_NUM,
+  kBUILT_IN_STRING,
+  kBUILT_IN_BOOL,
+  kBUILT_IN_ARRAY,
+  kBUILT_IN_HASH,
+  kBUILT_IN_CODE,
+  kBUILT_IN_SUB,
+  kOTHER
 };
 
 struct P6opaque : public gc {
-  built_in_types_t klass_type;
+  BuiltInTypes klass_type;
   const char *klass_name;
   std::vector<P6opaque*> *parents;
   void *content_ptr;
@@ -100,47 +64,43 @@ struct P6opaque : public gc {
   StringMap<mt_entry*> *method_table;
 };
 
-enum container_type_t {
-  scalar  = 0,
-  hash    = 1,
-  array   = 2,
-  code    = 3
+struct Stash : public gc {
+  StringMap<P6opaque*> values;
+  Stash* OUTER;
 };
 
-enum arg_type_t {
-  named     = 0,
-  requied   = 1,
-  optional  = 2
+enum ContainerTypes {
+  kSCALAR  = 0,
+  kHASH    = 1,
+  kARRAY   = 2,
+  kCODE    = 3
 };
 
-struct container {
-  container_type_t type;
-  P6opaque *val;
+enum ParamType {
+  kNAMED     = 0,
+  kREQUIRED  = 1,
+  kOPTIONAL  = 2
+};
+
+struct ParameterHolder : public gc {
+  ParamType ptype;
+  ContainerTypes ctype;
+  bool slurpy;
+  char* name;
+  P6opaquePtr val;
   // Type constraints?
 };
 
-struct signature_t {
-  int argc;
-  container *argv;
+struct ParamTy : public gc { 
+  unsigned int argc;
+  unsigned int expected;
+  bool slurpy;
+  ParameterHolder* argv;
 };
-
-/* 
-struct method_entry { 
-  signature_t sig_ref;
-  Ptr cfunc*;
-}
-*/
-
-struct ArgsTy : public gc {
-  vector<P6opaque *> args;
-};
-
 
 #ifdef __cplusplus
 }
 #endif
-
-} // end namespace nqp
 
 #endif // SRC_TYPES_H
 

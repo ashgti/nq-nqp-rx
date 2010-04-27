@@ -23,9 +23,6 @@ using namespace std;
 
 namespace nqp {
 
-Stash::Stash() {
-}
-
 P6opaque* Stash::find(string name) {
   StringMap<P6opaque*>::iterator it = values.find(name);
   if (it == values.end()) {
@@ -48,7 +45,7 @@ Stash* NqpVM::top() {
 NqpVM* NqpVM::main_vm = NULL; // new NqpVM;
 
 NqpVM::NqpVM() {
-  lex_pad = new Stash; lex_pad->OUTER = lex_pad; 
+  lex_pad = new Stash; 
 }
 
 NqpVM::~NqpVM() {
@@ -72,26 +69,123 @@ void NqpVM::pop() {
   this->lex_pad = this->lex_pad->OUTER;
 }
 
-P6opaque* NqpVM::dispatch(const char* name, int argc, ...) {
+P6opaque* NqpVM::dispatch(const char* name, unsigned int argc, ...) {
+  P6opaquePtr slurp = NULL;
   P6opaque* func_obj = this->top()->find(name);
-  cout << "func: " << func_obj << endl;
+  // cout << "func: " << func_obj << " argc: " << argc << endl;
   mt_entry* method = func_obj->method_table->lookup("postcircumfix:<( )>");
-  std::cout << "method found! " << method->argc << std::endl;
+  if (method == NULL) {
+    throw "error"; // MethodNotFound Error
+  }
+  if (method->sig->slurpy == false && argc != method->sig->argc) {
+    throw "Bad number of args";
+  } else if (method->sig->slurpy == true && argc < method->sig->expected) {
+    throw "not enough args";
+  }
+  
+  va_list argv;
+  va_start(argv, argc);
+
+  bool slurpy = false;
+  ParameterHolder *slurpy_arg = NULL;
+
+  for (unsigned int i = 0; i < method->sig->argc; ++i) {
+    if (method->sig->argv[i].slurpy) {
+      slurpy = true;
+      slurpy_arg = &method->sig->argv[i];
+    }
+  }
+
   Stash* stack = this->push();
-  stack->values["a"] = construct_int(4);
-  stack->values["b"] = construct_int(3);
-  (method->sub)(method->scope);
+
+  if (slurpy) {
+    slurp = construct_array();
+  }
+
+  // x used to reference current argument in list of args;
+  int x = 0;
+  for (unsigned int i = 0; i < argc; ++i) {
+    P6opaquePtr param = va_arg(argv, P6opaquePtr);
+    if (param) {
+      if (method->sig->argv[x].slurpy == true) {
+        array_push(slurp, param);
+      }
+      else {
+        stack->values[method->sig->argv[x].name] = param;
+        x++; 
+      }
+    }
+  }
+  
+  if (slurpy) {
+    stack->values[slurpy_arg->name] =  slurp;
+  }
+
+  va_end(argv);
+
+  P6opaquePtr result = (method->sub)(method->scope);
   this->pop();
+
+  return result;
 }
 
-P6opaque* NqpVM::dispatch(P6opaque* code, int argc, ...) {
+P6opaque* NqpVM::dispatch(P6opaque* code, unsigned int argc, ...) {
+  P6opaquePtr slurp = NULL;
   mt_entry* method = code->method_table->lookup("postcircumfix:<( )>");
-  std::cout << "method found! " << method->argc << std::endl;
+
+  if (method == NULL) {
+    throw "error"; // MethodNotFound Error
+  }
+  if (method->sig->slurpy == false && argc != method->sig->argc) {
+    throw "Bad number of args";
+  } else if (method->sig->slurpy == true && argc < method->sig->expected) {
+    throw "not enough args";
+  }
+  
+  va_list argv;
+  va_start(argv, argc);
+
+  bool slurpy = false;
+  ParameterHolder *slurpy_arg = NULL;
+
+  for (unsigned int i = 0; i < method->sig->argc; ++i) {
+    if (method->sig->argv[i].slurpy) {
+      slurpy = true;
+      slurpy_arg = &method->sig->argv[i];
+    }
+  }
+
   Stash* stack = this->push();
-  stack->values["a"] = construct_int(4);
-  stack->values["b"] = construct_int(3);
-  (method->sub)(method->scope);
+
+  if (slurpy) {
+    slurp = construct_array();
+  }
+
+  // x used to reference current argument in list of args;
+  int x = 0;
+  for (unsigned int i = 0; i < argc; ++i) {
+    P6opaquePtr param = va_arg(argv, P6opaquePtr);
+    if (param) {
+      if (method->sig->argv[x].slurpy == true) {
+        array_push(slurp, param);
+      }
+      else {
+        stack->values[method->sig->argv[x].name] = param;
+        x++; 
+      }
+    }
+  }
+  
+  if (slurpy) {
+    stack->values[slurpy_arg->name] =  slurp;
+  }
+
+  va_end(argv);
+
+  P6opaquePtr result = (method->sub)(method->scope);
   this->pop();
+
+  return result;
 }
 
 
