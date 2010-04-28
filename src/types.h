@@ -60,12 +60,12 @@ struct P6opaque : public gc {
   const char *klass_name;
   std::vector<P6opaque*> *parents;
   void *content_ptr;
-  StringMap<P6opaque*> *properties;
-  StringMap<mt_entry*> *method_table;
+  llvm::StringMap<P6opaque*> *properties;
+  llvm::StringMap<mt_entry*> *method_table;
 };
 
 struct Stash : public gc {
-  StringMap<P6opaque*> values;
+  llvm::StringMap<P6opaque*> values;
   Stash* OUTER;
 };
 

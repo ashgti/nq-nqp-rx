@@ -31,14 +31,13 @@ CodeGenContext::CodeGenContext(LLVMContext &context) : context(context) {
 //  Function::Create(FT, Function::ExternalLinkage, "_say", module);
 
   FT = FunctionType::get(GenericPointerType, false);
-  Function::Create(FT, Function::ExternalLinkage, "kernel_top", module);
+  Function::Create(FT, Function::ExternalLinkage, "vm_stack_push", module);
 
   FT = FunctionType::get(GenericPointerType, false);
-  Function::Create(FT, Function::ExternalLinkage, "kernel_pop", module);
+  Function::Create(FT, Function::ExternalLinkage, "vm_stack_pop", module);
 
   FT = FunctionType::get(GenericPointerType, false);
-  Function::Create(FT, Function::ExternalLinkage, "kernel_push", module);
-
+  Function::Create(FT, Function::ExternalLinkage, "vm_stack_top", module);
 
 }
 
@@ -98,7 +97,7 @@ Value* IntegerConstant::codeGen(CodeGenContext& context)
 {
   std::cout << "Creating integer: " << value << endl;
 
-  return ConstantInt::get(Type::getInt64Ty(getGlobalContext()), value, true);
+  // return ConstantInt::get(Type::getInt64Ty(getGlobalContext()), value, true);
 
   Function *construct_int = context.module->getFunction("construct_int");
 

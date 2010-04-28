@@ -27,6 +27,7 @@
 
 namespace nqp { 
 
+
 class NqpCore : public gc {
  public:
   static NqpCore *shared;
@@ -51,6 +52,8 @@ class NqpVM : public gc_cleanup {
 
   P6opaque* dispatch(P6opaque* code, unsigned int argc, ...);
   P6opaque* dispatch(const char* name, unsigned int argc, ...);
+  P6opaque* vdispatch(P6opaque* code, unsigned int argc, va_list argv);
+  P6opaque* vdispatch(const char* name, unsigned int argc, va_list argv);
 
   static NqpVM* current(void);
 };

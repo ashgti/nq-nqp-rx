@@ -26,12 +26,11 @@
 #include <gc/gc_cpp.h>
 #include <llvm/ADT/StringMap.h>
 #include "types.h"
+#include "vm.h"
 #include "runtime_support.h"
 
 using namespace std;
 using namespace llvm;
-
-namespace nqp { 
 
 #ifdef __cplusplus /* If this is a C++ compiler, use C linkage */
 extern "C" {
@@ -40,15 +39,13 @@ extern "C" {
 void
 nqp_init() {
   GC_INIT();
-  NqpVM::main_vm = new NqpVM();
+  nqp::NqpVM::main_vm = new nqp::NqpVM();
   settings();
 }
 
 void settings() {
   GET_VM()->push();
   Stash *stack = GET_VM()->top();
-
-  cout << "stack id" << stack << endl;;
 
   P6opaque *say = construct_sub(stack, reinterpret_cast<SubPtr>(_say), 1, "*@to-print", NULL);
   stack->values["&say"] = say;
@@ -57,12 +54,12 @@ void settings() {
   stack->values["&puts"] = puts;
 }
 
-Stash *vm_stack_top() {
-  return NqpVM::current()->top();
+Stash* vm_stack_top() {
+  return nqp::NqpVM::current()->top();
 }
 
-void vm_stack_push() {
-  GET_VM()->push();
+Stash* vm_stack_push() {
+  return GET_VM()->push();
 }
 
 void vm_stack_pop() {
@@ -133,6 +130,21 @@ P6opaquePtr _puts(Stash* lex) {
 
   cout << "\n";
   return NULL;
+}
+
+P6opaquePtr stack_find(Stash *stack, const char* name) {
+  StringMap<P6opaque*>::iterator it = stack->values.find(name);
+  if (it == stack->values.end()) {
+    if (stack->OUTER == NULL) {
+      throw "Error Value not found";
+    }
+    else {
+      return stack_find(stack->OUTER, name);
+    }
+  }
+  else {
+    return it->second;
+  }
 }
 
 P6opaquePtr construct_sub(Stash *lex_scope, SubPtr sub_ptr, unsigned int argc, ...) {
@@ -214,27 +226,15 @@ void print_stack(Stash *stack) {
   }
 }
 
-/* 
-P6opaque* invoke_sub(Stash *lex_scope, char* name, SubPtr sub_ptr, int argc) {
-  P6opaque* result = new P6opaque;
-  result->klass_name = "Sub()";
-  result->method_table = new StringMap<mt_entry*>;
-  
-  mt_entry *sub_entry = result->method_table->lookup("postcircumfix:<( )>", new mt_entry).second; // .second; // = new mt_entry;
-  sub_entry->sub = sub_ptr;
-  sub_entry->argc = argc;
-  sub_entry->sub_type = sub;
-  sub_entry->scope = lex_scope;
-  // result->method_table->GetOrCreateValue("postcircumfix:<( )>", sub_entry);
-
+P6opaquePtr vm_dispatch_sub(char* sub_name, unsigned int argc, ...) {
+  va_list argv;
+  va_start(argv, argc);
+  P6opaquePtr result = GET_VM()->vdispatch(sub_name, argc, argv);
+  va_end(argv);
   return result;
 }
-*/
 
 #ifdef __cplusplus /* If this is a C++ compiler, end C linkage */
 }
 #endif
-
-
-}
 

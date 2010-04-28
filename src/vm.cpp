@@ -16,27 +16,13 @@
  */
 #include "types.h"
 #include "runtime_support.h"
+#include "vm.h"
 #include <vector>
 #include <iostream>
 
 using namespace std;
 
 namespace nqp {
-
-P6opaque* Stash::find(string name) {
-  StringMap<P6opaque*>::iterator it = values.find(name);
-  if (it == values.end()) {
-    if (OUTER == NULL) {
-      throw "Error Value not found";
-    }
-    else {
-      return OUTER->find(name);
-    }
-  }
-  else {
-    return it->second;
-  }
-}
 
 Stash* NqpVM::top() {
   return this->lex_pad;
@@ -49,9 +35,8 @@ NqpVM::NqpVM() {
 }
 
 NqpVM::~NqpVM() {
-  cout << "hi?" << endl;
+  cout << "VM Destroyed" << endl;
 }
-
 
 NqpVM* NqpVM::current(void) {
   // Potentially add other VM's for other threads 
@@ -69,10 +54,29 @@ void NqpVM::pop() {
   this->lex_pad = this->lex_pad->OUTER;
 }
 
-P6opaque* NqpVM::dispatch(const char* name, unsigned int argc, ...) {
+P6opaquePtr NqpVM::dispatch(const char* name, unsigned int argc, ...) {
+  va_list argv;
+  va_start(argv, argc);
+
+  P6opaquePtr result = this->vdispatch(name, argc, argv);
+  va_end(argv);
+
+  return result;
+}
+
+P6opaquePtr NqpVM::dispatch(P6opaque* code, unsigned int argc, ...) {
+  va_list argv;
+  va_start(argv, argc);
+
+  P6opaquePtr result = this->vdispatch(code, argc, argv);
+  va_end(argv);
+
+  return result;
+}
+
+P6opaquePtr NqpVM::vdispatch(const char* name, unsigned int argc, va_list argv) {
   P6opaquePtr slurp = NULL;
-  P6opaque* func_obj = this->top()->find(name);
-  // cout << "func: " << func_obj << " argc: " << argc << endl;
+  P6opaquePtr func_obj = stack_find(this->top(), name);
   mt_entry* method = func_obj->method_table->lookup("postcircumfix:<( )>");
   if (method == NULL) {
     throw "error"; // MethodNotFound Error
@@ -83,9 +87,6 @@ P6opaque* NqpVM::dispatch(const char* name, unsigned int argc, ...) {
     throw "not enough args";
   }
   
-  va_list argv;
-  va_start(argv, argc);
-
   bool slurpy = false;
   ParameterHolder *slurpy_arg = NULL;
 
@@ -121,15 +122,13 @@ P6opaque* NqpVM::dispatch(const char* name, unsigned int argc, ...) {
     stack->values[slurpy_arg->name] =  slurp;
   }
 
-  va_end(argv);
-
   P6opaquePtr result = (method->sub)(method->scope);
   this->pop();
 
   return result;
 }
 
-P6opaque* NqpVM::dispatch(P6opaque* code, unsigned int argc, ...) {
+P6opaque* NqpVM::vdispatch(P6opaque* code, unsigned int argc, va_list argv) {
   P6opaquePtr slurp = NULL;
   mt_entry* method = code->method_table->lookup("postcircumfix:<( )>");
 
@@ -142,9 +141,6 @@ P6opaque* NqpVM::dispatch(P6opaque* code, unsigned int argc, ...) {
     throw "not enough args";
   }
   
-  va_list argv;
-  va_start(argv, argc);
-
   bool slurpy = false;
   ParameterHolder *slurpy_arg = NULL;
 
@@ -180,14 +176,11 @@ P6opaque* NqpVM::dispatch(P6opaque* code, unsigned int argc, ...) {
     stack->values[slurpy_arg->name] =  slurp;
   }
 
-  va_end(argv);
-
   P6opaquePtr result = (method->sub)(method->scope);
   this->pop();
 
   return result;
 }
-
 
 
 } // end namespace nqp
