@@ -76,6 +76,14 @@ P6opaquePtr NqpVM::dispatch(P6opaque* code, unsigned int argc, ...) {
 
 P6opaquePtr NqpVM::vdispatch(const char* name, unsigned int argc, va_list argv) {
   P6opaquePtr slurp = NULL;
+
+  if (name[0] != '&') {
+    char* tmp = (char*)malloc(sizeof(char) * strlen(name) + 2);
+    tmp[0] = '&';
+    strcpy(tmp+1, name);
+    name = tmp;
+  }
+
   P6opaquePtr func_obj = stack_find(this->top(), name);
   mt_entry* method = func_obj->method_table->lookup("postcircumfix:<( )>");
   if (method == NULL) {

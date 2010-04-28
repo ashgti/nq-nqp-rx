@@ -2,6 +2,7 @@
 #include <cstdio>
 #include "node.h"
 #include "codegen.h"
+#include "runtime_support.h"
 #include "parser/grammar.hpp"
 #include <gc/gc_cpp.h>
 #include "ast_pass.h"
@@ -27,6 +28,7 @@ main(int argc, char **argv) {
   parser.parse();
 
   // nqp::TypeInferencePass(root);
+  nqp_init();
 
   std::cerr << "Root:\n\n" << root->str("") << "\n";
   

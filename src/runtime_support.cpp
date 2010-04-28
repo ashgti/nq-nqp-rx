@@ -37,6 +37,9 @@ extern "C" {
 #endif
 
 void
+print_stack(Stash*);
+
+void
 nqp_init() {
   GC_INIT();
   nqp::NqpVM::main_vm = new nqp::NqpVM();
@@ -106,7 +109,7 @@ P6opaque* construct_int(long long v) {
 
 P6opaquePtr _say(Stash* lex) {
   Stash *stack = GET_VM()->top();
-  P6opaquePtr vals = stack->values["@to-print"];
+  P6opaquePtr vals = stack_find(stack, "@to-print");
   unsigned int size = array_size(vals); 
 
   for (unsigned int i = 0; i < size; ++i) {
@@ -158,17 +161,20 @@ P6opaquePtr construct_sub(Stash *lex_scope, SubPtr sub_ptr, unsigned int argc, .
   sub_args->slurpy = false;
   
   for (unsigned int i=0; i < argc; i++) {
-    char* tmp_name = va_arg(argv, char*);
+    const char* tmp_name = va_arg(argv, const char*);
     char* name;
     P6opaquePtr init = va_arg(argv, P6opaquePtr);
     ParameterHolder tmp;
     int name_length = strlen(tmp_name);
+    cout << "name: " << tmp_name << " length: " << name_length << endl;
     name = (char*)malloc(sizeof(char) * (name_length + 1));
     strncpy(name, tmp_name, name_length);
     tmp.ptype = kREQUIRED;
 
     if (name[0] == '*') {
-      strncpy(name, name+1, name_length--);
+      char* name_holder = (char*)malloc(sizeof(char) * name_length);
+      strncpy(name_holder, name, name_length);
+      strncpy(name, name_holder+1, name_length--);
       sub_args->slurpy = true;
       tmp.ptype = kOPTIONAL;
       tmp.slurpy = true;
@@ -226,7 +232,7 @@ void print_stack(Stash *stack) {
   }
 }
 
-P6opaquePtr vm_dispatch_sub(char* sub_name, unsigned int argc, ...) {
+P6opaquePtr vm_dispatch_sub(const char* sub_name, unsigned int argc, ...) {
   va_list argv;
   va_start(argv, argc);
   P6opaquePtr result = GET_VM()->vdispatch(sub_name, argc, argv);
