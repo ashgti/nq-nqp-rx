@@ -150,17 +150,24 @@ Value* BlockReturn::codeGen(CodeGenContext& context) {
 }
 
 Value* MethodCall::codeGen(CodeGenContext& context) {
-	const ArrayType *str_type = ArrayType::get(Type::getInt8Ty(getGlobalContext()),  id.name.length() + 1);
+  GlobalVariable *val;
+  StringMap<GlobalVariable*>::iterator iter = context.globals.find(id.name);
+    if (iter == context.globals.end()) {
+    const ArrayType *str_type = ArrayType::get(Type::getInt8Ty(getGlobalContext()),  id.name.length() + 1);
 
-	std::vector<Constant *> ary_elements;
-	for (unsigned int i = 0; i < id.name.length(); i++) {
-	  ary_elements.push_back(ConstantInt::get(Type::getInt8Ty(getGlobalContext()), id.name[i]));
-	}
-	ary_elements.push_back(ConstantInt::get(Type::getInt8Ty(getGlobalContext()), 0));
+    std::vector<Constant *> ary_elements;
+    for (unsigned int i = 0; i < id.name.length(); i++) {
+      ary_elements.push_back(ConstantInt::get(Type::getInt8Ty(getGlobalContext()), id.name[i]));
+    }
+    ary_elements.push_back(ConstantInt::get(Type::getInt8Ty(getGlobalContext()), 0));
 
-  GlobalVariable *val = new GlobalVariable(*context.module, str_type, true,
-		GlobalValue::InternalLinkage,
-		ConstantArray::get(str_type, ary_elements), "");
+    val = new GlobalVariable(*context.module, str_type, true, GlobalValue::InternalLinkage, ConstantArray::get(str_type, ary_elements), "");
+
+    context.globals[id.name] = val;
+  }
+  else {
+    val = iter->second;
+  }
   
   Function *function = context.module->getFunction("vm_dispatch_sub");
 
@@ -178,20 +185,24 @@ Value* MethodCall::codeGen(CodeGenContext& context) {
 }
 
 Value* BasicOp::codeGen(CodeGenContext& context) {
-  std::cout << "Creating binary operation " << op << endl;
-  Instruction::BinaryOps instr;
+  std::cout << "Creating infix operation " << op << endl;
+  string name;
   switch (op) {
     case token::T_PLUS:
-      instr = Instruction::Add;
+      // Call infix:<+> 
+      name = "&infix:<+>";
       break;
     case token::T_MINUS:
-      instr = Instruction::Sub;
+      // Call infix:<->
+      name = "&infix:<->";
       break;
     case token::T_MUL:
-      instr = Instruction::Mul;
+      // Call infix:<*>
+      name = "&infix:<*>";
       break;
     case token::T_DIV:
-      instr = Instruction::SDiv;
+      // Call infix:</>
+      name = "&infix:</>";
       break;
     /* TODO comparison */
     default: { 
@@ -200,8 +211,29 @@ Value* BasicOp::codeGen(CodeGenContext& context) {
     }
   }
 
-  return BinaryOperator::Create(instr, lhs.codeGen(context), 
-    rhs.codeGen(context), "", context.currentBlock());
+  Function *function = context.module->getFunction("vm_dispatch_sub");
+
+ 	const ArrayType *str_type = ArrayType::get(Type::getInt8Ty(getGlobalContext()),  name.length() + 1);
+
+	std::vector<Constant *> ary_elements;
+	for (unsigned int i = 0; i < name.length(); i++) {
+	  ary_elements.push_back(ConstantInt::get(Type::getInt8Ty(getGlobalContext()), name[i]));
+	}
+	ary_elements.push_back(ConstantInt::get(Type::getInt8Ty(getGlobalContext()), 0));
+
+  GlobalVariable *val = new GlobalVariable(*context.module, str_type, true,
+		GlobalValue::InternalLinkage,
+		ConstantArray::get(str_type, ary_elements), "");
+
+  std::vector<Value*> args;
+  ExpressionList::const_iterator it;
+
+  args.push_back(val);
+  args.push_back(ConstantInt::get(Type::getInt64Ty(getGlobalContext()), 2, true));
+  args.push_back(lhs.codeGen(context));
+  args.push_back(rhs.codeGen(context));
+
+  return CallInst::Create(function, args.begin(), args.end(), "", context.currentBlock());
 }
 
 Value* Assignment::codeGen(CodeGenContext& context) {
