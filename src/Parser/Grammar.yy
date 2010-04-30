@@ -343,7 +343,9 @@ expr : variable assignment expr {
        $$ = new BasicOp(*$1, $2, *$3);
      }
      | methodop 
-     | T_LPAREN expr T_RPAREN {}
+     | T_LPAREN args_list T_RPAREN {
+     
+     }
      | constants
      | variable
      ;
