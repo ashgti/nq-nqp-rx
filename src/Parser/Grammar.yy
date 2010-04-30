@@ -75,23 +75,26 @@ using namespace nqp;
  */
 /* numerics: */
 /* == != < > <= >= */
-%token <token> T_CN_EQ T_CN_NEQ T_CN_LT T_CN_GT T_CN_LTE T_CN_GTE T_CN_EQL
+%token <token> T_CN_EQ T_CN_NE T_CN_LT T_CN_GT T_CN_LE T_CN_GE
 /* string ops: */
 /* eq ne lt le gt ge */
-%token <token> T_CS_EQ T_CS_NEQ T_CS_LT T_CS_GT T_CS_LTE T_CS_GTE T_CS_EQL
+%token <token> T_CS_EQ T_CS_NE T_CS_LT T_CS_GT T_CS_LE T_CS_GE
 /* other operatos */
-/* ~~ === eqv ! ** */
-%token <token> T_SMARTMATCH T_TRIPLE_EQ T_EQV T_NOT T_REPEATER
+/* ~~ =:= ! ** ^ | // */
+%token <token> T_SMARTMATCH T_ID_CMP T_NOT T_REPEATER T_CAROT T_OR_EQ T_BAR
 /* math ops */
 /* + - * / % */
 %token <token> T_PLUS T_MINUS T_MUL T_DIV T_MOD
 /* string ops */
 /* ~ */
 %token <token> T_STITCH
+/* regex */
+/* ^^ $$ && & || {*} #= */
+%token <token> T_REGEX_OPEN T_REGEX_NAME T_REGEX_START T_REGEX_END T_BARBAR T_REGEX_AND T_AND
 
 /* control structure tokens */
-%token <token> T_IF T_ELSIF T_ELSE T_UNLESS T_FOR T_WHILE T_RETURN T_GIVEN T_WHEN
-%token T_LBRACE T_RBRACE T_LPAREN T_RPAREN T_COMMA T_SEMICOLON T_DOT
+%token <token> T_IF T_ELSIF T_ELSE T_UNLESS T_FOR T_WHILE T_RETURN T_MAKE T_GIVEN T_WHEN T_INLINE_IF T_INLINE_ELSE
+%token T_LBRACE T_RBRACE T_LPAREN T_RPAREN T_COMMA T_SEMICOLON T_DOT T_RBRACKET T_LBRACKET
 
 %type <block> prog stmts xblock
 %type <stmt> stmt var_declarator func_declarator regex_declarator
@@ -383,7 +386,7 @@ assignment : T_EQ
            | T_RO_BIND
            ;
 
-other_ops : T_TRIPLE_EQ | T_EQV | T_NOT | T_REPEATER
+other_ops :  T_REPEATER
           ;
 
 math_ops : T_PLUS | T_MINUS | T_MUL | T_DIV
@@ -393,9 +396,9 @@ string_ops : T_STITCH
            ;
 
 
-comparison : T_CN_EQ | T_CN_NEQ | T_CN_LT | T_CN_GT | T_CN_LTE | T_CN_GTE 
-           | T_CN_EQL | T_CS_EQ | T_CS_NEQ | T_CS_LT | T_CS_GT | T_CS_LTE 
-           | T_CS_GTE | T_CS_EQL | T_SMARTMATCH
+comparison : T_CN_EQ | T_CN_NE | T_CN_LT | T_CN_GT | T_CN_LE | T_CN_GE 
+           | T_CS_EQ | T_CS_NE | T_CS_LT | T_CS_GT | T_CS_LE | T_CS_GE 
+           | T_SMARTMATCH
            ;
 %%
 
