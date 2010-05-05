@@ -1,6 +1,7 @@
 #ifndef SRC_TYPES_H
 #define SRC_TYPES_H
 
+#include <stdint.h>
 #include <llvm/ADT/StringMap.h>
 #include <gc/gc_cpp.h>
 #include <map>
@@ -10,6 +11,17 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/* Declare some base types for built in types */
+#if __LP64__
+  #define N_INT int64_t
+#else
+  #define N_INT int32_t
+#endif
+
+#define N_NUM double
+#define N_STR uint8_t* // If i am going to support unicode, I need to check this and change it
+#define N_BOOL int8_t
 
 struct P6opaque;
 typedef P6opaque* P6opaquePtr;
@@ -46,11 +58,12 @@ enum BuiltInTypes {
   kBUILT_IN_MU = 0,
   kBUILT_IN_INT,
   kBUILT_IN_NUM,
-  kBUILT_IN_STRING,
+  kBUILT_IN_STR,
   kBUILT_IN_BOOL,
   kBUILT_IN_ARRAY,
   kBUILT_IN_HASH,
   kBUILT_IN_CODE,
+  kBUILT_IN_BLOCK,
   kBUILT_IN_SUB,
   kOTHER
 };

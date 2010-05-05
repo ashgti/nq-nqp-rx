@@ -17,7 +17,7 @@ ENABLE_TESTING()
 find_package(BISON)
 find_package(FLEX)
 
-# set(CMAKE_CXX_COMPILER "clang++")
+set(CMAKE_CXX_COMPILER "clang++")
 
 BISON_TARGET(NQPParser src/parser/grammar.yy src/parser/grammar.cpp COMPILE_FLAGS "-Wall -t -v -Lc++")
 FLEX_TARGET(NQPScanner src/parser/tokens.l  src/parser/tokens.cpp)
@@ -29,12 +29,16 @@ include_directories(src/Parser src ${LLVM_INCLUDE_DIR})
 set(CMAKE_CXX_FLAGS "${LLVM_COMPILE_FLAGS} -g -I/opt/local/include")
 # SET(CMAKE_SHARED_LINKER_FLAGS ${LLVM_LDFLAGS})
 
-add_executable(nq-nqp src/main.cpp src/node.cpp src/codegen.cpp src/node_builder.cpp src/runtime_support.cpp src/ast_pass.cpp src/vm.cpp ${BISON_NQPParser_OUTPUTS} ${FLEX_NQPScanner_OUTPUTS})
+add_library(nq-nqp SHARED src/vm.cpp src/runtime_support.cpp src/node.cpp src/codegen.cpp src/node_builder.cpp src/ast_pass.cpp ${BISON_NQPParser_OUTPUTS} ${FLEX_NQPScanner_OUTPUTS})
+add_library(nq-nqp-static STATIC src/vm.cpp src/runtime_support.cpp src/node.cpp src/codegen.cpp src/node_builder.cpp src/ast_pass.cpp ${BISON_NQPParser_OUTPUTS} ${FLEX_NQPScanner_OUTPUTS})
 
+add_executable(nq-nqpc src/main.cpp)
 add_executable(runtime_test src/test_main.cpp src/runtime_support.cpp src/vm.cpp)
 
 target_link_libraries(nq-nqp ${LLVM_LIBS_JIT} ${LLVM_LDFLAGS} "-L/opt/local/lib -lgc")
+target_link_libraries(nq-nqp-static ${LLVM_LIBS_JIT} ${LLVM_LDFLAGS} "-L/opt/local/lib -lgc")
+target_link_libraries(nq-nqpc nq-nqp)
 target_link_libraries(runtime_test ${LLVM_LIBS_JIT} ${LLVM_LDFLAGS} "-L/opt/local/lib -lgc")
 
-add_test(junk nq-nqp "t/simple.nqp")
+# add_test(junk nq-nqp "t/simple.nqp")
 

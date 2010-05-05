@@ -102,7 +102,7 @@ using namespace nqp;
 %type <param_list> signature param_list
 %type <param_var> parameter
 %type <var_decl> param_variable named_param
-%type <exprvec> args_list 
+%type <exprvec> args_list
 %type <expr> expr_list expr number stringc constants methodop
 %type <stmt> stmt_control if_stmt elsif_stmt unless_stmt for_stmt while_stmt
 %type <token> comparison assignment infix

@@ -26,10 +26,16 @@ CodeGenContext::CodeGenContext(LLVMContext &context) : context(context) {
   FunctionType *FT = FunctionType::get(GenericPointerType, Args, false);
   Function::Create(FT, Function::ExternalLinkage, "construct_int", module);
 
+  Args = vector<const Type*>();
+  Args.push_back(Type::getInt8PtrTy(getGlobalContext()));
+  Args.push_back(Type::getInt64Ty(getGlobalContext()));
+  FunctionType *FT = FunctionType::get(GenericPointerType, Args, false);
+  Function::Create(FT, Function::ExternalLinkage, "construct_int", module);
 //  Args = vector<const Type*>(1, Type::getInt64Ty(getGlobalContext()));
 //  FT = FunctionType::get(GenericPointerType, Args, true);
 //  Function::Create(FT, Function::ExternalLinkage, "_say", module);
 
+  /* 
   FT = FunctionType::get(GenericPointerType, false);
   Function::Create(FT, Function::ExternalLinkage, "vm_stack_push", module);
 
@@ -38,6 +44,7 @@ CodeGenContext::CodeGenContext(LLVMContext &context) : context(context) {
 
   FT = FunctionType::get(GenericPointerType, false);
   Function::Create(FT, Function::ExternalLinkage, "vm_stack_top", module);
+  */
 
   // Args = vector<const Type*>(2, Type::get);
   FT = FunctionType::get(GenericPointerType, true);
@@ -97,25 +104,14 @@ static const Type *typeOf(const Identifier& type)
 
 /* -- Code Generation -- */
 
-Value* IntegerConstant::codeGen(CodeGenContext& context)
-{
+Value* IntegerConstant::codeGen(CodeGenContext& context) {
   std::cout << "Creating integer: " << value << endl;
-
-  // return ConstantInt::get(Type::getInt64Ty(getGlobalContext()), value, true);
-
   Function *construct_int = context.module->getFunction("construct_int");
-
   if (construct_int == NULL) {
     std::cerr << "Bad construct int" << endl;
   }
-
   std::vector<Value*> ArgsV;
-
   ArgsV.push_back(ConstantInt::get(Type::getInt64Ty(getGlobalContext()), value, true));
-
-  cout << "this: " << this << " value is: " << value << endl;
-
-  // CallInst *call =   // Builder.CreateCall(construct_int, ArgsV.begin(), ArgsV.end(), "calltmp");
 
   return CallInst::Create(construct_int, ArgsV.begin(), ArgsV.end(), "", context.currentBlock());
 }
@@ -127,8 +123,37 @@ Value* DoubleConstant::codeGen(CodeGenContext& context)
 }
 
 Value* StringConstant::codeGen(CodeGenContext& context) {
-  std::cout << "Not yet Implemented" << endl;
-  return NULL;
+  std::cout << "Construing String: " << value << endl;
+
+  Function *construct_str = context.module->getFunction("construct_str");
+  if (construct_str == NULL) {
+    std::cerr << "Bad construct int" << endl;
+  }
+  
+  GlobalVariable *val;
+  StringMap<GlobalVariable*>::iterator iter = context.globals.find(value);
+    if (iter == context.globals.end()) {
+    const ArrayType *str_type = ArrayType::get(Type::getInt8Ty(getGlobalContext()),  value.length() + 1);
+
+    std::vector<Constant *> ary_elements;
+    for (unsigned int i = 0; i < value.length(); i++) {
+      ary_elements.push_back(ConstantInt::get(Type::getInt8Ty(getGlobalContext()), value[i]));
+    }
+    ary_elements.push_back(ConstantInt::get(Type::getInt8Ty(getGlobalContext()), 0));
+
+    val = new GlobalVariable(*context.module, str_type, true, GlobalValue::InternalLinkage, ConstantArray::get(str_type, ary_elements), "");
+
+    context.globals[value] = val;
+  }
+  else {
+    val = iter->second;
+  }
+
+  std::vector<Value*> ArgsV;
+  ArgsV.push_back(val);
+  ArgsV.psuh_back(ConstantInt::get(Type::getInt64Ty(getGlobalContext()), value.length, true));
+
+  return CallInst::Create(construct_str, ArgsV.begin(), ArgsV.end(), "", context.currentBlock());
 }
 
 Value* Identifier::codeGen(CodeGenContext& context)

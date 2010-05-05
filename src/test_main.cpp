@@ -5,13 +5,39 @@
 #include "vm.h"
 #include <gc/gc_cpp.h>
 
+using namespace std;
+
 P6opaquePtr add_two(Stash* lex) {
   Stash* stack = vm_stack_top();
+
+  //cout << "Stack id: " << stack << endl;
+
+  //print_stack(stack);
+  //print_stack(lex);
 
   int *a = (int*)stack_find(stack, "$a")->content_ptr;
   int *b = (int*)stack_find(stack, "$b")->content_ptr;
 
   return construct_int(*a + *b);
+}
+
+P6opaquePtr block(Stash* lex) {
+  Stash* stack = vm_stack_top();
+
+  return stack_find(lex, "$i");
+}
+
+P6opaquePtr foo(Stash* lex) {
+  Stash* stack = vm_stack_top();
+
+  P6opaquePtr i = stack_find(stack, "$i");
+
+  Stash* block_stack = vm_stack_push();
+  block_stack->values["$i"] = i;
+  P6opaquePtr result = construct_closure(block_stack, reinterpret_cast<SubPtr>(block), 0);
+  vm_stack_pop();
+
+  return result;
 }
 
 extern "C"
@@ -20,16 +46,28 @@ int main() {
  
   Stash* stack = vm_stack_top();
 
-  P6opaque *subs = construct_sub(stack, reinterpret_cast<SubPtr>(add_two), 2, "$a", NULL, "$b", NULL);
-
+  P6opaquePtr subs = construct_sub(stack, reinterpret_cast<SubPtr>(add_two), 4, "$a", NULL, "$b", NULL);
   stack->values["&add_two"] = subs;
+  subs = construct_sub(stack, reinterpret_cast<SubPtr>(foo), 2, "$i", NULL);
+  stack->values["&foo"] = subs;
 
-  P6opaquePtr foo = construct_int(4);
-  P6opaquePtr baz = construct_int(3);
+  P6opaquePtr foo = construct_int(4l);
+  P6opaquePtr baz = construct_int(3l);
+
+  //cout << "Trying to dispatch add_two" << endl;
 
   P6opaquePtr result = vm_dispatch_sub("&add_two", 2, foo, baz);
+
+  //cout << "result is: " << *(int*)result->content_ptr << endl;
+  //cout << " and " << result->klass_type << " id " << result << endl;
+
   vm_dispatch_sub("&say", 1, result);
   vm_dispatch_sub("&puts", 2, foo, baz);
+
+  P6opaquePtr a = vm_dispatch_sub("&foo", 1, foo);
+  P6opaquePtr b = vm_dispatch_sub("&foo", 1, baz);
+  vm_dispatch_sub("say", 2, vm_invoke(a, 0), vm_invoke(b, 0));
+  
 
   return 0;  
 }
