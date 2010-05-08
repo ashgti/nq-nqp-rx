@@ -74,6 +74,10 @@ VariableDeclaration::VariableDeclaration(Identifier& id,
     id(id), assignment(assignment_token), assignmentExpr(expr) {
 }
 
+ListDeclaration::ListDeclaration(ExpressionList* values) :
+    list_values(values) {
+}
+
 ParameterDeclaration::ParameterDeclaration(VariableDeclaration& var, 
                                            bool named, 
                                            bool optional, 
@@ -81,7 +85,6 @@ ParameterDeclaration::ParameterDeclaration(VariableDeclaration& var,
     var(var), named(named), optional(optional), slurpy(slurpy) {
 
 }
-
 
 FunctionDeclaration::FunctionDeclaration(Identifier& id,
                                          ParameterList& arguments, 
@@ -273,6 +276,17 @@ std::string BlockReturn::str(std::string prefix) {
 
   return o.str();
 }
+
+std::string ListDeclaration::str(std::string prefix) {
+  std::ostringstream o;
+
+  o << prefix << "<ListDeclaration ptr=\"" << this << "\">\n";
+  o << prefix << "\tlist\n";
+  o << prefix << "</ListDeclaration>\n";
+
+  return o.str();
+}
+
 
 std::string IfBlock::str(std::string prefix) {
   std::ostringstream o;

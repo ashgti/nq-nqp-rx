@@ -363,8 +363,8 @@ static void yy_fatal_error (yyconst char msg[]  );
 	*yy_cp = '\0'; \
 	(yy_c_buf_p) = yy_cp;
 
-#define YY_NUM_RULES 90
-#define YY_END_OF_BUFFER 91
+#define YY_NUM_RULES 88
+#define YY_END_OF_BUFFER 89
 /* This struct is not used in this scanner,
    but its presence is necessary. */
 struct yy_trans_info
@@ -374,27 +374,27 @@ struct yy_trans_info
 	};
 static yyconst flex_int16_t yy_accept[196] =
     {   0,
-        0,    0,    0,    0,   77,   77,    3,    3,   91,   89,
-        1,    4,   89,   89,    2,   85,   24,   48,   89,   10,
-       11,   21,   20,   14,   89,    9,   23,    5,   89,    6,
-       26,   15,   27,   89,   85,   87,   12,   13,   41,   87,
-       87,   87,   87,   87,   87,   87,   87,   87,   87,   87,
-       87,   87,   87,   87,   87,    7,   40,    8,   39,   76,
-       75,   73,   74,   77,    4,   77,   78,    3,    3,   50,
-       19,    0,   88,    0,   43,   45,    0,   22,   61,   64,
-       47,    5,    0,   16,    0,   28,    0,   18,   29,   49,
-       87,   42,   87,   87,   36,   87,   35,   87,   87,   33,
+        0,    0,    0,    0,   75,   75,    3,    3,   89,   87,
+        1,    4,   87,   87,    2,   83,   22,   46,   87,   10,
+       11,   19,   18,   14,   87,    9,   21,    5,   87,    6,
+       24,   15,   25,   87,   83,   85,   12,   13,   39,   85,
+       85,   85,   85,   85,   85,   85,   85,   85,   85,   85,
+       85,   85,   85,   85,   85,    7,   38,    8,   37,   74,
+       73,   71,   72,   75,    4,   75,   76,    3,    3,   48,
+       29,    0,   86,    0,   41,   43,    0,   20,   59,   62,
+       45,    5,    0,   16,    0,   26,    0,   28,   27,   47,
+       85,   40,   85,   85,   34,   85,   33,   85,   85,   31,
 
-       87,   53,   34,   32,   87,   87,   87,   65,   37,   87,
-       87,   87,   87,   87,   87,   87,   87,   87,    0,   46,
-       38,   73,   77,   77,    3,    3,   63,   17,   62,   25,
-       87,   87,   57,   87,   87,   67,   87,   87,   87,   66,
-       87,   87,   87,   87,   87,   68,   87,   87,   87,   87,
-       44,   87,   55,   87,   87,   87,   52,   87,   87,   87,
-       87,   87,   83,   79,   87,   87,   87,   60,   87,   80,
-       54,   59,   87,   87,   87,   87,   71,   87,   87,   72,
-       87,   58,   87,   69,   84,   87,   51,   87,   56,   82,
-       81,   87,   87,   70,    0
+       85,   51,   32,   30,   85,   85,   85,   63,   35,   85,
+       85,   85,   85,   85,   85,   85,   85,   85,    0,   44,
+       36,   71,   75,   75,    3,    3,   61,   17,   60,   23,
+       85,   85,   55,   85,   85,   65,   85,   85,   85,   64,
+       85,   85,   85,   85,   85,   66,   85,   85,   85,   85,
+       42,   85,   53,   85,   85,   85,   50,   85,   85,   85,
+       85,   85,   81,   77,   85,   85,   85,   58,   85,   78,
+       52,   57,   85,   85,   85,   85,   69,   85,   85,   70,
+       85,   56,   85,   67,   82,   85,   49,   85,   54,   80,
+       79,   85,   85,   68,    0
 
     } ;
 
@@ -1017,317 +1017,307 @@ return TOKEN(token::T_RO_BIND);
 case 18:
 YY_RULE_SETUP
 #line 53 "src/parser/tokens.l"
-return TOKEN(token::T_CN_EQ);
+return TOKEN(token::T_PLUS);
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
 #line 54 "src/parser/tokens.l"
-return TOKEN(token::T_CN_NE);
+return TOKEN(token::T_MUL);
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
 #line 55 "src/parser/tokens.l"
-return TOKEN(token::T_PLUS);
+return TOKEN(token::T_REPEATER);
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
 #line 56 "src/parser/tokens.l"
-return TOKEN(token::T_MUL);
+return TOKEN(token::T_DIV); 
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
 #line 57 "src/parser/tokens.l"
-return TOKEN(token::T_REPEATER);
+return TOKEN(token::T_MOD);
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
 #line 58 "src/parser/tokens.l"
-return TOKEN(token::T_DIV); 
+return TOKEN(token::T_ID_CMP);
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
 #line 59 "src/parser/tokens.l"
-return TOKEN(token::T_MOD);
+return TOKEN(token::T_CN_LT);
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
 #line 60 "src/parser/tokens.l"
-return TOKEN(token::T_ID_CMP);
+return TOKEN(token::T_CN_GT);
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
 #line 61 "src/parser/tokens.l"
-return TOKEN(token::T_CN_LT);
+return TOKEN(token::T_CN_LE);
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
 #line 62 "src/parser/tokens.l"
-return TOKEN(token::T_CN_GT);
+return TOKEN(token::T_CN_GE);
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
 #line 63 "src/parser/tokens.l"
-return TOKEN(token::T_CN_LE);
+return TOKEN(token::T_CN_EQ);
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
 #line 64 "src/parser/tokens.l"
-return TOKEN(token::T_CN_GE);
+return TOKEN(token::T_CN_NE);
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
 #line 65 "src/parser/tokens.l"
-return TOKEN(token::T_CN_EQ);
+return TOKEN(token::T_CS_LT);
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
 #line 66 "src/parser/tokens.l"
-return TOKEN(token::T_CN_NE);
+return TOKEN(token::T_CS_GT);
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
 #line 67 "src/parser/tokens.l"
-return TOKEN(token::T_CS_LT);
+return TOKEN(token::T_CS_LE);
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
 #line 68 "src/parser/tokens.l"
-return TOKEN(token::T_CS_GT);
+return TOKEN(token::T_CS_GE);
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
 #line 69 "src/parser/tokens.l"
-return TOKEN(token::T_CS_LE);
+return TOKEN(token::T_CS_EQ);
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
 #line 70 "src/parser/tokens.l"
-return TOKEN(token::T_CS_GE);
+return TOKEN(token::T_CS_NE);
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
 #line 71 "src/parser/tokens.l"
-return TOKEN(token::T_CS_EQ);
+return TOKEN(token::T_SMARTMATCH);
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
 #line 72 "src/parser/tokens.l"
-return TOKEN(token::T_CS_NE);
+return TOKEN(token::T_STITCH);
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
 #line 73 "src/parser/tokens.l"
-return TOKEN(token::T_SMARTMATCH);
+return TOKEN(token::T_BAR);
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
 #line 74 "src/parser/tokens.l"
-return TOKEN(token::T_STITCH);
+return TOKEN(token::T_CAROT);
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
 #line 75 "src/parser/tokens.l"
-return TOKEN(token::T_BAR);
+return TOKEN(token::T_REGEX_START);
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
 #line 76 "src/parser/tokens.l"
-return TOKEN(token::T_CAROT);
+return TOKEN(token::T_REGEX_END);
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
 #line 77 "src/parser/tokens.l"
-return TOKEN(token::T_REGEX_START);
+return TOKEN(token::T_REGEX_OPEN);
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
 #line 78 "src/parser/tokens.l"
-return TOKEN(token::T_REGEX_END);
+return TOKEN(token::T_REGEX_AND);
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
 #line 79 "src/parser/tokens.l"
-return TOKEN(token::T_REGEX_OPEN);
+return TOKEN(token::T_BARBAR);
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
 #line 80 "src/parser/tokens.l"
-return TOKEN(token::T_REGEX_AND);
+return TOKEN(token::T_OR_EQ);
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
 #line 81 "src/parser/tokens.l"
-return TOKEN(token::T_BARBAR);
+return TOKEN(token::T_AND);
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
 #line 82 "src/parser/tokens.l"
-return TOKEN(token::T_OR_EQ);
+return TOKEN(token::T_INLINE_IF);
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
 #line 83 "src/parser/tokens.l"
-return TOKEN(token::T_AND);
+return TOKEN(token::T_INLINE_ELSE);
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 84 "src/parser/tokens.l"
-return TOKEN(token::T_INLINE_IF);
+#line 85 "src/parser/tokens.l"
+return TOKEN(token::T_RETURN);
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 85 "src/parser/tokens.l"
-return TOKEN(token::T_INLINE_ELSE);
+#line 86 "src/parser/tokens.l"
+return TOKEN(token::T_MAKE);
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 87 "src/parser/tokens.l"
-return TOKEN(token::T_RETURN);
+#line 88 "src/parser/tokens.l"
+return TOKEN(token::T_IF);
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 88 "src/parser/tokens.l"
-return TOKEN(token::T_MAKE);
+#line 89 "src/parser/tokens.l"
+return TOKEN(token::T_ELSIF);
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
 #line 90 "src/parser/tokens.l"
-return TOKEN(token::T_IF);
+return TOKEN(token::T_ELSE);
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
 #line 91 "src/parser/tokens.l"
-return TOKEN(token::T_ELSIF);
+return TOKEN(token::T_UNLESS);
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
 #line 92 "src/parser/tokens.l"
-return TOKEN(token::T_ELSE);
+return TOKEN(token::T_FOR);
 	YY_BREAK
 case 56:
 YY_RULE_SETUP
 #line 93 "src/parser/tokens.l"
-return TOKEN(token::T_UNLESS);
+return TOKEN(token::T_WHILE);
 	YY_BREAK
 case 57:
 YY_RULE_SETUP
 #line 94 "src/parser/tokens.l"
-return TOKEN(token::T_FOR);
+return TOKEN(token::T_GIVEN);
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
 #line 95 "src/parser/tokens.l"
-return TOKEN(token::T_WHILE);
+return TOKEN(token::T_WHEN);
 	YY_BREAK
 case 59:
 YY_RULE_SETUP
-#line 96 "src/parser/tokens.l"
-return TOKEN(token::T_GIVEN);
+#line 97 "src/parser/tokens.l"
+return TOKEN(token::T_LAMBDA);
 	YY_BREAK
 case 60:
 YY_RULE_SETUP
-#line 97 "src/parser/tokens.l"
-return TOKEN(token::T_WHEN);
+#line 98 "src/parser/tokens.l"
+return TOKEN(token::T_LAMBDA_RW);
 	YY_BREAK
 case 61:
 YY_RULE_SETUP
-#line 99 "src/parser/tokens.l"
-return TOKEN(token::T_LAMBDA);
+#line 100 "src/parser/tokens.l"
+return TOKEN(token::T_ELLIPSES);
 	YY_BREAK
 case 62:
 YY_RULE_SETUP
-#line 100 "src/parser/tokens.l"
-return TOKEN(token::T_LAMBDA_RW);
+#line 101 "src/parser/tokens.l"
+return TOKEN(token::T_RANGE);
 	YY_BREAK
 case 63:
 YY_RULE_SETUP
-#line 102 "src/parser/tokens.l"
-return TOKEN(token::T_ELLIPSES);
+#line 103 "src/parser/tokens.l"
+return TOKEN(token::T_MY);
 	YY_BREAK
 case 64:
 YY_RULE_SETUP
-#line 103 "src/parser/tokens.l"
-return TOKEN(token::T_RANGE);
+#line 104 "src/parser/tokens.l"
+return TOKEN(token::T_OUR);
 	YY_BREAK
 case 65:
 YY_RULE_SETUP
 #line 105 "src/parser/tokens.l"
-return TOKEN(token::T_MY);
+return TOKEN(token::T_HAS);
 	YY_BREAK
 case 66:
 YY_RULE_SETUP
-#line 106 "src/parser/tokens.l"
-return TOKEN(token::T_OUR);
+#line 107 "src/parser/tokens.l"
+return TOKEN(token::T_SUB);
 	YY_BREAK
 case 67:
 YY_RULE_SETUP
-#line 107 "src/parser/tokens.l"
-return TOKEN(token::T_HAS);
+#line 108 "src/parser/tokens.l"
+return TOKEN(token::T_METHOD);
 	YY_BREAK
 case 68:
 YY_RULE_SETUP
 #line 109 "src/parser/tokens.l"
-return TOKEN(token::T_SUB);
+return TOKEN(token::T_SUBMETHOD);
 	YY_BREAK
 case 69:
 YY_RULE_SETUP
-#line 110 "src/parser/tokens.l"
-return TOKEN(token::T_METHOD);
+#line 111 "src/parser/tokens.l"
+return TOKEN(token::T_REGEX);
 	YY_BREAK
 case 70:
 YY_RULE_SETUP
-#line 111 "src/parser/tokens.l"
-return TOKEN(token::T_SUBMETHOD);
-	YY_BREAK
-case 71:
-YY_RULE_SETUP
-#line 113 "src/parser/tokens.l"
-return TOKEN(token::T_REGEX);
-	YY_BREAK
-case 72:
-YY_RULE_SETUP
-#line 114 "src/parser/tokens.l"
+#line 112 "src/parser/tokens.l"
 { 
   yy_push_state(expect_regex);
   return TOKEN(token::T_TOKEN);
 }
 	YY_BREAK
-case 73:
+case 71:
 YY_RULE_SETUP
-#line 118 "src/parser/tokens.l"
+#line 116 "src/parser/tokens.l"
 {
   SAVE_TOKEN;
   return token::T_ID;
 }
 	YY_BREAK
-case 74:
+case 72:
 YY_RULE_SETUP
-#line 122 "src/parser/tokens.l"
+#line 120 "src/parser/tokens.l"
 {
   yy_push_state(regex);
   return TOKEN(token::T_LBRACE);
 }
 	YY_BREAK
-case 75:
+case 73:
 YY_RULE_SETUP
-#line 126 "src/parser/tokens.l"
+#line 124 "src/parser/tokens.l"
 { printf("space encountered\n");  }
 	YY_BREAK
-case 76:
+case 74:
 YY_RULE_SETUP
-#line 127 "src/parser/tokens.l"
+#line 125 "src/parser/tokens.l"
 {  printf("Unknown Token. %s\n", yytext); }
 	YY_BREAK
 
-case 77:
-/* rule 77 can match eol */
+case 75:
+/* rule 75 can match eol */
 YY_RULE_SETUP
-#line 129 "src/parser/tokens.l"
+#line 127 "src/parser/tokens.l"
 { SAVE_TOKEN; return token::T_RBLOCK; }
 	YY_BREAK
-case 78:
+case 76:
 YY_RULE_SETUP
-#line 130 "src/parser/tokens.l"
+#line 128 "src/parser/tokens.l"
 {
   yy_pop_state();
   yy_pop_state();
@@ -1335,67 +1325,67 @@ YY_RULE_SETUP
 }
 	YY_BREAK
 
-case 79:
+case 77:
+YY_RULE_SETUP
+#line 134 "src/parser/tokens.l"
+return TOKEN(token::T_RULE);
+	YY_BREAK
+case 78:
 YY_RULE_SETUP
 #line 136 "src/parser/tokens.l"
-return TOKEN(token::T_RULE);
+return TOKEN(token::T_CLASS);
+	YY_BREAK
+case 79:
+YY_RULE_SETUP
+#line 137 "src/parser/tokens.l"
+return TOKEN(token::T_PACKAGE);
 	YY_BREAK
 case 80:
 YY_RULE_SETUP
 #line 138 "src/parser/tokens.l"
-return TOKEN(token::T_CLASS);
+return TOKEN(token::T_GRAMMAR);
 	YY_BREAK
 case 81:
 YY_RULE_SETUP
 #line 139 "src/parser/tokens.l"
-return TOKEN(token::T_PACKAGE);
+return TOKEN(token::T_ROLE);
 	YY_BREAK
 case 82:
 YY_RULE_SETUP
 #line 140 "src/parser/tokens.l"
-return TOKEN(token::T_GRAMMAR);
+return TOKEN(token::T_MODULE);
 	YY_BREAK
 case 83:
 YY_RULE_SETUP
-#line 141 "src/parser/tokens.l"
-return TOKEN(token::T_ROLE);
+#line 142 "src/parser/tokens.l"
+SAVE_TOKEN; return token::T_SIGIL;
 	YY_BREAK
 case 84:
 YY_RULE_SETUP
-#line 142 "src/parser/tokens.l"
-return TOKEN(token::T_MODULE);
+#line 143 "src/parser/tokens.l"
+SAVE_TOKEN; return token::T_TWIGIL;
 	YY_BREAK
 case 85:
 YY_RULE_SETUP
 #line 144 "src/parser/tokens.l"
-SAVE_TOKEN; return token::T_SIGIL;
+{ SAVE_TOKEN; return token::T_ID; }
 	YY_BREAK
 case 86:
 YY_RULE_SETUP
 #line 145 "src/parser/tokens.l"
-SAVE_TOKEN; return token::T_TWIGIL;
+{ SAVE_TOKEN; return token::T_STRINGC; }
 	YY_BREAK
 case 87:
 YY_RULE_SETUP
 #line 146 "src/parser/tokens.l"
-{ SAVE_TOKEN; return token::T_ID; }
+{ printf("Unknown Token. %s\n", yytext); }
 	YY_BREAK
 case 88:
 YY_RULE_SETUP
-#line 147 "src/parser/tokens.l"
-{ SAVE_TOKEN; return token::T_STRINGC; }
-	YY_BREAK
-case 89:
-YY_RULE_SETUP
 #line 148 "src/parser/tokens.l"
-{ printf("Unknown Token. %s\n", yytext); }
-	YY_BREAK
-case 90:
-YY_RULE_SETUP
-#line 150 "src/parser/tokens.l"
 ECHO;
 	YY_BREAK
-#line 1399 "src/parser/tokens.cpp"
+#line 1389 "src/parser/tokens.cpp"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(expect_regex):
 case YY_STATE_EOF(regex):
@@ -2441,7 +2431,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 150 "src/parser/tokens.l"
+#line 148 "src/parser/tokens.l"
 
 
 

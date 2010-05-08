@@ -35,9 +35,15 @@ void settings();
 P6opaquePtr _say(Stash* lex);
 P6opaquePtr _puts(Stash* lex);
 P6opaquePtr _infix_add(Stash* lex);
+P6opaquePtr _infix_sub(Stash* lex);
+P6opaquePtr _infix_mul(Stash* lex);
+P6opaquePtr _infix_div(Stash* lex);
+P6opaquePtr _infix_stitch(Stash* lex);
+P6opaquePtr _prefix_stitch(Stash* lex);
+P6opaquePtr _prefix_add(Stash* lex);
 
 /* Construct a nqp integer */
-P6opaquePtr  construct_str(N_STR v);
+P6opaquePtr  construct_str(N_STR v, uint64_t len = ULLONG_MAX);
 P6opaquePtr  construct_bool(N_BOOL v);
 P6opaquePtr  construct_int(N_INT v);
 P6opaquePtr  construct_num(N_NUM v);
@@ -64,6 +70,11 @@ P6opaquePtr construct_closure(Stash *lex_scope, SubPtr sub_ptr, unsigned int arg
 P6opaquePtr vm_invoke(P6opaquePtr sub_obj, unsigned int argc, ...);
 P6opaquePtr vm_dispatch_sub(const char* sub_name, unsigned int argc, ...);
 P6opaquePtr vm_disaptch_method(P6opaquePtr self, char* sub_name, unsigned int argc, ...);
+
+
+/* Internal ops */
+N_STR internal_to_str(P6opaquePtr val);
+N_NUM internal_to_num(P6opaquePtr val);
 
 #ifdef __cplusplus
 }

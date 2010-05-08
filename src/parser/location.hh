@@ -56,13 +56,6 @@ namespace nqp {
   {
   public:
 
-    /// Construct a location.
-    location ()
-      : begin (), end ()
-    {
-    }
-
-
     /// Initialization.
     inline void initialize (std::string* fn)
     {
@@ -164,6 +157,6 @@ namespace nqp {
 } // nqp
 
 /* Line 271 of location.cc  */
-#line 168 "src/parser/location.hh"
+#line 161 "src/parser/location.hh"
 
 #endif // not BISON_LOCATION_HH

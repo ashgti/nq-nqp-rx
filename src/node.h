@@ -122,6 +122,14 @@ class Block : public Expression {
   virtual std::string str(std::string prefix = "");
 };
 
+class ListDeclaration : public Expression {
+ public:
+  ExpressionList* list_values;
+  ListDeclaration(ExpressionList* values);
+  virtual llvm::Value* codeGen(CodeGenContext& context);
+  virtual std::string str(std::string prefix = "");
+};
+
 class ExpressionStatement : public Statement {
  public:
   Expression& expression;

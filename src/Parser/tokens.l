@@ -50,8 +50,6 @@ REGEX           \{(\\.|)*\}
 "="               return TOKEN(token::T_EQ);
 ":="              return TOKEN(token::T_BIND);
 "::="             return TOKEN(token::T_RO_BIND);
-"=="              return TOKEN(token::T_CN_EQ);
-"!="              return TOKEN(token::T_CN_NE);
 "+"               return TOKEN(token::T_PLUS);
 "*"               return TOKEN(token::T_MUL);
 "**"              return TOKEN(token::T_REPEATER);

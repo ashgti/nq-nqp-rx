@@ -28,11 +28,11 @@ Terminals unused in grammar
    T_WHEN
    T_INLINE_IF
    T_INLINE_ELSE
-   T_RBRACKET
    T_LBRACKET
 
 
-State 42 conflicts: 1 shift/reduce
+State 23 conflicts: 1 shift/reduce
+State 43 conflicts: 1 shift/reduce
 
 
 Grammar
@@ -136,79 +136,80 @@ Grammar
    68     | variable infix expr
    69     | constants infix expr
    70     | methodop
-   71     | T_LPAREN args_list T_RPAREN
-   72     | constants
-   73     | variable
+   71     | T_RBRACKET args_list T_RBRACKET
+   72     | T_LPAREN args_list T_RPAREN
+   73     | constants
+   74     | variable
 
-   74 p6regex: '/' nibbler '/'
+   75 p6regex: '/' nibbler '/'
 
-   75 nibbler: T_STRINGC
-   76        | '|' T_STRINGC
+   76 nibbler: T_STRINGC
+   77        | '|' T_STRINGC
 
-   77 number: T_DIGIT
-   78       | T_DIGIT T_DOT T_DIGIT
+   78 number: T_DIGIT
+   79       | T_DIGIT T_DOT T_DIGIT
 
-   79 constants: number
-   80          | stringc
-   81          | p6regex
+   80 constants: number
+   81          | stringc
+   82          | p6regex
 
-   82 infix: comparison
-   83      | math_ops
-   84      | string_ops
-   85      | other_ops
+   83 infix: comparison
+   84      | math_ops
+   85      | string_ops
+   86      | other_ops
 
-   86 stringc: T_STRINGC
+   87 stringc: T_STRINGC
 
-   87 assignment: T_EQ
-   88           | T_BIND
-   89           | T_RO_BIND
+   88 assignment: T_EQ
+   89           | T_BIND
+   90           | T_RO_BIND
 
-   90 other_ops: T_REPEATER
+   91 other_ops: T_REPEATER
 
-   91 math_ops: T_PLUS
-   92         | T_MINUS
-   93         | T_MUL
-   94         | T_DIV
+   92 math_ops: T_PLUS
+   93         | T_MINUS
+   94         | T_MUL
+   95         | T_DIV
 
-   95 string_ops: T_STITCH
+   96 string_ops: T_STITCH
 
-   96 comparison: T_CN_EQ
-   97           | T_CN_NE
-   98           | T_CN_LT
-   99           | T_CN_GT
-  100           | T_CN_LE
-  101           | T_CN_GE
-  102           | T_CS_EQ
-  103           | T_CS_NE
-  104           | T_CS_LT
-  105           | T_CS_GT
-  106           | T_CS_LE
-  107           | T_CS_GE
-  108           | T_SMARTMATCH
+   97 comparison: T_CN_EQ
+   98           | T_CN_NE
+   99           | T_CN_LT
+  100           | T_CN_GT
+  101           | T_CN_LE
+  102           | T_CN_GE
+  103           | T_CS_EQ
+  104           | T_CS_NE
+  105           | T_CS_LT
+  106           | T_CS_GT
+  107           | T_CS_LE
+  108           | T_CS_GE
+  109           | T_SMARTMATCH
 
 
 Terminals, with rules where they appear
 
 $end (0) 0
 '&' (38) 13
-'/' (47) 74
+'/' (47) 75
 ':' (58) 38
 '<' (60) 26
 '?' (63) 34
-'|' (124) 76
+'|' (124) 77
 error (256)
 T_ID (258) 12 13 14 15 16 17 18 41 59
-T_DIGIT (259) 77 78
+T_DIGIT (259) 78 79
 T_RBLOCK (260) 27
-T_STRINGC (261) 75 76 86
+T_STRINGC (261) 76 77 87
 T_SIGIL (262) 41
 T_TWIGIL (263)
 T_MY (264) 39 40
 T_OUR (265)
 T_HAS (266)
-T_EQ (267) 87
-T_BIND (268) 88
-T_RO_BIND (269) 89
+T_EQ (267) 88
+T_BIND (268) 89
+T_RO_BIND (269) 90
 T_PACKAGE (270) 14
 T_MODULE (271) 15
 T_CLASS (272) 16
@@ -227,31 +228,31 @@ T_LAMBDA (284)
 T_LAMBDA_RW (285)
 T_RANGE (286)
 T_ELLIPSES (287)
-T_CN_EQ (288) 96
-T_CN_NE (289) 97
-T_CN_LT (290) 98
-T_CN_GT (291) 99
-T_CN_LE (292) 100
-T_CN_GE (293) 101
-T_CS_EQ (294) 102
-T_CS_NE (295) 103
-T_CS_LT (296) 104
-T_CS_GT (297) 105
-T_CS_LE (298) 106
-T_CS_GE (299) 107
-T_SMARTMATCH (300) 108
+T_CN_EQ (288) 97
+T_CN_NE (289) 98
+T_CN_LT (290) 99
+T_CN_GT (291) 100
+T_CN_LE (292) 101
+T_CN_GE (293) 102
+T_CS_EQ (294) 103
+T_CS_NE (295) 104
+T_CS_LT (296) 105
+T_CS_GT (297) 106
+T_CS_LE (298) 107
+T_CS_GE (299) 108
+T_SMARTMATCH (300) 109
 T_ID_CMP (301)
 T_NOT (302)
-T_REPEATER (303) 90
+T_REPEATER (303) 91
 T_CAROT (304)
 T_OR_EQ (305)
 T_BAR (306)
-T_PLUS (307) 91
-T_MINUS (308) 92
-T_MUL (309) 33 93
-T_DIV (310) 94
+T_PLUS (307) 92
+T_MINUS (308) 93
+T_MUL (309) 33 94
+T_DIV (310) 95
 T_MOD (311)
-T_STITCH (312) 95
+T_STITCH (312) 96
 T_REGEX_OPEN (313)
 T_REGEX_NAME (314)
 T_REGEX_START (315)
@@ -273,12 +274,12 @@ T_INLINE_IF (330)
 T_INLINE_ELSE (331)
 T_LBRACE (332) 26 27 63 64
 T_RBRACE (333) 26 27 63 64
-T_LPAREN (334) 28 57 58 59 71
-T_RPAREN (335) 28 57 58 59 71
+T_LPAREN (334) 28 57 58 59 72
+T_RPAREN (335) 28 57 58 59 72
 T_COMMA (336) 31 62 66
 T_SEMICOLON (337) 4 9 10 55
-T_DOT (338) 58 59 78
-T_RBRACKET (339)
+T_DOT (338) 58 59 79
+T_RBRACKET (339) 71
 T_LBRACKET (340)
 
 
@@ -317,7 +318,7 @@ named_param (106)
 var_declarator (107)
     on left: 39 40, on right: 4
 variable (108)
-    on left: 41, on right: 36 37 39 40 58 67 68 73
+    on left: 41, on right: 36 37 39 40 58 67 68 74
 stmt_control (109)
     on left: 42 43 44 45 46, on right: 8
 if_stmt (110)
@@ -335,37 +336,38 @@ while_stmt (115)
 methodop (116)
     on left: 57 58 59, on right: 70
 args_list (117)
-    on left: 60 61 62, on right: 57 58 59 62 71
+    on left: 60 61 62, on right: 57 58 59 62 71 72
 xblock (118)
     on left: 63 64, on right: 14 15 16 17 18 19 20 21 47 48 49 50 51
     52 53 54 56
 expr_list (119)
     on left: 65 66, on right: 9 10 11 40 47 48 49 50 53 54 55 56 66
 expr (120)
-    on left: 67 68 69 70 71 72 73, on right: 37 61 62 65 66 67 68 69
+    on left: 67 68 69 70 71 72 73 74, on right: 37 61 62 65 66 67 68
+    69
 p6regex (121)
-    on left: 74, on right: 81
+    on left: 75, on right: 82
 nibbler (122)
-    on left: 75 76, on right: 74
+    on left: 76 77, on right: 75
 number (123)
-    on left: 77 78, on right: 79
+    on left: 78 79, on right: 80
 constants (124)
-    on left: 79 80 81, on right: 69 72
+    on left: 80 81 82, on right: 69 73
 infix (125)
-    on left: 82 83 84 85, on right: 68 69
+    on left: 83 84 85 86, on right: 68 69
 stringc (126)
-    on left: 86, on right: 80
+    on left: 87, on right: 81
 assignment (127)
-    on left: 87 88 89, on right: 37 40 67
+    on left: 88 89 90, on right: 37 40 67
 other_ops (128)
-    on left: 90, on right: 85
+    on left: 91, on right: 86
 math_ops (129)
-    on left: 91 92 93 94, on right: 83
+    on left: 92 93 94 95, on right: 84
 string_ops (130)
-    on left: 95, on right: 84
+    on left: 96, on right: 85
 comparison (131)
-    on left: 96 97 98 99 100 101 102 103 104 105 106 107 108, on right:
-    82
+    on left: 97 98 99 100 101 102 103 104 105 106 107 108 109, on right:
+    83
 
 
 state 0
@@ -394,32 +396,33 @@ state 0
     T_WHILE      shift, and go to state 20
     T_RETURN     shift, and go to state 21
     T_LPAREN     shift, and go to state 22
-    '&'          shift, and go to state 23
-    '/'          shift, and go to state 24
+    T_RBRACKET   shift, and go to state 23
+    '&'          shift, and go to state 24
+    '/'          shift, and go to state 25
 
-    prog                   go to state 25
-    stmts                  go to state 26
-    stmt                   go to state 27
-    func_ident             go to state 28
-    package_declarator     go to state 29
-    func_declarator        go to state 30
-    regex_declarator       go to state 31
-    regex_type_identifier  go to state 32
-    var_declarator         go to state 33
-    variable               go to state 34
-    stmt_control           go to state 35
-    if_stmt                go to state 36
-    unless_stmt            go to state 37
-    for_stmt               go to state 38
-    for_inline_stmt        go to state 39
-    while_stmt             go to state 40
-    methodop               go to state 41
-    expr_list              go to state 42
-    expr                   go to state 43
-    p6regex                go to state 44
-    number                 go to state 45
-    constants              go to state 46
-    stringc                go to state 47
+    prog                   go to state 26
+    stmts                  go to state 27
+    stmt                   go to state 28
+    func_ident             go to state 29
+    package_declarator     go to state 30
+    func_declarator        go to state 31
+    regex_declarator       go to state 32
+    regex_type_identifier  go to state 33
+    var_declarator         go to state 34
+    variable               go to state 35
+    stmt_control           go to state 36
+    if_stmt                go to state 37
+    unless_stmt            go to state 38
+    for_stmt               go to state 39
+    for_inline_stmt        go to state 40
+    while_stmt             go to state 41
+    methodop               go to state 42
+    expr_list              go to state 43
+    expr                   go to state 44
+    p6regex                go to state 45
+    number                 go to state 46
+    constants              go to state 47
+    stringc                go to state 48
 
 
 state 1
@@ -427,33 +430,33 @@ state 1
    12 func_ident: T_ID .
    59 methodop: T_ID . T_DOT func_ident T_LPAREN args_list T_RPAREN
 
-    T_DOT  shift, and go to state 48
+    T_DOT  shift, and go to state 49
 
     $default  reduce using rule 12 (func_ident)
 
 
 state 2
 
-   77 number: T_DIGIT .
-   78       | T_DIGIT . T_DOT T_DIGIT
+   78 number: T_DIGIT .
+   79       | T_DIGIT . T_DOT T_DIGIT
 
-    T_DOT  shift, and go to state 49
+    T_DOT  shift, and go to state 50
 
-    $default  reduce using rule 77 (number)
+    $default  reduce using rule 78 (number)
 
 
 state 3
 
-   86 stringc: T_STRINGC .
+   87 stringc: T_STRINGC .
 
-    $default  reduce using rule 86 (stringc)
+    $default  reduce using rule 87 (stringc)
 
 
 state 4
 
    41 variable: T_SIGIL . T_ID
 
-    T_ID  shift, and go to state 50
+    T_ID  shift, and go to state 51
 
 
 state 5
@@ -463,72 +466,72 @@ state 5
 
     T_SIGIL  shift, and go to state 4
 
-    variable  go to state 51
+    variable  go to state 52
 
 
 state 6
 
    14 package_declarator: T_PACKAGE . T_ID xblock
 
-    T_ID  shift, and go to state 52
+    T_ID  shift, and go to state 53
 
 
 state 7
 
    15 package_declarator: T_MODULE . T_ID xblock
 
-    T_ID  shift, and go to state 53
+    T_ID  shift, and go to state 54
 
 
 state 8
 
    16 package_declarator: T_CLASS . T_ID xblock
 
-    T_ID  shift, and go to state 54
+    T_ID  shift, and go to state 55
 
 
 state 9
 
    17 package_declarator: T_GRAMMAR . T_ID xblock
 
-    T_ID  shift, and go to state 55
+    T_ID  shift, and go to state 56
 
 
 state 10
 
    18 package_declarator: T_ROLE . T_ID xblock
 
-    T_ID  shift, and go to state 56
+    T_ID  shift, and go to state 57
 
 
 state 11
 
    19 func_declarator: T_SUB . func_ident signature xblock
 
-    T_ID  shift, and go to state 57
-    '&'   shift, and go to state 23
+    T_ID  shift, and go to state 58
+    '&'   shift, and go to state 24
 
-    func_ident  go to state 58
+    func_ident  go to state 59
 
 
 state 12
 
    20 func_declarator: T_METHOD . func_ident signature xblock
 
-    T_ID  shift, and go to state 57
-    '&'   shift, and go to state 23
+    T_ID  shift, and go to state 58
+    '&'   shift, and go to state 24
 
-    func_ident  go to state 59
+    func_ident  go to state 60
 
 
 state 13
 
    21 func_declarator: T_SUBMETHOD . func_ident signature xblock
 
-    T_ID  shift, and go to state 57
-    '&'   shift, and go to state 23
+    T_ID  shift, and go to state 58
+    '&'   shift, and go to state 24
 
-    func_ident  go to state 60
+    func_ident  go to state 61
 
 
 state 14
@@ -559,167 +562,200 @@ state 17
    49        | T_IF . expr_list xblock elsif_stmt
    50        | T_IF . expr_list xblock elsif_stmt T_ELSE xblock
 
-    T_ID       shift, and go to state 1
-    T_DIGIT    shift, and go to state 2
-    T_STRINGC  shift, and go to state 3
-    T_SIGIL    shift, and go to state 4
-    T_LPAREN   shift, and go to state 22
-    '&'        shift, and go to state 23
-    '/'        shift, and go to state 24
+    T_ID        shift, and go to state 1
+    T_DIGIT     shift, and go to state 2
+    T_STRINGC   shift, and go to state 3
+    T_SIGIL     shift, and go to state 4
+    T_LPAREN    shift, and go to state 22
+    T_RBRACKET  shift, and go to state 23
+    '&'         shift, and go to state 24
+    '/'         shift, and go to state 25
 
-    func_ident  go to state 28
-    variable    go to state 34
-    methodop    go to state 41
-    expr_list   go to state 61
-    expr        go to state 43
-    p6regex     go to state 44
-    number      go to state 45
-    constants   go to state 46
-    stringc     go to state 47
+    func_ident  go to state 29
+    variable    go to state 35
+    methodop    go to state 42
+    expr_list   go to state 62
+    expr        go to state 44
+    p6regex     go to state 45
+    number      go to state 46
+    constants   go to state 47
+    stringc     go to state 48
 
 
 state 18
 
    53 unless_stmt: T_UNLESS . expr_list xblock
 
-    T_ID       shift, and go to state 1
-    T_DIGIT    shift, and go to state 2
-    T_STRINGC  shift, and go to state 3
-    T_SIGIL    shift, and go to state 4
-    T_LPAREN   shift, and go to state 22
-    '&'        shift, and go to state 23
-    '/'        shift, and go to state 24
+    T_ID        shift, and go to state 1
+    T_DIGIT     shift, and go to state 2
+    T_STRINGC   shift, and go to state 3
+    T_SIGIL     shift, and go to state 4
+    T_LPAREN    shift, and go to state 22
+    T_RBRACKET  shift, and go to state 23
+    '&'         shift, and go to state 24
+    '/'         shift, and go to state 25
 
-    func_ident  go to state 28
-    variable    go to state 34
-    methodop    go to state 41
-    expr_list   go to state 62
-    expr        go to state 43
-    p6regex     go to state 44
-    number      go to state 45
-    constants   go to state 46
-    stringc     go to state 47
+    func_ident  go to state 29
+    variable    go to state 35
+    methodop    go to state 42
+    expr_list   go to state 63
+    expr        go to state 44
+    p6regex     go to state 45
+    number      go to state 46
+    constants   go to state 47
+    stringc     go to state 48
 
 
 state 19
 
    54 for_stmt: T_FOR . expr_list xblock
 
-    T_ID       shift, and go to state 1
-    T_DIGIT    shift, and go to state 2
-    T_STRINGC  shift, and go to state 3
-    T_SIGIL    shift, and go to state 4
-    T_LPAREN   shift, and go to state 22
-    '&'        shift, and go to state 23
-    '/'        shift, and go to state 24
+    T_ID        shift, and go to state 1
+    T_DIGIT     shift, and go to state 2
+    T_STRINGC   shift, and go to state 3
+    T_SIGIL     shift, and go to state 4
+    T_LPAREN    shift, and go to state 22
+    T_RBRACKET  shift, and go to state 23
+    '&'         shift, and go to state 24
+    '/'         shift, and go to state 25
 
-    func_ident  go to state 28
-    variable    go to state 34
-    methodop    go to state 41
-    expr_list   go to state 63
-    expr        go to state 43
-    p6regex     go to state 44
-    number      go to state 45
-    constants   go to state 46
-    stringc     go to state 47
+    func_ident  go to state 29
+    variable    go to state 35
+    methodop    go to state 42
+    expr_list   go to state 64
+    expr        go to state 44
+    p6regex     go to state 45
+    number      go to state 46
+    constants   go to state 47
+    stringc     go to state 48
 
 
 state 20
 
    56 while_stmt: T_WHILE . expr_list xblock
 
-    T_ID       shift, and go to state 1
-    T_DIGIT    shift, and go to state 2
-    T_STRINGC  shift, and go to state 3
-    T_SIGIL    shift, and go to state 4
-    T_LPAREN   shift, and go to state 22
-    '&'        shift, and go to state 23
-    '/'        shift, and go to state 24
+    T_ID        shift, and go to state 1
+    T_DIGIT     shift, and go to state 2
+    T_STRINGC   shift, and go to state 3
+    T_SIGIL     shift, and go to state 4
+    T_LPAREN    shift, and go to state 22
+    T_RBRACKET  shift, and go to state 23
+    '&'         shift, and go to state 24
+    '/'         shift, and go to state 25
 
-    func_ident  go to state 28
-    variable    go to state 34
-    methodop    go to state 41
-    expr_list   go to state 64
-    expr        go to state 43
-    p6regex     go to state 44
-    number      go to state 45
-    constants   go to state 46
-    stringc     go to state 47
+    func_ident  go to state 29
+    variable    go to state 35
+    methodop    go to state 42
+    expr_list   go to state 65
+    expr        go to state 44
+    p6regex     go to state 45
+    number      go to state 46
+    constants   go to state 47
+    stringc     go to state 48
 
 
 state 21
 
     9 stmt: T_RETURN . expr_list T_SEMICOLON
 
-    T_ID       shift, and go to state 1
-    T_DIGIT    shift, and go to state 2
-    T_STRINGC  shift, and go to state 3
-    T_SIGIL    shift, and go to state 4
-    T_LPAREN   shift, and go to state 22
-    '&'        shift, and go to state 23
-    '/'        shift, and go to state 24
+    T_ID        shift, and go to state 1
+    T_DIGIT     shift, and go to state 2
+    T_STRINGC   shift, and go to state 3
+    T_SIGIL     shift, and go to state 4
+    T_LPAREN    shift, and go to state 22
+    T_RBRACKET  shift, and go to state 23
+    '&'         shift, and go to state 24
+    '/'         shift, and go to state 25
 
-    func_ident  go to state 28
-    variable    go to state 34
-    methodop    go to state 41
-    expr_list   go to state 65
-    expr        go to state 43
-    p6regex     go to state 44
-    number      go to state 45
-    constants   go to state 46
-    stringc     go to state 47
+    func_ident  go to state 29
+    variable    go to state 35
+    methodop    go to state 42
+    expr_list   go to state 66
+    expr        go to state 44
+    p6regex     go to state 45
+    number      go to state 46
+    constants   go to state 47
+    stringc     go to state 48
 
 
 state 22
 
-   71 expr: T_LPAREN . args_list T_RPAREN
+   72 expr: T_LPAREN . args_list T_RPAREN
 
-    T_ID       shift, and go to state 1
-    T_DIGIT    shift, and go to state 2
-    T_STRINGC  shift, and go to state 3
-    T_SIGIL    shift, and go to state 4
-    T_LPAREN   shift, and go to state 22
-    '&'        shift, and go to state 23
-    '/'        shift, and go to state 24
+    T_ID        shift, and go to state 1
+    T_DIGIT     shift, and go to state 2
+    T_STRINGC   shift, and go to state 3
+    T_SIGIL     shift, and go to state 4
+    T_LPAREN    shift, and go to state 22
+    T_RBRACKET  shift, and go to state 23
+    '&'         shift, and go to state 24
+    '/'         shift, and go to state 25
 
     $default  reduce using rule 60 (args_list)
 
-    func_ident  go to state 28
-    variable    go to state 34
-    methodop    go to state 41
-    args_list   go to state 66
-    expr        go to state 67
-    p6regex     go to state 44
-    number      go to state 45
-    constants   go to state 46
-    stringc     go to state 47
+    func_ident  go to state 29
+    variable    go to state 35
+    methodop    go to state 42
+    args_list   go to state 67
+    expr        go to state 68
+    p6regex     go to state 45
+    number      go to state 46
+    constants   go to state 47
+    stringc     go to state 48
 
 
 state 23
 
-   13 func_ident: '&' . T_ID
+   71 expr: T_RBRACKET . args_list T_RBRACKET
 
-    T_ID  shift, and go to state 68
+    T_ID        shift, and go to state 1
+    T_DIGIT     shift, and go to state 2
+    T_STRINGC   shift, and go to state 3
+    T_SIGIL     shift, and go to state 4
+    T_LPAREN    shift, and go to state 22
+    T_RBRACKET  shift, and go to state 23
+    '&'         shift, and go to state 24
+    '/'         shift, and go to state 25
+
+    T_RBRACKET  [reduce using rule 60 (args_list)]
+    $default    reduce using rule 60 (args_list)
+
+    func_ident  go to state 29
+    variable    go to state 35
+    methodop    go to state 42
+    args_list   go to state 69
+    expr        go to state 68
+    p6regex     go to state 45
+    number      go to state 46
+    constants   go to state 47
+    stringc     go to state 48
 
 
 state 24
 
-   74 p6regex: '/' . nibbler '/'
+   13 func_ident: '&' . T_ID
 
-    T_STRINGC  shift, and go to state 69
-    '|'        shift, and go to state 70
-
-    nibbler  go to state 71
+    T_ID  shift, and go to state 70
 
 
 state 25
 
-    0 $accept: prog . $end
+   75 p6regex: '/' . nibbler '/'
 
-    $end  shift, and go to state 72
+    T_STRINGC  shift, and go to state 71
+    '|'        shift, and go to state 72
+
+    nibbler  go to state 73
 
 
 state 26
+
+    0 $accept: prog . $end
+
+    $end  shift, and go to state 74
+
+
+state 27
 
     1 prog: stmts .
     3 stmts: stmts . stmt
@@ -746,371 +782,372 @@ state 26
     T_WHILE      shift, and go to state 20
     T_RETURN     shift, and go to state 21
     T_LPAREN     shift, and go to state 22
-    '&'          shift, and go to state 23
-    '/'          shift, and go to state 24
+    T_RBRACKET   shift, and go to state 23
+    '&'          shift, and go to state 24
+    '/'          shift, and go to state 25
 
     $default  reduce using rule 1 (prog)
 
-    stmt                   go to state 73
-    func_ident             go to state 28
-    package_declarator     go to state 29
-    func_declarator        go to state 30
-    regex_declarator       go to state 31
-    regex_type_identifier  go to state 32
-    var_declarator         go to state 33
-    variable               go to state 34
-    stmt_control           go to state 35
-    if_stmt                go to state 36
-    unless_stmt            go to state 37
-    for_stmt               go to state 38
-    for_inline_stmt        go to state 39
-    while_stmt             go to state 40
-    methodop               go to state 41
-    expr_list              go to state 42
-    expr                   go to state 43
-    p6regex                go to state 44
-    number                 go to state 45
-    constants              go to state 46
-    stringc                go to state 47
+    stmt                   go to state 75
+    func_ident             go to state 29
+    package_declarator     go to state 30
+    func_declarator        go to state 31
+    regex_declarator       go to state 32
+    regex_type_identifier  go to state 33
+    var_declarator         go to state 34
+    variable               go to state 35
+    stmt_control           go to state 36
+    if_stmt                go to state 37
+    unless_stmt            go to state 38
+    for_stmt               go to state 39
+    for_inline_stmt        go to state 40
+    while_stmt             go to state 41
+    methodop               go to state 42
+    expr_list              go to state 43
+    expr                   go to state 44
+    p6regex                go to state 45
+    number                 go to state 46
+    constants              go to state 47
+    stringc                go to state 48
 
 
-state 27
+state 28
 
     2 stmts: stmt .
 
     $default  reduce using rule 2 (stmts)
 
 
-state 28
+state 29
 
    57 methodop: func_ident . T_LPAREN args_list T_RPAREN
 
-    T_LPAREN  shift, and go to state 74
+    T_LPAREN  shift, and go to state 76
 
 
-state 29
+state 30
 
     5 stmt: package_declarator .
 
     $default  reduce using rule 5 (stmt)
 
 
-state 30
+state 31
 
     6 stmt: func_declarator .
 
     $default  reduce using rule 6 (stmt)
 
 
-state 31
+state 32
 
     7 stmt: regex_declarator .
 
     $default  reduce using rule 7 (stmt)
 
 
-state 32
+state 33
 
    22 regex_declarator: regex_type_identifier . func_ident rblock
 
-    T_ID  shift, and go to state 57
-    '&'   shift, and go to state 23
+    T_ID  shift, and go to state 58
+    '&'   shift, and go to state 24
 
-    func_ident  go to state 75
-
-
-state 33
-
-    4 stmt: var_declarator . T_SEMICOLON
-
-    T_SEMICOLON  shift, and go to state 76
+    func_ident  go to state 77
 
 
 state 34
 
-   58 methodop: variable . T_DOT func_ident T_LPAREN args_list T_RPAREN
-   67 expr: variable . assignment expr
-   68     | variable . infix expr
-   73     | variable .
+    4 stmt: var_declarator . T_SEMICOLON
 
-    T_EQ          shift, and go to state 77
-    T_BIND        shift, and go to state 78
-    T_RO_BIND     shift, and go to state 79
-    T_CN_EQ       shift, and go to state 80
-    T_CN_NE       shift, and go to state 81
-    T_CN_LT       shift, and go to state 82
-    T_CN_GT       shift, and go to state 83
-    T_CN_LE       shift, and go to state 84
-    T_CN_GE       shift, and go to state 85
-    T_CS_EQ       shift, and go to state 86
-    T_CS_NE       shift, and go to state 87
-    T_CS_LT       shift, and go to state 88
-    T_CS_GT       shift, and go to state 89
-    T_CS_LE       shift, and go to state 90
-    T_CS_GE       shift, and go to state 91
-    T_SMARTMATCH  shift, and go to state 92
-    T_REPEATER    shift, and go to state 93
-    T_PLUS        shift, and go to state 94
-    T_MINUS       shift, and go to state 95
-    T_MUL         shift, and go to state 96
-    T_DIV         shift, and go to state 97
-    T_STITCH      shift, and go to state 98
-    T_DOT         shift, and go to state 99
-
-    $default  reduce using rule 73 (expr)
-
-    infix       go to state 100
-    assignment  go to state 101
-    other_ops   go to state 102
-    math_ops    go to state 103
-    string_ops  go to state 104
-    comparison  go to state 105
+    T_SEMICOLON  shift, and go to state 78
 
 
 state 35
+
+   58 methodop: variable . T_DOT func_ident T_LPAREN args_list T_RPAREN
+   67 expr: variable . assignment expr
+   68     | variable . infix expr
+   74     | variable .
+
+    T_EQ          shift, and go to state 79
+    T_BIND        shift, and go to state 80
+    T_RO_BIND     shift, and go to state 81
+    T_CN_EQ       shift, and go to state 82
+    T_CN_NE       shift, and go to state 83
+    T_CN_LT       shift, and go to state 84
+    T_CN_GT       shift, and go to state 85
+    T_CN_LE       shift, and go to state 86
+    T_CN_GE       shift, and go to state 87
+    T_CS_EQ       shift, and go to state 88
+    T_CS_NE       shift, and go to state 89
+    T_CS_LT       shift, and go to state 90
+    T_CS_GT       shift, and go to state 91
+    T_CS_LE       shift, and go to state 92
+    T_CS_GE       shift, and go to state 93
+    T_SMARTMATCH  shift, and go to state 94
+    T_REPEATER    shift, and go to state 95
+    T_PLUS        shift, and go to state 96
+    T_MINUS       shift, and go to state 97
+    T_MUL         shift, and go to state 98
+    T_DIV         shift, and go to state 99
+    T_STITCH      shift, and go to state 100
+    T_DOT         shift, and go to state 101
+
+    $default  reduce using rule 74 (expr)
+
+    infix       go to state 102
+    assignment  go to state 103
+    other_ops   go to state 104
+    math_ops    go to state 105
+    string_ops  go to state 106
+    comparison  go to state 107
+
+
+state 36
 
     8 stmt: stmt_control .
 
     $default  reduce using rule 8 (stmt)
 
 
-state 36
+state 37
 
    42 stmt_control: if_stmt .
 
     $default  reduce using rule 42 (stmt_control)
 
 
-state 37
+state 38
 
    43 stmt_control: unless_stmt .
 
     $default  reduce using rule 43 (stmt_control)
 
 
-state 38
+state 39
 
    44 stmt_control: for_stmt .
 
     $default  reduce using rule 44 (stmt_control)
 
 
-state 39
+state 40
 
    45 stmt_control: for_inline_stmt .
 
     $default  reduce using rule 45 (stmt_control)
 
 
-state 40
+state 41
 
    46 stmt_control: while_stmt .
 
     $default  reduce using rule 46 (stmt_control)
 
 
-state 41
+state 42
 
    70 expr: methodop .
 
     $default  reduce using rule 70 (expr)
 
 
-state 42
+state 43
 
    10 stmt: expr_list . T_SEMICOLON
    11     | expr_list .
    55 for_inline_stmt: expr_list . T_FOR expr_list T_SEMICOLON
    66 expr_list: expr_list . T_COMMA expr
 
-    T_FOR        shift, and go to state 106
-    T_COMMA      shift, and go to state 107
-    T_SEMICOLON  shift, and go to state 108
+    T_FOR        shift, and go to state 108
+    T_COMMA      shift, and go to state 109
+    T_SEMICOLON  shift, and go to state 110
 
     T_FOR     [reduce using rule 11 (stmt)]
     $default  reduce using rule 11 (stmt)
 
 
-state 43
+state 44
 
    65 expr_list: expr .
 
     $default  reduce using rule 65 (expr_list)
 
 
-state 44
-
-   81 constants: p6regex .
-
-    $default  reduce using rule 81 (constants)
-
-
 state 45
 
-   79 constants: number .
+   82 constants: p6regex .
 
-    $default  reduce using rule 79 (constants)
+    $default  reduce using rule 82 (constants)
 
 
 state 46
 
-   69 expr: constants . infix expr
-   72     | constants .
-
-    T_CN_EQ       shift, and go to state 80
-    T_CN_NE       shift, and go to state 81
-    T_CN_LT       shift, and go to state 82
-    T_CN_GT       shift, and go to state 83
-    T_CN_LE       shift, and go to state 84
-    T_CN_GE       shift, and go to state 85
-    T_CS_EQ       shift, and go to state 86
-    T_CS_NE       shift, and go to state 87
-    T_CS_LT       shift, and go to state 88
-    T_CS_GT       shift, and go to state 89
-    T_CS_LE       shift, and go to state 90
-    T_CS_GE       shift, and go to state 91
-    T_SMARTMATCH  shift, and go to state 92
-    T_REPEATER    shift, and go to state 93
-    T_PLUS        shift, and go to state 94
-    T_MINUS       shift, and go to state 95
-    T_MUL         shift, and go to state 96
-    T_DIV         shift, and go to state 97
-    T_STITCH      shift, and go to state 98
-
-    $default  reduce using rule 72 (expr)
-
-    infix       go to state 109
-    other_ops   go to state 102
-    math_ops    go to state 103
-    string_ops  go to state 104
-    comparison  go to state 105
-
-
-state 47
-
-   80 constants: stringc .
+   80 constants: number .
 
     $default  reduce using rule 80 (constants)
 
 
+state 47
+
+   69 expr: constants . infix expr
+   73     | constants .
+
+    T_CN_EQ       shift, and go to state 82
+    T_CN_NE       shift, and go to state 83
+    T_CN_LT       shift, and go to state 84
+    T_CN_GT       shift, and go to state 85
+    T_CN_LE       shift, and go to state 86
+    T_CN_GE       shift, and go to state 87
+    T_CS_EQ       shift, and go to state 88
+    T_CS_NE       shift, and go to state 89
+    T_CS_LT       shift, and go to state 90
+    T_CS_GT       shift, and go to state 91
+    T_CS_LE       shift, and go to state 92
+    T_CS_GE       shift, and go to state 93
+    T_SMARTMATCH  shift, and go to state 94
+    T_REPEATER    shift, and go to state 95
+    T_PLUS        shift, and go to state 96
+    T_MINUS       shift, and go to state 97
+    T_MUL         shift, and go to state 98
+    T_DIV         shift, and go to state 99
+    T_STITCH      shift, and go to state 100
+
+    $default  reduce using rule 73 (expr)
+
+    infix       go to state 111
+    other_ops   go to state 104
+    math_ops    go to state 105
+    string_ops  go to state 106
+    comparison  go to state 107
+
+
 state 48
 
-   59 methodop: T_ID T_DOT . func_ident T_LPAREN args_list T_RPAREN
+   81 constants: stringc .
 
-    T_ID  shift, and go to state 57
-    '&'   shift, and go to state 23
-
-    func_ident  go to state 110
+    $default  reduce using rule 81 (constants)
 
 
 state 49
 
-   78 number: T_DIGIT T_DOT . T_DIGIT
+   59 methodop: T_ID T_DOT . func_ident T_LPAREN args_list T_RPAREN
 
-    T_DIGIT  shift, and go to state 111
+    T_ID  shift, and go to state 58
+    '&'   shift, and go to state 24
+
+    func_ident  go to state 112
 
 
 state 50
+
+   79 number: T_DIGIT T_DOT . T_DIGIT
+
+    T_DIGIT  shift, and go to state 113
+
+
+state 51
 
    41 variable: T_SIGIL T_ID .
 
     $default  reduce using rule 41 (variable)
 
 
-state 51
+state 52
 
    39 var_declarator: T_MY variable .
    40               | T_MY variable . assignment expr_list
 
-    T_EQ       shift, and go to state 77
-    T_BIND     shift, and go to state 78
-    T_RO_BIND  shift, and go to state 79
+    T_EQ       shift, and go to state 79
+    T_BIND     shift, and go to state 80
+    T_RO_BIND  shift, and go to state 81
 
     $default  reduce using rule 39 (var_declarator)
 
-    assignment  go to state 112
-
-
-state 52
-
-   14 package_declarator: T_PACKAGE T_ID . xblock
-
-    T_LBRACE  shift, and go to state 113
-
-    xblock  go to state 114
+    assignment  go to state 114
 
 
 state 53
 
-   15 package_declarator: T_MODULE T_ID . xblock
+   14 package_declarator: T_PACKAGE T_ID . xblock
 
-    T_LBRACE  shift, and go to state 113
-
-    xblock  go to state 115
-
-
-state 54
-
-   16 package_declarator: T_CLASS T_ID . xblock
-
-    T_LBRACE  shift, and go to state 113
+    T_LBRACE  shift, and go to state 115
 
     xblock  go to state 116
 
 
-state 55
+state 54
 
-   17 package_declarator: T_GRAMMAR T_ID . xblock
+   15 package_declarator: T_MODULE T_ID . xblock
 
-    T_LBRACE  shift, and go to state 113
+    T_LBRACE  shift, and go to state 115
 
     xblock  go to state 117
 
 
-state 56
+state 55
 
-   18 package_declarator: T_ROLE T_ID . xblock
+   16 package_declarator: T_CLASS T_ID . xblock
 
-    T_LBRACE  shift, and go to state 113
+    T_LBRACE  shift, and go to state 115
 
     xblock  go to state 118
 
 
+state 56
+
+   17 package_declarator: T_GRAMMAR T_ID . xblock
+
+    T_LBRACE  shift, and go to state 115
+
+    xblock  go to state 119
+
+
 state 57
+
+   18 package_declarator: T_ROLE T_ID . xblock
+
+    T_LBRACE  shift, and go to state 115
+
+    xblock  go to state 120
+
+
+state 58
 
    12 func_ident: T_ID .
 
     $default  reduce using rule 12 (func_ident)
 
 
-state 58
+state 59
 
    19 func_declarator: T_SUB func_ident . signature xblock
 
-    T_LPAREN  shift, and go to state 119
-
-    signature  go to state 120
-
-
-state 59
-
-   20 func_declarator: T_METHOD func_ident . signature xblock
-
-    T_LPAREN  shift, and go to state 119
-
-    signature  go to state 121
-
-
-state 60
-
-   21 func_declarator: T_SUBMETHOD func_ident . signature xblock
-
-    T_LPAREN  shift, and go to state 119
+    T_LPAREN  shift, and go to state 121
 
     signature  go to state 122
 
 
+state 60
+
+   20 func_declarator: T_METHOD func_ident . signature xblock
+
+    T_LPAREN  shift, and go to state 121
+
+    signature  go to state 123
+
+
 state 61
+
+   21 func_declarator: T_SUBMETHOD func_ident . signature xblock
+
+    T_LPAREN  shift, and go to state 121
+
+    signature  go to state 124
+
+
+state 62
 
    47 if_stmt: T_IF expr_list . xblock
    48        | T_IF expr_list . xblock T_ELSE xblock
@@ -1118,501 +1155,517 @@ state 61
    50        | T_IF expr_list . xblock elsif_stmt T_ELSE xblock
    66 expr_list: expr_list . T_COMMA expr
 
-    T_LBRACE  shift, and go to state 113
-    T_COMMA   shift, and go to state 107
-
-    xblock  go to state 123
-
-
-state 62
-
-   53 unless_stmt: T_UNLESS expr_list . xblock
-   66 expr_list: expr_list . T_COMMA expr
-
-    T_LBRACE  shift, and go to state 113
-    T_COMMA   shift, and go to state 107
-
-    xblock  go to state 124
-
-
-state 63
-
-   54 for_stmt: T_FOR expr_list . xblock
-   66 expr_list: expr_list . T_COMMA expr
-
-    T_LBRACE  shift, and go to state 113
-    T_COMMA   shift, and go to state 107
+    T_LBRACE  shift, and go to state 115
+    T_COMMA   shift, and go to state 109
 
     xblock  go to state 125
 
 
-state 64
+state 63
 
-   56 while_stmt: T_WHILE expr_list . xblock
+   53 unless_stmt: T_UNLESS expr_list . xblock
    66 expr_list: expr_list . T_COMMA expr
 
-    T_LBRACE  shift, and go to state 113
-    T_COMMA   shift, and go to state 107
+    T_LBRACE  shift, and go to state 115
+    T_COMMA   shift, and go to state 109
 
     xblock  go to state 126
 
 
-state 65
+state 64
 
-    9 stmt: T_RETURN expr_list . T_SEMICOLON
+   54 for_stmt: T_FOR expr_list . xblock
    66 expr_list: expr_list . T_COMMA expr
 
-    T_COMMA      shift, and go to state 107
-    T_SEMICOLON  shift, and go to state 127
+    T_LBRACE  shift, and go to state 115
+    T_COMMA   shift, and go to state 109
+
+    xblock  go to state 127
+
+
+state 65
+
+   56 while_stmt: T_WHILE expr_list . xblock
+   66 expr_list: expr_list . T_COMMA expr
+
+    T_LBRACE  shift, and go to state 115
+    T_COMMA   shift, and go to state 109
+
+    xblock  go to state 128
 
 
 state 66
 
-   62 args_list: args_list . T_COMMA expr
-   71 expr: T_LPAREN args_list . T_RPAREN
+    9 stmt: T_RETURN expr_list . T_SEMICOLON
+   66 expr_list: expr_list . T_COMMA expr
 
-    T_RPAREN  shift, and go to state 128
-    T_COMMA   shift, and go to state 129
+    T_COMMA      shift, and go to state 109
+    T_SEMICOLON  shift, and go to state 129
 
 
 state 67
+
+   62 args_list: args_list . T_COMMA expr
+   72 expr: T_LPAREN args_list . T_RPAREN
+
+    T_RPAREN  shift, and go to state 130
+    T_COMMA   shift, and go to state 131
+
+
+state 68
 
    61 args_list: expr .
 
     $default  reduce using rule 61 (args_list)
 
 
-state 68
+state 69
+
+   62 args_list: args_list . T_COMMA expr
+   71 expr: T_RBRACKET args_list . T_RBRACKET
+
+    T_COMMA     shift, and go to state 131
+    T_RBRACKET  shift, and go to state 132
+
+
+state 70
 
    13 func_ident: '&' T_ID .
 
     $default  reduce using rule 13 (func_ident)
 
 
-state 69
-
-   75 nibbler: T_STRINGC .
-
-    $default  reduce using rule 75 (nibbler)
-
-
-state 70
-
-   76 nibbler: '|' . T_STRINGC
-
-    T_STRINGC  shift, and go to state 130
-
-
 state 71
 
-   74 p6regex: '/' nibbler . '/'
+   76 nibbler: T_STRINGC .
 
-    '/'  shift, and go to state 131
+    $default  reduce using rule 76 (nibbler)
 
 
 state 72
+
+   77 nibbler: '|' . T_STRINGC
+
+    T_STRINGC  shift, and go to state 133
+
+
+state 73
+
+   75 p6regex: '/' nibbler . '/'
+
+    '/'  shift, and go to state 134
+
+
+state 74
 
     0 $accept: prog $end .
 
     $default  accept
 
 
-state 73
+state 75
 
     3 stmts: stmts stmt .
 
     $default  reduce using rule 3 (stmts)
 
 
-state 74
+state 76
 
    57 methodop: func_ident T_LPAREN . args_list T_RPAREN
 
-    T_ID       shift, and go to state 1
-    T_DIGIT    shift, and go to state 2
-    T_STRINGC  shift, and go to state 3
-    T_SIGIL    shift, and go to state 4
-    T_LPAREN   shift, and go to state 22
-    '&'        shift, and go to state 23
-    '/'        shift, and go to state 24
+    T_ID        shift, and go to state 1
+    T_DIGIT     shift, and go to state 2
+    T_STRINGC   shift, and go to state 3
+    T_SIGIL     shift, and go to state 4
+    T_LPAREN    shift, and go to state 22
+    T_RBRACKET  shift, and go to state 23
+    '&'         shift, and go to state 24
+    '/'         shift, and go to state 25
 
     $default  reduce using rule 60 (args_list)
 
-    func_ident  go to state 28
-    variable    go to state 34
-    methodop    go to state 41
-    args_list   go to state 132
-    expr        go to state 67
-    p6regex     go to state 44
-    number      go to state 45
-    constants   go to state 46
-    stringc     go to state 47
+    func_ident  go to state 29
+    variable    go to state 35
+    methodop    go to state 42
+    args_list   go to state 135
+    expr        go to state 68
+    p6regex     go to state 45
+    number      go to state 46
+    constants   go to state 47
+    stringc     go to state 48
 
 
-state 75
+state 77
 
    22 regex_declarator: regex_type_identifier func_ident . rblock
 
-    T_LBRACE  shift, and go to state 133
+    T_LBRACE  shift, and go to state 136
 
-    rblock  go to state 134
+    rblock  go to state 137
 
 
-state 76
+state 78
 
     4 stmt: var_declarator T_SEMICOLON .
 
     $default  reduce using rule 4 (stmt)
 
 
-state 77
+state 79
 
-   87 assignment: T_EQ .
-
-    $default  reduce using rule 87 (assignment)
-
-
-state 78
-
-   88 assignment: T_BIND .
+   88 assignment: T_EQ .
 
     $default  reduce using rule 88 (assignment)
 
 
-state 79
+state 80
 
-   89 assignment: T_RO_BIND .
+   89 assignment: T_BIND .
 
     $default  reduce using rule 89 (assignment)
 
 
-state 80
-
-   96 comparison: T_CN_EQ .
-
-    $default  reduce using rule 96 (comparison)
-
-
 state 81
 
-   97 comparison: T_CN_NE .
+   90 assignment: T_RO_BIND .
 
-    $default  reduce using rule 97 (comparison)
+    $default  reduce using rule 90 (assignment)
 
 
 state 82
 
-   98 comparison: T_CN_LT .
+   97 comparison: T_CN_EQ .
 
-    $default  reduce using rule 98 (comparison)
+    $default  reduce using rule 97 (comparison)
 
 
 state 83
 
-   99 comparison: T_CN_GT .
+   98 comparison: T_CN_NE .
 
-    $default  reduce using rule 99 (comparison)
+    $default  reduce using rule 98 (comparison)
 
 
 state 84
 
-  100 comparison: T_CN_LE .
+   99 comparison: T_CN_LT .
 
-    $default  reduce using rule 100 (comparison)
+    $default  reduce using rule 99 (comparison)
 
 
 state 85
 
-  101 comparison: T_CN_GE .
+  100 comparison: T_CN_GT .
 
-    $default  reduce using rule 101 (comparison)
+    $default  reduce using rule 100 (comparison)
 
 
 state 86
 
-  102 comparison: T_CS_EQ .
+  101 comparison: T_CN_LE .
 
-    $default  reduce using rule 102 (comparison)
+    $default  reduce using rule 101 (comparison)
 
 
 state 87
 
-  103 comparison: T_CS_NE .
+  102 comparison: T_CN_GE .
 
-    $default  reduce using rule 103 (comparison)
+    $default  reduce using rule 102 (comparison)
 
 
 state 88
 
-  104 comparison: T_CS_LT .
+  103 comparison: T_CS_EQ .
 
-    $default  reduce using rule 104 (comparison)
+    $default  reduce using rule 103 (comparison)
 
 
 state 89
 
-  105 comparison: T_CS_GT .
+  104 comparison: T_CS_NE .
 
-    $default  reduce using rule 105 (comparison)
+    $default  reduce using rule 104 (comparison)
 
 
 state 90
 
-  106 comparison: T_CS_LE .
+  105 comparison: T_CS_LT .
 
-    $default  reduce using rule 106 (comparison)
+    $default  reduce using rule 105 (comparison)
 
 
 state 91
 
-  107 comparison: T_CS_GE .
+  106 comparison: T_CS_GT .
 
-    $default  reduce using rule 107 (comparison)
+    $default  reduce using rule 106 (comparison)
 
 
 state 92
 
-  108 comparison: T_SMARTMATCH .
+  107 comparison: T_CS_LE .
 
-    $default  reduce using rule 108 (comparison)
+    $default  reduce using rule 107 (comparison)
 
 
 state 93
 
-   90 other_ops: T_REPEATER .
+  108 comparison: T_CS_GE .
 
-    $default  reduce using rule 90 (other_ops)
+    $default  reduce using rule 108 (comparison)
 
 
 state 94
 
-   91 math_ops: T_PLUS .
+  109 comparison: T_SMARTMATCH .
 
-    $default  reduce using rule 91 (math_ops)
+    $default  reduce using rule 109 (comparison)
 
 
 state 95
 
-   92 math_ops: T_MINUS .
+   91 other_ops: T_REPEATER .
 
-    $default  reduce using rule 92 (math_ops)
+    $default  reduce using rule 91 (other_ops)
 
 
 state 96
 
-   93 math_ops: T_MUL .
+   92 math_ops: T_PLUS .
 
-    $default  reduce using rule 93 (math_ops)
+    $default  reduce using rule 92 (math_ops)
 
 
 state 97
 
-   94 math_ops: T_DIV .
+   93 math_ops: T_MINUS .
 
-    $default  reduce using rule 94 (math_ops)
+    $default  reduce using rule 93 (math_ops)
 
 
 state 98
 
-   95 string_ops: T_STITCH .
+   94 math_ops: T_MUL .
 
-    $default  reduce using rule 95 (string_ops)
+    $default  reduce using rule 94 (math_ops)
 
 
 state 99
 
-   58 methodop: variable T_DOT . func_ident T_LPAREN args_list T_RPAREN
+   95 math_ops: T_DIV .
 
-    T_ID  shift, and go to state 57
-    '&'   shift, and go to state 23
-
-    func_ident  go to state 135
+    $default  reduce using rule 95 (math_ops)
 
 
 state 100
 
-   68 expr: variable infix . expr
+   96 string_ops: T_STITCH .
 
-    T_ID       shift, and go to state 1
-    T_DIGIT    shift, and go to state 2
-    T_STRINGC  shift, and go to state 3
-    T_SIGIL    shift, and go to state 4
-    T_LPAREN   shift, and go to state 22
-    '&'        shift, and go to state 23
-    '/'        shift, and go to state 24
-
-    func_ident  go to state 28
-    variable    go to state 34
-    methodop    go to state 41
-    expr        go to state 136
-    p6regex     go to state 44
-    number      go to state 45
-    constants   go to state 46
-    stringc     go to state 47
+    $default  reduce using rule 96 (string_ops)
 
 
 state 101
 
-   67 expr: variable assignment . expr
+   58 methodop: variable T_DOT . func_ident T_LPAREN args_list T_RPAREN
 
-    T_ID       shift, and go to state 1
-    T_DIGIT    shift, and go to state 2
-    T_STRINGC  shift, and go to state 3
-    T_SIGIL    shift, and go to state 4
-    T_LPAREN   shift, and go to state 22
-    '&'        shift, and go to state 23
-    '/'        shift, and go to state 24
+    T_ID  shift, and go to state 58
+    '&'   shift, and go to state 24
 
-    func_ident  go to state 28
-    variable    go to state 34
-    methodop    go to state 41
-    expr        go to state 137
-    p6regex     go to state 44
-    number      go to state 45
-    constants   go to state 46
-    stringc     go to state 47
+    func_ident  go to state 138
 
 
 state 102
 
-   85 infix: other_ops .
+   68 expr: variable infix . expr
 
-    $default  reduce using rule 85 (infix)
+    T_ID        shift, and go to state 1
+    T_DIGIT     shift, and go to state 2
+    T_STRINGC   shift, and go to state 3
+    T_SIGIL     shift, and go to state 4
+    T_LPAREN    shift, and go to state 22
+    T_RBRACKET  shift, and go to state 23
+    '&'         shift, and go to state 24
+    '/'         shift, and go to state 25
+
+    func_ident  go to state 29
+    variable    go to state 35
+    methodop    go to state 42
+    expr        go to state 139
+    p6regex     go to state 45
+    number      go to state 46
+    constants   go to state 47
+    stringc     go to state 48
 
 
 state 103
 
-   83 infix: math_ops .
+   67 expr: variable assignment . expr
 
-    $default  reduce using rule 83 (infix)
+    T_ID        shift, and go to state 1
+    T_DIGIT     shift, and go to state 2
+    T_STRINGC   shift, and go to state 3
+    T_SIGIL     shift, and go to state 4
+    T_LPAREN    shift, and go to state 22
+    T_RBRACKET  shift, and go to state 23
+    '&'         shift, and go to state 24
+    '/'         shift, and go to state 25
+
+    func_ident  go to state 29
+    variable    go to state 35
+    methodop    go to state 42
+    expr        go to state 140
+    p6regex     go to state 45
+    number      go to state 46
+    constants   go to state 47
+    stringc     go to state 48
 
 
 state 104
 
-   84 infix: string_ops .
+   86 infix: other_ops .
 
-    $default  reduce using rule 84 (infix)
+    $default  reduce using rule 86 (infix)
 
 
 state 105
 
-   82 infix: comparison .
+   84 infix: math_ops .
 
-    $default  reduce using rule 82 (infix)
+    $default  reduce using rule 84 (infix)
 
 
 state 106
 
-   55 for_inline_stmt: expr_list T_FOR . expr_list T_SEMICOLON
+   85 infix: string_ops .
 
-    T_ID       shift, and go to state 1
-    T_DIGIT    shift, and go to state 2
-    T_STRINGC  shift, and go to state 3
-    T_SIGIL    shift, and go to state 4
-    T_LPAREN   shift, and go to state 22
-    '&'        shift, and go to state 23
-    '/'        shift, and go to state 24
-
-    func_ident  go to state 28
-    variable    go to state 34
-    methodop    go to state 41
-    expr_list   go to state 138
-    expr        go to state 43
-    p6regex     go to state 44
-    number      go to state 45
-    constants   go to state 46
-    stringc     go to state 47
+    $default  reduce using rule 85 (infix)
 
 
 state 107
 
-   66 expr_list: expr_list T_COMMA . expr
+   83 infix: comparison .
 
-    T_ID       shift, and go to state 1
-    T_DIGIT    shift, and go to state 2
-    T_STRINGC  shift, and go to state 3
-    T_SIGIL    shift, and go to state 4
-    T_LPAREN   shift, and go to state 22
-    '&'        shift, and go to state 23
-    '/'        shift, and go to state 24
-
-    func_ident  go to state 28
-    variable    go to state 34
-    methodop    go to state 41
-    expr        go to state 139
-    p6regex     go to state 44
-    number      go to state 45
-    constants   go to state 46
-    stringc     go to state 47
+    $default  reduce using rule 83 (infix)
 
 
 state 108
+
+   55 for_inline_stmt: expr_list T_FOR . expr_list T_SEMICOLON
+
+    T_ID        shift, and go to state 1
+    T_DIGIT     shift, and go to state 2
+    T_STRINGC   shift, and go to state 3
+    T_SIGIL     shift, and go to state 4
+    T_LPAREN    shift, and go to state 22
+    T_RBRACKET  shift, and go to state 23
+    '&'         shift, and go to state 24
+    '/'         shift, and go to state 25
+
+    func_ident  go to state 29
+    variable    go to state 35
+    methodop    go to state 42
+    expr_list   go to state 141
+    expr        go to state 44
+    p6regex     go to state 45
+    number      go to state 46
+    constants   go to state 47
+    stringc     go to state 48
+
+
+state 109
+
+   66 expr_list: expr_list T_COMMA . expr
+
+    T_ID        shift, and go to state 1
+    T_DIGIT     shift, and go to state 2
+    T_STRINGC   shift, and go to state 3
+    T_SIGIL     shift, and go to state 4
+    T_LPAREN    shift, and go to state 22
+    T_RBRACKET  shift, and go to state 23
+    '&'         shift, and go to state 24
+    '/'         shift, and go to state 25
+
+    func_ident  go to state 29
+    variable    go to state 35
+    methodop    go to state 42
+    expr        go to state 142
+    p6regex     go to state 45
+    number      go to state 46
+    constants   go to state 47
+    stringc     go to state 48
+
+
+state 110
 
    10 stmt: expr_list T_SEMICOLON .
 
     $default  reduce using rule 10 (stmt)
 
 
-state 109
+state 111
 
    69 expr: constants infix . expr
 
-    T_ID       shift, and go to state 1
-    T_DIGIT    shift, and go to state 2
-    T_STRINGC  shift, and go to state 3
-    T_SIGIL    shift, and go to state 4
-    T_LPAREN   shift, and go to state 22
-    '&'        shift, and go to state 23
-    '/'        shift, and go to state 24
+    T_ID        shift, and go to state 1
+    T_DIGIT     shift, and go to state 2
+    T_STRINGC   shift, and go to state 3
+    T_SIGIL     shift, and go to state 4
+    T_LPAREN    shift, and go to state 22
+    T_RBRACKET  shift, and go to state 23
+    '&'         shift, and go to state 24
+    '/'         shift, and go to state 25
 
-    func_ident  go to state 28
-    variable    go to state 34
-    methodop    go to state 41
-    expr        go to state 140
-    p6regex     go to state 44
-    number      go to state 45
-    constants   go to state 46
-    stringc     go to state 47
-
-
-state 110
-
-   59 methodop: T_ID T_DOT func_ident . T_LPAREN args_list T_RPAREN
-
-    T_LPAREN  shift, and go to state 141
-
-
-state 111
-
-   78 number: T_DIGIT T_DOT T_DIGIT .
-
-    $default  reduce using rule 78 (number)
+    func_ident  go to state 29
+    variable    go to state 35
+    methodop    go to state 42
+    expr        go to state 143
+    p6regex     go to state 45
+    number      go to state 46
+    constants   go to state 47
+    stringc     go to state 48
 
 
 state 112
 
-   40 var_declarator: T_MY variable assignment . expr_list
+   59 methodop: T_ID T_DOT func_ident . T_LPAREN args_list T_RPAREN
 
-    T_ID       shift, and go to state 1
-    T_DIGIT    shift, and go to state 2
-    T_STRINGC  shift, and go to state 3
-    T_SIGIL    shift, and go to state 4
-    T_LPAREN   shift, and go to state 22
-    '&'        shift, and go to state 23
-    '/'        shift, and go to state 24
-
-    func_ident  go to state 28
-    variable    go to state 34
-    methodop    go to state 41
-    expr_list   go to state 142
-    expr        go to state 43
-    p6regex     go to state 44
-    number      go to state 45
-    constants   go to state 46
-    stringc     go to state 47
+    T_LPAREN  shift, and go to state 144
 
 
 state 113
+
+   79 number: T_DIGIT T_DOT T_DIGIT .
+
+    $default  reduce using rule 79 (number)
+
+
+state 114
+
+   40 var_declarator: T_MY variable assignment . expr_list
+
+    T_ID        shift, and go to state 1
+    T_DIGIT     shift, and go to state 2
+    T_STRINGC   shift, and go to state 3
+    T_SIGIL     shift, and go to state 4
+    T_LPAREN    shift, and go to state 22
+    T_RBRACKET  shift, and go to state 23
+    '&'         shift, and go to state 24
+    '/'         shift, and go to state 25
+
+    func_ident  go to state 29
+    variable    go to state 35
+    methodop    go to state 42
+    expr_list   go to state 145
+    expr        go to state 44
+    p6regex     go to state 45
+    number      go to state 46
+    constants   go to state 47
+    stringc     go to state 48
+
+
+state 115
 
    63 xblock: T_LBRACE . T_RBRACE
    64       | T_LBRACE . stmts T_RBRACE
@@ -1638,312 +1691,322 @@ state 113
     T_FOR        shift, and go to state 19
     T_WHILE      shift, and go to state 20
     T_RETURN     shift, and go to state 21
-    T_RBRACE     shift, and go to state 143
+    T_RBRACE     shift, and go to state 146
     T_LPAREN     shift, and go to state 22
-    '&'          shift, and go to state 23
-    '/'          shift, and go to state 24
+    T_RBRACKET   shift, and go to state 23
+    '&'          shift, and go to state 24
+    '/'          shift, and go to state 25
 
-    stmts                  go to state 144
-    stmt                   go to state 27
-    func_ident             go to state 28
-    package_declarator     go to state 29
-    func_declarator        go to state 30
-    regex_declarator       go to state 31
-    regex_type_identifier  go to state 32
-    var_declarator         go to state 33
-    variable               go to state 34
-    stmt_control           go to state 35
-    if_stmt                go to state 36
-    unless_stmt            go to state 37
-    for_stmt               go to state 38
-    for_inline_stmt        go to state 39
-    while_stmt             go to state 40
-    methodop               go to state 41
-    expr_list              go to state 42
-    expr                   go to state 43
-    p6regex                go to state 44
-    number                 go to state 45
-    constants              go to state 46
-    stringc                go to state 47
+    stmts                  go to state 147
+    stmt                   go to state 28
+    func_ident             go to state 29
+    package_declarator     go to state 30
+    func_declarator        go to state 31
+    regex_declarator       go to state 32
+    regex_type_identifier  go to state 33
+    var_declarator         go to state 34
+    variable               go to state 35
+    stmt_control           go to state 36
+    if_stmt                go to state 37
+    unless_stmt            go to state 38
+    for_stmt               go to state 39
+    for_inline_stmt        go to state 40
+    while_stmt             go to state 41
+    methodop               go to state 42
+    expr_list              go to state 43
+    expr                   go to state 44
+    p6regex                go to state 45
+    number                 go to state 46
+    constants              go to state 47
+    stringc                go to state 48
 
 
-state 114
+state 116
 
    14 package_declarator: T_PACKAGE T_ID xblock .
 
     $default  reduce using rule 14 (package_declarator)
 
 
-state 115
+state 117
 
    15 package_declarator: T_MODULE T_ID xblock .
 
     $default  reduce using rule 15 (package_declarator)
 
 
-state 116
+state 118
 
    16 package_declarator: T_CLASS T_ID xblock .
 
     $default  reduce using rule 16 (package_declarator)
 
 
-state 117
+state 119
 
    17 package_declarator: T_GRAMMAR T_ID xblock .
 
     $default  reduce using rule 17 (package_declarator)
 
 
-state 118
+state 120
 
    18 package_declarator: T_ROLE T_ID xblock .
 
     $default  reduce using rule 18 (package_declarator)
 
 
-state 119
+state 121
 
    28 signature: T_LPAREN . param_list T_RPAREN
 
     T_SIGIL  shift, and go to state 4
-    T_MUL    shift, and go to state 145
-    ':'      shift, and go to state 146
+    T_MUL    shift, and go to state 148
+    ':'      shift, and go to state 149
 
     $default  reduce using rule 29 (param_list)
 
-    param_list      go to state 147
-    parameter       go to state 148
-    param_variable  go to state 149
-    named_param     go to state 150
-    variable        go to state 151
-
-
-state 120
-
-   19 func_declarator: T_SUB func_ident signature . xblock
-
-    T_LBRACE  shift, and go to state 113
-
-    xblock  go to state 152
-
-
-state 121
-
-   20 func_declarator: T_METHOD func_ident signature . xblock
-
-    T_LBRACE  shift, and go to state 113
-
-    xblock  go to state 153
+    param_list      go to state 150
+    parameter       go to state 151
+    param_variable  go to state 152
+    named_param     go to state 153
+    variable        go to state 154
 
 
 state 122
 
-   21 func_declarator: T_SUBMETHOD func_ident signature . xblock
+   19 func_declarator: T_SUB func_ident signature . xblock
 
-    T_LBRACE  shift, and go to state 113
+    T_LBRACE  shift, and go to state 115
 
-    xblock  go to state 154
+    xblock  go to state 155
 
 
 state 123
+
+   20 func_declarator: T_METHOD func_ident signature . xblock
+
+    T_LBRACE  shift, and go to state 115
+
+    xblock  go to state 156
+
+
+state 124
+
+   21 func_declarator: T_SUBMETHOD func_ident signature . xblock
+
+    T_LBRACE  shift, and go to state 115
+
+    xblock  go to state 157
+
+
+state 125
 
    47 if_stmt: T_IF expr_list xblock .
    48        | T_IF expr_list xblock . T_ELSE xblock
    49        | T_IF expr_list xblock . elsif_stmt
    50        | T_IF expr_list xblock . elsif_stmt T_ELSE xblock
 
-    T_ELSIF  shift, and go to state 155
-    T_ELSE   shift, and go to state 156
+    T_ELSIF  shift, and go to state 158
+    T_ELSE   shift, and go to state 159
 
     $default  reduce using rule 47 (if_stmt)
 
-    elsif_stmt  go to state 157
+    elsif_stmt  go to state 160
 
 
-state 124
+state 126
 
    53 unless_stmt: T_UNLESS expr_list xblock .
 
     $default  reduce using rule 53 (unless_stmt)
 
 
-state 125
+state 127
 
    54 for_stmt: T_FOR expr_list xblock .
 
     $default  reduce using rule 54 (for_stmt)
 
 
-state 126
+state 128
 
    56 while_stmt: T_WHILE expr_list xblock .
 
     $default  reduce using rule 56 (while_stmt)
 
 
-state 127
+state 129
 
     9 stmt: T_RETURN expr_list T_SEMICOLON .
 
     $default  reduce using rule 9 (stmt)
 
 
-state 128
-
-   71 expr: T_LPAREN args_list T_RPAREN .
-
-    $default  reduce using rule 71 (expr)
-
-
-state 129
-
-   62 args_list: args_list T_COMMA . expr
-
-    T_ID       shift, and go to state 1
-    T_DIGIT    shift, and go to state 2
-    T_STRINGC  shift, and go to state 3
-    T_SIGIL    shift, and go to state 4
-    T_LPAREN   shift, and go to state 22
-    '&'        shift, and go to state 23
-    '/'        shift, and go to state 24
-
-    func_ident  go to state 28
-    variable    go to state 34
-    methodop    go to state 41
-    expr        go to state 158
-    p6regex     go to state 44
-    number      go to state 45
-    constants   go to state 46
-    stringc     go to state 47
-
-
 state 130
 
-   76 nibbler: '|' T_STRINGC .
+   72 expr: T_LPAREN args_list T_RPAREN .
 
-    $default  reduce using rule 76 (nibbler)
+    $default  reduce using rule 72 (expr)
 
 
 state 131
 
-   74 p6regex: '/' nibbler '/' .
+   62 args_list: args_list T_COMMA . expr
 
-    $default  reduce using rule 74 (p6regex)
+    T_ID        shift, and go to state 1
+    T_DIGIT     shift, and go to state 2
+    T_STRINGC   shift, and go to state 3
+    T_SIGIL     shift, and go to state 4
+    T_LPAREN    shift, and go to state 22
+    T_RBRACKET  shift, and go to state 23
+    '&'         shift, and go to state 24
+    '/'         shift, and go to state 25
+
+    func_ident  go to state 29
+    variable    go to state 35
+    methodop    go to state 42
+    expr        go to state 161
+    p6regex     go to state 45
+    number      go to state 46
+    constants   go to state 47
+    stringc     go to state 48
 
 
 state 132
 
-   57 methodop: func_ident T_LPAREN args_list . T_RPAREN
-   62 args_list: args_list . T_COMMA expr
+   71 expr: T_RBRACKET args_list T_RBRACKET .
 
-    T_RPAREN  shift, and go to state 159
-    T_COMMA   shift, and go to state 129
+    $default  reduce using rule 71 (expr)
 
 
 state 133
 
-   26 rblock: T_LBRACE . '<' T_RBRACE
-   27       | T_LBRACE . T_RBLOCK T_RBRACE
+   77 nibbler: '|' T_STRINGC .
 
-    T_RBLOCK  shift, and go to state 160
-    '<'       shift, and go to state 161
+    $default  reduce using rule 77 (nibbler)
 
 
 state 134
+
+   75 p6regex: '/' nibbler '/' .
+
+    $default  reduce using rule 75 (p6regex)
+
+
+state 135
+
+   57 methodop: func_ident T_LPAREN args_list . T_RPAREN
+   62 args_list: args_list . T_COMMA expr
+
+    T_RPAREN  shift, and go to state 162
+    T_COMMA   shift, and go to state 131
+
+
+state 136
+
+   26 rblock: T_LBRACE . '<' T_RBRACE
+   27       | T_LBRACE . T_RBLOCK T_RBRACE
+
+    T_RBLOCK  shift, and go to state 163
+    '<'       shift, and go to state 164
+
+
+state 137
 
    22 regex_declarator: regex_type_identifier func_ident rblock .
 
     $default  reduce using rule 22 (regex_declarator)
 
 
-state 135
+state 138
 
    58 methodop: variable T_DOT func_ident . T_LPAREN args_list T_RPAREN
 
-    T_LPAREN  shift, and go to state 162
+    T_LPAREN  shift, and go to state 165
 
 
-state 136
+state 139
 
    68 expr: variable infix expr .
 
     $default  reduce using rule 68 (expr)
 
 
-state 137
+state 140
 
    67 expr: variable assignment expr .
 
     $default  reduce using rule 67 (expr)
 
 
-state 138
+state 141
 
    55 for_inline_stmt: expr_list T_FOR expr_list . T_SEMICOLON
    66 expr_list: expr_list . T_COMMA expr
 
-    T_COMMA      shift, and go to state 107
-    T_SEMICOLON  shift, and go to state 163
+    T_COMMA      shift, and go to state 109
+    T_SEMICOLON  shift, and go to state 166
 
 
-state 139
+state 142
 
    66 expr_list: expr_list T_COMMA expr .
 
     $default  reduce using rule 66 (expr_list)
 
 
-state 140
+state 143
 
    69 expr: constants infix expr .
 
     $default  reduce using rule 69 (expr)
 
 
-state 141
+state 144
 
    59 methodop: T_ID T_DOT func_ident T_LPAREN . args_list T_RPAREN
 
-    T_ID       shift, and go to state 1
-    T_DIGIT    shift, and go to state 2
-    T_STRINGC  shift, and go to state 3
-    T_SIGIL    shift, and go to state 4
-    T_LPAREN   shift, and go to state 22
-    '&'        shift, and go to state 23
-    '/'        shift, and go to state 24
+    T_ID        shift, and go to state 1
+    T_DIGIT     shift, and go to state 2
+    T_STRINGC   shift, and go to state 3
+    T_SIGIL     shift, and go to state 4
+    T_LPAREN    shift, and go to state 22
+    T_RBRACKET  shift, and go to state 23
+    '&'         shift, and go to state 24
+    '/'         shift, and go to state 25
 
     $default  reduce using rule 60 (args_list)
 
-    func_ident  go to state 28
-    variable    go to state 34
-    methodop    go to state 41
-    args_list   go to state 164
-    expr        go to state 67
-    p6regex     go to state 44
-    number      go to state 45
-    constants   go to state 46
-    stringc     go to state 47
+    func_ident  go to state 29
+    variable    go to state 35
+    methodop    go to state 42
+    args_list   go to state 167
+    expr        go to state 68
+    p6regex     go to state 45
+    number      go to state 46
+    constants   go to state 47
+    stringc     go to state 48
 
 
-state 142
+state 145
 
    40 var_declarator: T_MY variable assignment expr_list .
    66 expr_list: expr_list . T_COMMA expr
 
-    T_COMMA  shift, and go to state 107
+    T_COMMA  shift, and go to state 109
 
     $default  reduce using rule 40 (var_declarator)
 
 
-state 143
+state 146
 
    63 xblock: T_LBRACE T_RBRACE .
 
     $default  reduce using rule 63 (xblock)
 
 
-state 144
+state 147
 
     3 stmts: stmts . stmt
    64 xblock: T_LBRACE stmts . T_RBRACE
@@ -1969,383 +2032,386 @@ state 144
     T_FOR        shift, and go to state 19
     T_WHILE      shift, and go to state 20
     T_RETURN     shift, and go to state 21
-    T_RBRACE     shift, and go to state 165
+    T_RBRACE     shift, and go to state 168
     T_LPAREN     shift, and go to state 22
-    '&'          shift, and go to state 23
-    '/'          shift, and go to state 24
+    T_RBRACKET   shift, and go to state 23
+    '&'          shift, and go to state 24
+    '/'          shift, and go to state 25
 
-    stmt                   go to state 73
-    func_ident             go to state 28
-    package_declarator     go to state 29
-    func_declarator        go to state 30
-    regex_declarator       go to state 31
-    regex_type_identifier  go to state 32
-    var_declarator         go to state 33
-    variable               go to state 34
-    stmt_control           go to state 35
-    if_stmt                go to state 36
-    unless_stmt            go to state 37
-    for_stmt               go to state 38
-    for_inline_stmt        go to state 39
-    while_stmt             go to state 40
-    methodop               go to state 41
-    expr_list              go to state 42
-    expr                   go to state 43
-    p6regex                go to state 44
-    number                 go to state 45
-    constants              go to state 46
-    stringc                go to state 47
+    stmt                   go to state 75
+    func_ident             go to state 29
+    package_declarator     go to state 30
+    func_declarator        go to state 31
+    regex_declarator       go to state 32
+    regex_type_identifier  go to state 33
+    var_declarator         go to state 34
+    variable               go to state 35
+    stmt_control           go to state 36
+    if_stmt                go to state 37
+    unless_stmt            go to state 38
+    for_stmt               go to state 39
+    for_inline_stmt        go to state 40
+    while_stmt             go to state 41
+    methodop               go to state 42
+    expr_list              go to state 43
+    expr                   go to state 44
+    p6regex                go to state 45
+    number                 go to state 46
+    constants              go to state 47
+    stringc                go to state 48
 
 
-state 145
+state 148
 
    33 parameter: T_MUL . param_variable
 
     T_SIGIL  shift, and go to state 4
 
-    param_variable  go to state 166
-    variable        go to state 151
+    param_variable  go to state 169
+    variable        go to state 154
 
 
-state 146
+state 149
 
    38 named_param: ':' . param_variable
 
     T_SIGIL  shift, and go to state 4
 
-    param_variable  go to state 167
-    variable        go to state 151
+    param_variable  go to state 170
+    variable        go to state 154
 
 
-state 147
+state 150
 
    28 signature: T_LPAREN param_list . T_RPAREN
    31 param_list: param_list . T_COMMA parameter
 
-    T_RPAREN  shift, and go to state 168
-    T_COMMA   shift, and go to state 169
+    T_RPAREN  shift, and go to state 171
+    T_COMMA   shift, and go to state 172
 
 
-state 148
+state 151
 
    30 param_list: parameter .
 
     $default  reduce using rule 30 (param_list)
 
 
-state 149
+state 152
 
    32 parameter: param_variable .
    34          | param_variable . '?'
 
-    '?'  shift, and go to state 170
+    '?'  shift, and go to state 173
 
     $default  reduce using rule 32 (parameter)
 
 
-state 150
+state 153
 
    35 parameter: named_param .
 
     $default  reduce using rule 35 (parameter)
 
 
-state 151
+state 154
 
    36 param_variable: variable .
    37               | variable . assignment expr
 
-    T_EQ       shift, and go to state 77
-    T_BIND     shift, and go to state 78
-    T_RO_BIND  shift, and go to state 79
+    T_EQ       shift, and go to state 79
+    T_BIND     shift, and go to state 80
+    T_RO_BIND  shift, and go to state 81
 
     $default  reduce using rule 36 (param_variable)
 
-    assignment  go to state 171
+    assignment  go to state 174
 
 
-state 152
+state 155
 
    19 func_declarator: T_SUB func_ident signature xblock .
 
     $default  reduce using rule 19 (func_declarator)
 
 
-state 153
+state 156
 
    20 func_declarator: T_METHOD func_ident signature xblock .
 
     $default  reduce using rule 20 (func_declarator)
 
 
-state 154
+state 157
 
    21 func_declarator: T_SUBMETHOD func_ident signature xblock .
 
     $default  reduce using rule 21 (func_declarator)
 
 
-state 155
+state 158
 
    51 elsif_stmt: T_ELSIF . xblock
 
-    T_LBRACE  shift, and go to state 113
+    T_LBRACE  shift, and go to state 115
 
-    xblock  go to state 172
+    xblock  go to state 175
 
 
-state 156
+state 159
 
    48 if_stmt: T_IF expr_list xblock T_ELSE . xblock
 
-    T_LBRACE  shift, and go to state 113
+    T_LBRACE  shift, and go to state 115
 
-    xblock  go to state 173
+    xblock  go to state 176
 
 
-state 157
+state 160
 
    49 if_stmt: T_IF expr_list xblock elsif_stmt .
    50        | T_IF expr_list xblock elsif_stmt . T_ELSE xblock
    52 elsif_stmt: elsif_stmt . T_ELSIF xblock
 
-    T_ELSIF  shift, and go to state 174
-    T_ELSE   shift, and go to state 175
+    T_ELSIF  shift, and go to state 177
+    T_ELSE   shift, and go to state 178
 
     $default  reduce using rule 49 (if_stmt)
 
 
-state 158
+state 161
 
    62 args_list: args_list T_COMMA expr .
 
     $default  reduce using rule 62 (args_list)
 
 
-state 159
+state 162
 
    57 methodop: func_ident T_LPAREN args_list T_RPAREN .
 
     $default  reduce using rule 57 (methodop)
 
 
-state 160
+state 163
 
    27 rblock: T_LBRACE T_RBLOCK . T_RBRACE
 
-    T_RBRACE  shift, and go to state 176
+    T_RBRACE  shift, and go to state 179
 
 
-state 161
+state 164
 
    26 rblock: T_LBRACE '<' . T_RBRACE
 
-    T_RBRACE  shift, and go to state 177
+    T_RBRACE  shift, and go to state 180
 
 
-state 162
+state 165
 
    58 methodop: variable T_DOT func_ident T_LPAREN . args_list T_RPAREN
 
-    T_ID       shift, and go to state 1
-    T_DIGIT    shift, and go to state 2
-    T_STRINGC  shift, and go to state 3
-    T_SIGIL    shift, and go to state 4
-    T_LPAREN   shift, and go to state 22
-    '&'        shift, and go to state 23
-    '/'        shift, and go to state 24
+    T_ID        shift, and go to state 1
+    T_DIGIT     shift, and go to state 2
+    T_STRINGC   shift, and go to state 3
+    T_SIGIL     shift, and go to state 4
+    T_LPAREN    shift, and go to state 22
+    T_RBRACKET  shift, and go to state 23
+    '&'         shift, and go to state 24
+    '/'         shift, and go to state 25
 
     $default  reduce using rule 60 (args_list)
 
-    func_ident  go to state 28
-    variable    go to state 34
-    methodop    go to state 41
-    args_list   go to state 178
-    expr        go to state 67
-    p6regex     go to state 44
-    number      go to state 45
-    constants   go to state 46
-    stringc     go to state 47
+    func_ident  go to state 29
+    variable    go to state 35
+    methodop    go to state 42
+    args_list   go to state 181
+    expr        go to state 68
+    p6regex     go to state 45
+    number      go to state 46
+    constants   go to state 47
+    stringc     go to state 48
 
 
-state 163
+state 166
 
    55 for_inline_stmt: expr_list T_FOR expr_list T_SEMICOLON .
 
     $default  reduce using rule 55 (for_inline_stmt)
 
 
-state 164
+state 167
 
    59 methodop: T_ID T_DOT func_ident T_LPAREN args_list . T_RPAREN
    62 args_list: args_list . T_COMMA expr
 
-    T_RPAREN  shift, and go to state 179
-    T_COMMA   shift, and go to state 129
+    T_RPAREN  shift, and go to state 182
+    T_COMMA   shift, and go to state 131
 
 
-state 165
+state 168
 
    64 xblock: T_LBRACE stmts T_RBRACE .
 
     $default  reduce using rule 64 (xblock)
 
 
-state 166
+state 169
 
    33 parameter: T_MUL param_variable .
 
     $default  reduce using rule 33 (parameter)
 
 
-state 167
+state 170
 
    38 named_param: ':' param_variable .
 
     $default  reduce using rule 38 (named_param)
 
 
-state 168
+state 171
 
    28 signature: T_LPAREN param_list T_RPAREN .
 
     $default  reduce using rule 28 (signature)
 
 
-state 169
+state 172
 
    31 param_list: param_list T_COMMA . parameter
 
     T_SIGIL  shift, and go to state 4
-    T_MUL    shift, and go to state 145
-    ':'      shift, and go to state 146
+    T_MUL    shift, and go to state 148
+    ':'      shift, and go to state 149
 
-    parameter       go to state 180
-    param_variable  go to state 149
-    named_param     go to state 150
-    variable        go to state 151
+    parameter       go to state 183
+    param_variable  go to state 152
+    named_param     go to state 153
+    variable        go to state 154
 
 
-state 170
+state 173
 
    34 parameter: param_variable '?' .
 
     $default  reduce using rule 34 (parameter)
 
 
-state 171
+state 174
 
    37 param_variable: variable assignment . expr
 
-    T_ID       shift, and go to state 1
-    T_DIGIT    shift, and go to state 2
-    T_STRINGC  shift, and go to state 3
-    T_SIGIL    shift, and go to state 4
-    T_LPAREN   shift, and go to state 22
-    '&'        shift, and go to state 23
-    '/'        shift, and go to state 24
+    T_ID        shift, and go to state 1
+    T_DIGIT     shift, and go to state 2
+    T_STRINGC   shift, and go to state 3
+    T_SIGIL     shift, and go to state 4
+    T_LPAREN    shift, and go to state 22
+    T_RBRACKET  shift, and go to state 23
+    '&'         shift, and go to state 24
+    '/'         shift, and go to state 25
 
-    func_ident  go to state 28
-    variable    go to state 34
-    methodop    go to state 41
-    expr        go to state 181
-    p6regex     go to state 44
-    number      go to state 45
-    constants   go to state 46
-    stringc     go to state 47
+    func_ident  go to state 29
+    variable    go to state 35
+    methodop    go to state 42
+    expr        go to state 184
+    p6regex     go to state 45
+    number      go to state 46
+    constants   go to state 47
+    stringc     go to state 48
 
 
-state 172
+state 175
 
    51 elsif_stmt: T_ELSIF xblock .
 
     $default  reduce using rule 51 (elsif_stmt)
 
 
-state 173
+state 176
 
    48 if_stmt: T_IF expr_list xblock T_ELSE xblock .
 
     $default  reduce using rule 48 (if_stmt)
 
 
-state 174
+state 177
 
    52 elsif_stmt: elsif_stmt T_ELSIF . xblock
 
-    T_LBRACE  shift, and go to state 113
+    T_LBRACE  shift, and go to state 115
 
-    xblock  go to state 182
+    xblock  go to state 185
 
 
-state 175
+state 178
 
    50 if_stmt: T_IF expr_list xblock elsif_stmt T_ELSE . xblock
 
-    T_LBRACE  shift, and go to state 113
+    T_LBRACE  shift, and go to state 115
 
-    xblock  go to state 183
+    xblock  go to state 186
 
 
-state 176
+state 179
 
    27 rblock: T_LBRACE T_RBLOCK T_RBRACE .
 
     $default  reduce using rule 27 (rblock)
 
 
-state 177
+state 180
 
    26 rblock: T_LBRACE '<' T_RBRACE .
 
     $default  reduce using rule 26 (rblock)
 
 
-state 178
+state 181
 
    58 methodop: variable T_DOT func_ident T_LPAREN args_list . T_RPAREN
    62 args_list: args_list . T_COMMA expr
 
-    T_RPAREN  shift, and go to state 184
-    T_COMMA   shift, and go to state 129
+    T_RPAREN  shift, and go to state 187
+    T_COMMA   shift, and go to state 131
 
 
-state 179
+state 182
 
    59 methodop: T_ID T_DOT func_ident T_LPAREN args_list T_RPAREN .
 
     $default  reduce using rule 59 (methodop)
 
 
-state 180
+state 183
 
    31 param_list: param_list T_COMMA parameter .
 
     $default  reduce using rule 31 (param_list)
 
 
-state 181
+state 184
 
    37 param_variable: variable assignment expr .
 
     $default  reduce using rule 37 (param_variable)
 
 
-state 182
+state 185
 
    52 elsif_stmt: elsif_stmt T_ELSIF xblock .
 
     $default  reduce using rule 52 (elsif_stmt)
 
 
-state 183
+state 186
 
    50 if_stmt: T_IF expr_list xblock elsif_stmt T_ELSE xblock .
 
     $default  reduce using rule 50 (if_stmt)
 
 
-state 184
+state 187
 
    58 methodop: variable T_DOT func_ident T_LPAREN args_list T_RPAREN .
 

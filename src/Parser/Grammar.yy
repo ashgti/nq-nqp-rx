@@ -16,7 +16,8 @@ using namespace nqp;
 
 %define namespace "nqp"
 
-%expect 1
+%glr-parser
+%expect 2
 
 %parse-param { Block * &root_node }
 /*  %lex-param   { NBLock &ctx } */
@@ -342,9 +343,12 @@ expr : variable assignment expr {
      | constants infix expr {
        $$ = new BasicOp(*$1, $2, *$3);
      }
-     | methodop 
+     | methodop
+     | T_RBRACKET args_list T_RBRACKET {
+       $$ = new ListDeclaration($2);
+     }
      | T_LPAREN args_list T_RPAREN {
-     
+       $$ = new ListDeclaration($2);
      }
      | constants
      | variable

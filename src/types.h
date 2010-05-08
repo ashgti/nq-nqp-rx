@@ -20,7 +20,8 @@ extern "C" {
 #endif
 
 #define N_NUM double
-#define N_STR uint8_t* // If i am going to support unicode, I need to check this and change it
+#define N_STR const char* // If i am going to support unicode, I need to check this and change it
+#define N_STR_VAL char 
 #define N_BOOL int8_t
 
 struct P6opaque;
@@ -68,6 +69,9 @@ enum BuiltInTypes {
   kOTHER
 };
 
+#define N_BOOL_TRUE  1
+#define N_BOOL_FALSE 0
+
 struct P6opaque : public gc {
   BuiltInTypes klass_type;
   const char *klass_name;
@@ -110,6 +114,14 @@ struct ParamTy : public gc {
   bool slurpy;
   ParameterHolder* argv;
 };
+
+/* Internal rep of a string */
+struct StrObj : public gc {
+  N_STR val;
+  uint64_t len;
+};
+
+
 
 #ifdef __cplusplus
 }

@@ -55,13 +55,6 @@ namespace nqp {
   {
   public:
 
-    /// Construct a position.
-    position ()
-      : filename (0), line (1), column (1)
-    {
-    }
-
-
     /// Initialization.
     inline void initialize (std::string* fn)
     {
@@ -161,5 +154,5 @@ namespace nqp {
 } // nqp
 
 /* Line 144 of location.cc  */
-#line 165 "src/parser/position.hh"
+#line 158 "src/parser/position.hh"
 #endif // not BISON_POSITION_HH

@@ -26,27 +26,31 @@ CodeGenContext::CodeGenContext(LLVMContext &context) : context(context) {
   FunctionType *FT = FunctionType::get(GenericPointerType, Args, false);
   Function::Create(FT, Function::ExternalLinkage, "construct_int", module);
 
+  Args = vector<const Type*>(1, Type::getDoubleTy(getGlobalContext()));
+  FT = FunctionType::get(GenericPointerType, Args, false);
+  Function::Create(FT, Function::ExternalLinkage, "construct_num", module);
+
+  FT = FunctionType::get(GenericPointerType, false);
+  Function::Create(FT, Function::ExternalLinkage, "construct_array", module);
+
+  Args = vector<const Type*>();
+  Args.push_back(GenericPointerType);
+  Args.push_back(GenericPointerType);
+  FT = FunctionType::get(Type::getVoidTy(getGlobalContext()), Args, false);
+  Function::Create(FT, Function::ExternalLinkage, "array_push", module);
+
   Args = vector<const Type*>();
   Args.push_back(Type::getInt8PtrTy(getGlobalContext()));
   Args.push_back(Type::getInt64Ty(getGlobalContext()));
-  FunctionType *FT = FunctionType::get(GenericPointerType, Args, false);
-  Function::Create(FT, Function::ExternalLinkage, "construct_int", module);
-//  Args = vector<const Type*>(1, Type::getInt64Ty(getGlobalContext()));
-//  FT = FunctionType::get(GenericPointerType, Args, true);
-//  Function::Create(FT, Function::ExternalLinkage, "_say", module);
+  FT = FunctionType::get(GenericPointerType, Args, false);
+  Function::Create(FT, Function::ExternalLinkage, "construct_str", module);
 
-  /* 
-  FT = FunctionType::get(GenericPointerType, false);
-  Function::Create(FT, Function::ExternalLinkage, "vm_stack_push", module);
+  Args = vector<const Type*>();
+  Args.push_back(Type::getInt8PtrTy(getGlobalContext()));
+  Args.push_back(Type::getInt64Ty(getGlobalContext()));
+  FT = FunctionType::get(GenericPointerType, Args, false);
+  Function::Create(FT, Function::ExternalLinkage, "construct_str", module);
 
-  FT = FunctionType::get(GenericPointerType, false);
-  Function::Create(FT, Function::ExternalLinkage, "vm_stack_pop", module);
-
-  FT = FunctionType::get(GenericPointerType, false);
-  Function::Create(FT, Function::ExternalLinkage, "vm_stack_top", module);
-  */
-
-  // Args = vector<const Type*>(2, Type::get);
   FT = FunctionType::get(GenericPointerType, true);
   Function::Create(FT, Function::ExternalLinkage, "vm_dispatch_sub", module);
 }
@@ -116,10 +120,16 @@ Value* IntegerConstant::codeGen(CodeGenContext& context) {
   return CallInst::Create(construct_int, ArgsV.begin(), ArgsV.end(), "", context.currentBlock());
 }
 
-Value* DoubleConstant::codeGen(CodeGenContext& context)
-{
+Value* DoubleConstant::codeGen(CodeGenContext& context) {
   std::cout << "Creating double: " << value << endl;
-  return ConstantFP::get(Type::getDoubleTy(getGlobalContext()), value);
+  Function *construct_num = context.module->getFunction("construct_num");
+  if (construct_num == NULL) {
+    std::cerr << "Bad construct int" << endl;
+  }
+  std::vector<Value*> ArgsV;
+  ArgsV.push_back(ConstantFP::get(Type::getDoubleTy(getGlobalContext()), value));
+
+  return CallInst::Create(construct_num, ArgsV.begin(), ArgsV.end(), "", context.currentBlock());
 }
 
 Value* StringConstant::codeGen(CodeGenContext& context) {
@@ -129,14 +139,16 @@ Value* StringConstant::codeGen(CodeGenContext& context) {
   if (construct_str == NULL) {
     std::cerr << "Bad construct int" << endl;
   }
+
+  cout << "Value is: " << value << endl;
   
   GlobalVariable *val;
   StringMap<GlobalVariable*>::iterator iter = context.globals.find(value);
-    if (iter == context.globals.end()) {
+  if (iter == context.globals.end()) {
     const ArrayType *str_type = ArrayType::get(Type::getInt8Ty(getGlobalContext()),  value.length() + 1);
 
     std::vector<Constant *> ary_elements;
-    for (unsigned int i = 0; i < value.length(); i++) {
+    for (unsigned int i = 1; i < value.length() - 1; i++) {
       ary_elements.push_back(ConstantInt::get(Type::getInt8Ty(getGlobalContext()), value[i]));
     }
     ary_elements.push_back(ConstantInt::get(Type::getInt8Ty(getGlobalContext()), 0));
@@ -151,13 +163,12 @@ Value* StringConstant::codeGen(CodeGenContext& context) {
 
   std::vector<Value*> ArgsV;
   ArgsV.push_back(val);
-  ArgsV.psuh_back(ConstantInt::get(Type::getInt64Ty(getGlobalContext()), value.length, true));
+  ArgsV.push_back(ConstantInt::get(Type::getInt64Ty(getGlobalContext()), value.length() - 2));
 
   return CallInst::Create(construct_str, ArgsV.begin(), ArgsV.end(), "", context.currentBlock());
 }
 
-Value* Identifier::codeGen(CodeGenContext& context)
-{
+Value* Identifier::codeGen(CodeGenContext& context) {
   std::cout << "Creating identifier reference: " << name << endl;
   if (context.locals().find(name) == context.locals().end()) {
     std::cerr << "undeclared variable " << name << endl;
@@ -229,6 +240,10 @@ Value* BasicOp::codeGen(CodeGenContext& context) {
       // Call infix:</>
       name = "&infix:</>";
       break;
+    case token::T_STITCH:
+      // Call infix:<~>
+      name = "&infix:<~>";
+      break;
     /* TODO comparison */
     default: { 
       /* not implemented */
@@ -251,8 +266,6 @@ Value* BasicOp::codeGen(CodeGenContext& context) {
 		ConstantArray::get(str_type, ary_elements), "");
 
   std::vector<Value*> args;
-  ExpressionList::const_iterator it;
-
   args.push_back(val);
   args.push_back(ConstantInt::get(Type::getInt64Ty(getGlobalContext()), 2, true));
   args.push_back(lhs.codeGen(context));
@@ -301,6 +314,26 @@ Value* VariableDeclaration::codeGen(CodeGenContext& context) {
     assn.codeGen(context);
   }
   return alloc; 
+}
+
+Value* ListDeclaration::codeGen(CodeGenContext& context) {
+  std::cout << "Constructing new Array of length: " << list_values->size() << endl;
+  
+  Function *function = context.module->getFunction("construct_array");
+
+  Value* new_array = CallInst::Create(function, "", context.currentBlock());
+
+  for (ExpressionList::iterator it = list_values->begin(); it != list_values->end(); ++it) {
+    function = context.module->getFunction("array_push");
+    
+    std::vector<Value*> args;
+    args.push_back(new_array);
+    args.push_back((*it)->codeGen(context));
+    
+    CallInst::Create(function, args.begin(), args.end(), "", context.currentBlock());
+  }
+
+  return new_array;
 }
 
 Value* ParameterDeclaration::codeGen(CodeGenContext& context) {

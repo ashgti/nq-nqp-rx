@@ -48,14 +48,17 @@ void settings() {
   GET_VM()->push();
   Stash *stack = GET_VM()->top();
 
-  P6opaque *say = construct_sub(stack, reinterpret_cast<SubPtr>(_say), 2, "*@to-print", NULL);
-  stack->values["&say"] = say;
+  stack->values["&say"] = construct_sub(stack, reinterpret_cast<SubPtr>(_say), 2, "*@to-print", NULL);
+  stack->values["&puts"] = construct_sub(stack, reinterpret_cast<SubPtr>(_say), 2, "*@to-print", NULL);;
 
-  P6opaque *puts = construct_sub(stack, reinterpret_cast<SubPtr>(_puts), 2, "*@to-print", NULL);
-  stack->values["&puts"] = puts;
-
-  P6opaque *infix_add = construct_sub(stack, reinterpret_cast<SubPtr>(_infix_add), 4, "$lhs", NULL, "$rhs", NULL);
-  stack->values["&infix:<+>"] = infix_add;
+  stack->values["&infix:<+>"] = construct_sub(stack, reinterpret_cast<SubPtr>(_infix_add), 4, "$lhs", NULL, "$rhs", NULL);
+  stack->values["&infix:<->"] = construct_sub(stack, reinterpret_cast<SubPtr>(_infix_sub), 4, "$lhs", NULL, "$rhs", NULL);
+  stack->values["&infix:<*>"] = construct_sub(stack, reinterpret_cast<SubPtr>(_infix_mul), 4, "$lhs", NULL, "$rhs", NULL);
+  stack->values["&infix:</>"] = construct_sub(stack, reinterpret_cast<SubPtr>(_infix_div), 4, "$lhs", NULL, "$rhs", NULL);
+  stack->values["&prefix:<+>"] = construct_sub(stack, reinterpret_cast<SubPtr>(_prefix_add), 2, "$val", NULL);
+  
+  stack->values["&infix:<~>"] = construct_sub(stack, reinterpret_cast<SubPtr>(_infix_stitch), 4, "$lhs", NULL, "$rhs", NULL);
+  stack->values["&prefix:<~>"] = construct_sub(stack, reinterpret_cast<SubPtr>(_prefix_stitch), 2, "$val", NULL);
 }
 
 Stash* vm_stack_top() {
@@ -116,28 +119,44 @@ P6opaque* construct_int(N_INT v) {
 }
 
 // 32 vs 64 bit here
-P6opaque* construct_str(N_STR v, int64_t len = ULLONG_MAX) {
+P6opaque* construct_str(N_STR v, uint64_t len) {
   P6opaque* result = new P6opaque;
-  if (len == ULLONG_MAX) len = 0;
-  result->content_ptr = static_cast<void*>(new N_STR);
+  if (len == ULLONG_MAX) { 
+    len = strlen(v);
+  }
+
+  StrObj *str_container = new StrObj;
+
+  str_container->len = len;
+  str_container->val = new N_STR_VAL[len+1];
+
+  strncpy((char*)str_container->val, v, len);
+
+  result->content_ptr = static_cast<void*>(str_container);
   result->klass_type = kBUILT_IN_STR;
   result->klass_name = "Str()";
+
   return result;
 }
 
 P6opaque* construct_num(N_NUM v) {
   P6opaque* result = new P6opaque;
-  result->content_ptr = static_cast<void*>(new N_INT(v));
+  result->content_ptr = static_cast<void*>(new N_NUM(v));
   result->klass_type = kBUILT_IN_NUM;
   result->klass_name = "Num()";
   return result;
 }
 
+P6opaque* construct_bool(N_BOOL v) {
+  P6opaque* result = new P6opaque;
+  result->content_ptr = static_cast<void*>(new N_BOOL(v));
+  result->klass_type = kBUILT_IN_BOOL;
+  result->klass_name = "Bool()";
+  return result;
+}
+
 P6opaquePtr _infix_add(Stash* lex) {
   Stash* stack = vm_stack_top();
-
-  print_stack(stack);
-  print_stack(lex);
 
   P6opaquePtr lhs = stack_find(stack, "$lhs");
   P6opaquePtr rhs = stack_find(stack, "$rhs");
@@ -145,10 +164,147 @@ P6opaquePtr _infix_add(Stash* lex) {
   if (rhs->klass_type == lhs->klass_type == kBUILT_IN_INT) {
     return construct_int(*static_cast<N_INT*>(lhs->content_ptr) + *static_cast<N_INT*>(rhs->content_ptr));
   }
+  else if ((rhs->klass_type == kBUILT_IN_NUM || rhs->klass_type == kBUILT_IN_INT) && (lhs->klass_type == kBUILT_IN_NUM || lhs->klass_type == kBUILT_IN_INT)) {
+    return construct_num(*static_cast<N_NUM*>(lhs->content_ptr) + *static_cast<N_INT*>(rhs->content_ptr));
+  }
   else {
+    // TODO: call some sort of conversion to cast objects as nums
     throw new exception;
   }
   return NULL;
+}
+
+P6opaquePtr _infix_sub(Stash* lex) {
+  Stash* stack = vm_stack_top();
+
+  P6opaquePtr lhs = stack_find(stack, "$lhs");
+  P6opaquePtr rhs = stack_find(stack, "$rhs");
+  
+  if (rhs->klass_type == lhs->klass_type == kBUILT_IN_INT) {
+    return construct_int(*static_cast<N_INT*>(lhs->content_ptr) - *static_cast<N_INT*>(rhs->content_ptr));
+  }
+  else if ((rhs->klass_type == kBUILT_IN_NUM || rhs->klass_type == kBUILT_IN_INT) && (lhs->klass_type == kBUILT_IN_NUM || lhs->klass_type == kBUILT_IN_INT)) {
+    return construct_num(*static_cast<N_NUM*>(lhs->content_ptr) - *static_cast<N_INT*>(rhs->content_ptr));
+  }
+  else {
+    // TODO: call some sort of conversion to cast objects as nums
+    throw new exception;
+  }
+  return NULL;
+}
+
+P6opaquePtr _infix_mul(Stash* lex) {
+  Stash* stack = vm_stack_top();
+
+  P6opaquePtr lhs = stack_find(stack, "$lhs");
+  P6opaquePtr rhs = stack_find(stack, "$rhs");
+  
+  if (rhs->klass_type == lhs->klass_type == kBUILT_IN_INT) {
+    return construct_int(*static_cast<N_INT*>(lhs->content_ptr) * *static_cast<N_INT*>(rhs->content_ptr));
+  }
+  else if ((rhs->klass_type == kBUILT_IN_NUM || rhs->klass_type == kBUILT_IN_INT) && (lhs->klass_type == kBUILT_IN_NUM || lhs->klass_type == kBUILT_IN_INT)) {
+    return construct_num(*static_cast<N_NUM*>(lhs->content_ptr) * *static_cast<N_INT*>(rhs->content_ptr));
+  }
+  else {
+    // TODO: call some sort of conversion to cast objects as nums
+    throw new exception;
+  }
+  return NULL;
+}
+
+P6opaquePtr _infix_div(Stash* lex) {
+  Stash* stack = vm_stack_top();
+
+  P6opaquePtr lhs = stack_find(stack, "$lhs");
+  P6opaquePtr rhs = stack_find(stack, "$rhs");
+  
+  if (rhs->klass_type == lhs->klass_type == kBUILT_IN_INT) {
+    return construct_int(*static_cast<N_INT*>(lhs->content_ptr) / *static_cast<N_INT*>(rhs->content_ptr));
+  }
+  else if ((rhs->klass_type == kBUILT_IN_NUM || rhs->klass_type == kBUILT_IN_INT) && (lhs->klass_type == kBUILT_IN_NUM || lhs->klass_type == kBUILT_IN_INT)) {
+    return construct_num(*static_cast<N_NUM*>(lhs->content_ptr) / *static_cast<N_INT*>(rhs->content_ptr));
+  }
+  else {
+    // TODO: call some sort of conversion to cast objects as nums
+    throw new exception;
+  }
+  return NULL;
+}
+
+P6opaquePtr _infix_stitch(Stash* lex) {
+  Stash* stack = vm_stack_top();
+
+  P6opaquePtr lhs = stack_find(stack, "$lhs");
+  P6opaquePtr rhs = stack_find(stack, "$rhs");
+  
+  N_STR lhs_repr = internal_to_str(lhs);
+  size_t lhs_len = strlen(lhs_repr);
+  
+  N_STR rhs_repr = internal_to_str(rhs);
+  size_t rhs_len = strlen(rhs_repr);
+
+  char* combined = (char*)malloc(sizeof(N_STR_VAL) * (lhs_len + rhs_len));
+
+  size_t len_cpy = lhs_len;
+  while (len_cpy--) {
+    combined[len_cpy] = lhs_repr[len_cpy];
+  }
+  len_cpy = rhs_len;
+  while (len_cpy--) {
+    combined[lhs_len + len_cpy] = rhs_repr[len_cpy];
+  }
+  combined[lhs_len + rhs_len + 1] = '\0';
+
+  P6opaquePtr result = construct_str(combined, lhs_len + rhs_len + 1);
+  
+  return result;
+}
+
+P6opaquePtr _prefix_stitch(Stash* lex) {
+  Stash* stack = vm_stack_top();
+  P6opaquePtr val = stack_find(stack, "$val");
+  
+  if (val->klass_type == kBUILT_IN_STR) {
+    return val;
+  }
+  else {
+    return construct_str(internal_to_str(val));
+  }
+}
+
+P6opaquePtr _prefix_add(Stash* lex) {
+  Stash* stack = vm_stack_top();
+
+  P6opaquePtr val = stack_find(stack, "$var");
+  
+  return construct_num(internal_to_num(val));
+}
+
+N_NUM internal_to_num(P6opaquePtr val) {
+  switch (val->klass_type) {
+    case kBUILT_IN_INT:
+      return *static_cast<N_INT*>(val->content_ptr);
+      break;
+    case kBUILT_IN_NUM:
+      return *static_cast<N_NUM*>(val->content_ptr);
+      break;
+    case kBUILT_IN_STR:
+      /* magic happens here */
+      throw new exception;
+      break;
+    case kBUILT_IN_BOOL:
+      if (*(N_BOOL*)val->content_ptr) {
+        return 1;
+      }
+      else {
+        return 0;
+      }
+      break;
+    default:
+      cerr << "I don't know how to numify this yet " << val->klass_name << endl;
+      exit(-1);
+      break;
+  }
 }
 
 N_STR internal_to_str(P6opaquePtr val) {
@@ -161,18 +317,21 @@ N_STR internal_to_str(P6opaquePtr val) {
       o << *((N_NUM*)val->content_ptr);
       break;
     case kBUILT_IN_STR:
-      o << *((N_STR*)val->content_ptr);
+      o << (N_STR)((StrObj*)val->content_ptr)->val;
       break;
     case kBUILT_IN_BOOL:
       if (*(N_BOOL*)val->content_ptr) {
-        cout << "True";
+        o << "True";
       }
       else {
-        cout << "False";
+        o << "False";
       }
       break;
     case kBUILT_IN_MU:
-      cout << "Mu()";
+      o << "Mu()";
+      break;
+    case kBUILT_IN_ARRAY:
+      o << array_size(val);
       break;
     default:
       cerr << "I don't know how to print this yet" << endl;
@@ -180,7 +339,13 @@ N_STR internal_to_str(P6opaquePtr val) {
       break;
   }
 
-  return (N_STR)o.str().c_str();
+  string result_buf = o.str();
+  char* result = (char*)malloc(sizeof(N_STR_VAL) * result_buf.length());
+  for (size_t i = 0; i < result_buf.length(); i++)
+    result[i] = result_buf[i];
+  result[result_buf.length()] = '\0';
+ 
+  return result;
 }
 
 P6opaquePtr _say(Stash* lex) {
