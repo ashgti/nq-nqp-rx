@@ -1,4 +1,4 @@
-=head1 NQ-NQP-rx - Not Quiet NQP-rx
+=head1 NQ-NQP-rx - Not Quite NQP-rx
 
 NQP is Copyright (C) 2009 by The Perl Foundation.  See F<LICENSE>
 for licensing details.
@@ -9,13 +9,10 @@ This project is mostly a learning exercise for me to try to learn more about com
 
 This project requires the llvm, bison, flex, and cmake. Currently, I am using:
 
-llvm: version 2.7 
-
-bison: version 2.5.35
-
-flex: version 2.4.1
-
-cmake: version 2.8.1
+  llvm: version 2.7 
+  bison: version 2.5.35
+  flex: version 2.4.1
+  cmake: version 2.8.1
 
 This may work with other versions of bison, flex or cmake, but because of the tight integration with the llvm, you will need the same version I am using. See the llvm website for more details on building the llvm.
 
@@ -23,8 +20,7 @@ This may work with other versions of bison, flex or cmake, but because of the ti
 
 CMake takes care of all of the configuratoins, so simply run: 
 
-cmake . 
-
-make
+  cmake . 
+  make
 
 
