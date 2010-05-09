@@ -43,23 +43,32 @@ P6opaquePtr _prefix_stitch(Stash* lex);
 P6opaquePtr _prefix_add(Stash* lex);
 
 /* Construct a nqp integer */
-P6opaquePtr  construct_str(N_STR v, uint64_t len = ULLONG_MAX);
-P6opaquePtr  construct_bool(N_BOOL v);
-P6opaquePtr  construct_int(N_INT v);
-P6opaquePtr  construct_num(N_NUM v);
-P6opaquePtr  construct_array();
-P6opaquePtr  construct_hash();
+P6opaquePtr  str_new(N_STR v, uint64_t len = ULLONG_MAX);
+P6opaquePtr  bool_new(N_BOOL v);
+P6opaquePtr  int_new(N_INT v);
+P6opaquePtr  num_new(N_NUM v);
 
+P6opaquePtr  array_new();
 void         array_push(P6opaquePtr ar, P6opaquePtr val);
 P6opaquePtr  array_pop(P6opaquePtr ar);
-P6opaquePtr  array_at(P6opaquePtr ar, int key);
+P6opaquePtr  array_at(P6opaquePtr ar, unsigned int key);
 unsigned int array_size(P6opaquePtr ar);
+P6opaquePtr  array_iter(P6opaquePtr ar);
 
-Stash*      vm_stack_top();
-Stash*      vm_stack_push();
+P6opaquePtr  hash_new();
+void         hash_push(P6opaquePtr hash, P6opaquePtr key);
+P6opaquePtr  hash_remove(P6opaquePtr hash, P6opaquePtr key);
+P6opaquePtr  hash_find(P6opaquePtr, P6opaquePtr key);
+unsigned int hash_size(P6opaquePtr hash);
+P6opaquePtr  hash_iter(P6opaquePtr hash);
+
+void        vm_stack_push();
 void        vm_stack_pop();
-P6opaquePtr stack_find(Stash *stack, const char* name);
-void        print_stack(Stash*);
+void        vm_stack_set_package(const char* name);
+P6opaquePtr vm_stack_create_val(const char* name);
+P6opaquePtr vm_stack_find(const char* name);
+/* Utility Function */
+void        print_stack(unsigned int lex = 1); // Prints the current lexical scope (lex = 1), or the current dynamic scope (lex = 0) 
 
 
 /* Construct a sub object, for using nqp */
