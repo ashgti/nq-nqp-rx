@@ -508,7 +508,7 @@ void print_stack(Stash *stack) {
   }
 }
 
-P6opaquePtr vm_dispatch_sub(const char* sub_name, unsigned int argc, ...) {
+P6opaquePtr vm_dispatch(const char* sub_name, unsigned int argc, ...) {
   va_list argv;
   va_start(argv, argc);
   P6opaquePtr result = GET_VM()->vdispatch(sub_name, argc, argv);

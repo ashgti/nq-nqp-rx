@@ -17,7 +17,7 @@ using namespace nqp;
 %define namespace "nqp"
 
 %glr-parser
-%expect 2
+%expect 6
 
 %parse-param { Block * &root_node }
 /*  %lex-param   { NBLock &ctx } */
@@ -106,7 +106,7 @@ using namespace nqp;
 %type <exprvec> args_list
 %type <expr> expr_list expr number stringc constants methodop
 %type <stmt> stmt_control if_stmt elsif_stmt unless_stmt for_stmt while_stmt
-%type <token> comparison assignment infix
+%type <token> comparison assignment infix prefix
 
 /* Operator precedence for mathematical operators */
 /*
@@ -338,14 +338,17 @@ expr : variable assignment expr {
        $$ = new Assignment(*$<ident>1, $2, *$3);
      }
      | variable infix expr {
-       $$ = new BasicOp(*$1, $2, *$3);
+       $$ = new BinaryOp(*$1, $2, *$3);
      }
      | constants infix expr {
-       $$ = new BasicOp(*$1, $2, *$3);
+       $$ = new BinaryOp(*$1, $2, *$3);
      }
      | methodop
      | T_RBRACKET args_list T_RBRACKET {
        $$ = new ListDeclaration($2);
+     }
+     | prefix expr {
+       $$ = new PrefixOp($1, *$2);
      }
      | T_LPAREN args_list T_RPAREN {
        $$ = new ListDeclaration($2);
@@ -381,6 +384,9 @@ infix : comparison { }
       | string_ops { }
       | other_ops { }
       ;
+
+prefix : T_PLUS | T_STITCH | T_BAR
+       ;
 
 stringc : T_STRINGC {
           $$ = new StringConstant(*$1);

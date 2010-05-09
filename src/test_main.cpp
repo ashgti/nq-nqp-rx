@@ -53,23 +53,23 @@ int main() {
   P6opaquePtr num = construct_num(123.123);
   P6opaquePtr bool_test = construct_bool(N_BOOL_TRUE);
 
-  P6opaquePtr result = vm_dispatch_sub("&add_two", 2, foo, baz);
-  P6opaquePtr result2 = vm_dispatch_sub("&infix:<~>", 2, foo, bar);
+  P6opaquePtr result = vm_dispatch("&add_two", 2, foo, baz);
+  P6opaquePtr result2 = vm_dispatch("&infix:<~>", 2, foo, bar);
 
-  vm_dispatch_sub("&say", 1, result2);
+  vm_dispatch("&say", 1, result2);
 
   //cout << "result is: " << *(int*)result->content_ptr << endl;
   //cout << " and " << result->klass_type << " id " << result << endl;
 
-  vm_dispatch_sub("&say", 1, result);
-  vm_dispatch_sub("&puts", 2, foo, baz);
-  vm_dispatch_sub("&puts", 3, bar, num, bool_test);
+  vm_dispatch("&say", 1, result);
+  vm_dispatch("&puts", 2, foo, baz);
+  vm_dispatch("&puts", 3, bar, num, bool_test);
 
-  vm_dispatch_sub("&puts", 1, vm_dispatch_sub("&infix:<->", 2, num, baz));
+  vm_dispatch("&puts", 1, vm_dispatch("&infix:<->", 2, num, baz));
 
-  P6opaquePtr a = vm_dispatch_sub("&foo", 1, foo);
-  P6opaquePtr b = vm_dispatch_sub("&foo", 1, baz);
-  vm_dispatch_sub("say", 2, vm_invoke(a, 0), vm_invoke(b, 0));
+  P6opaquePtr a = vm_dispatch("&foo", 1, foo);
+  P6opaquePtr b = vm_dispatch("&foo", 1, baz);
+  vm_dispatch("say", 2, vm_invoke(a, 0), vm_invoke(b, 0));
   
   return 0;  
 }

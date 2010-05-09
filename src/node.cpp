@@ -41,8 +41,12 @@ MethodCall::MethodCall(Identifier* obj, Identifier& id, ExpressionList* args) :
   obj = NULL;
 }
 
-BasicOp::BasicOp(Expression& lhs, int op, Expression& rhs) :
+BinaryOp::BinaryOp(Expression& lhs, int op, Expression& rhs) :
     lhs(lhs), op(op), rhs(rhs) {
+}
+
+PrefixOp::PrefixOp(int op, Expression& val) :
+    op(op), val(val) {
 }
 
 Assignment::Assignment(Identifier& lhs, unsigned int type, Expression& rhs) :
@@ -191,17 +195,22 @@ std::string Identifier::str(std::string prefix) {
   return o.str();
 }
 
-std::string BasicOp::str(std::string prefix) {
+std::string BinaryOp::str(std::string prefix) {
   std::ostringstream o;
 
-  o << prefix << "<BasicOp ptr=\"" << this << "\">\n";
+  o << prefix << "<BinaryOp ptr=\"" << this << "\">\n";
   o << prefix << "\t<lhs>\n" << lhs.str(prefix+"\t\t") << "\n" << prefix << "\t</lhs>\n";
   o << prefix << "\t<op>" << op << "</op>\n";
   o << prefix << "\t<rhs>\n" << rhs.str(prefix+"\t\t") << "\n" << prefix << "\t</rhs>\n";
-  o << prefix << "</BasicOp>";
+  o << prefix << "</BinaryOp>";
 
   return o.str();
 }
+
+std::string PrefixOp::str(std::string prefix) {
+  return "hello World";
+}
+
 
 std::string MethodCall::str(std::string prefix) {
   std::ostringstream o;

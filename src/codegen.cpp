@@ -52,7 +52,7 @@ CodeGenContext::CodeGenContext(LLVMContext &context) : context(context) {
   Function::Create(FT, Function::ExternalLinkage, "construct_str", module);
 
   FT = FunctionType::get(GenericPointerType, true);
-  Function::Create(FT, Function::ExternalLinkage, "vm_dispatch_sub", module);
+  Function::Create(FT, Function::ExternalLinkage, "vm_dispatch", module);
 }
 
 /* Compile the AST into a module */
@@ -205,7 +205,7 @@ Value* MethodCall::codeGen(CodeGenContext& context) {
     val = iter->second;
   }
   
-  Function *function = context.module->getFunction("vm_dispatch_sub");
+  Function *function = context.module->getFunction("vm_dispatch");
 
   std::vector<Value*> args;
   ExpressionList::const_iterator it;
@@ -220,7 +220,50 @@ Value* MethodCall::codeGen(CodeGenContext& context) {
   return call;
 }
 
-Value* BasicOp::codeGen(CodeGenContext& context) {
+Value* PrefixOp::codeGen(CodeGenContext& context) {
+  string name;
+  switch (op) {
+    case token::T_PLUS:
+      // Call prefix:<+> 
+      name = "&prefix:<+>";
+      break;
+    case token::T_BAR:
+      // Call infix:<|>
+      name = "&prefix:<|>";
+      break;
+    case token::T_STITCH:
+      // Call prefix:<~>
+      name = "&prefix:<~>";
+      break;
+    default: { 
+      /* not implemented */
+      return NULL;
+    }
+  }
+
+  Function *function = context.module->getFunction("vm_dispatch");
+
+ 	const ArrayType *str_type = ArrayType::get(Type::getInt8Ty(getGlobalContext()),  name.length() + 1);
+
+	std::vector<Constant *> ary_elements;
+	for (unsigned int i = 0; i < name.length(); i++) {
+	  ary_elements.push_back(ConstantInt::get(Type::getInt8Ty(getGlobalContext()), name[i]));
+	}
+	ary_elements.push_back(ConstantInt::get(Type::getInt8Ty(getGlobalContext()), 0));
+
+  GlobalVariable *method_name = new GlobalVariable(*context.module, str_type, true,
+		  GlobalValue::InternalLinkage,
+		  ConstantArray::get(str_type, ary_elements), "");
+
+  std::vector<Value*> args;
+  args.push_back(method_name);
+  args.push_back(ConstantInt::get(Type::getInt64Ty(getGlobalContext()), 1, true));
+  args.push_back(val.codeGen(context));
+
+  return CallInst::Create(function, args.begin(), args.end(), "", context.currentBlock());
+}
+
+Value* BinaryOp::codeGen(CodeGenContext& context) {
   std::cout << "Creating infix operation " << op << endl;
   string name;
   switch (op) {
@@ -251,7 +294,7 @@ Value* BasicOp::codeGen(CodeGenContext& context) {
     }
   }
 
-  Function *function = context.module->getFunction("vm_dispatch_sub");
+  Function *function = context.module->getFunction("vm_dispatch");
 
  	const ArrayType *str_type = ArrayType::get(Type::getInt8Ty(getGlobalContext()),  name.length() + 1);
 
@@ -275,13 +318,10 @@ Value* BasicOp::codeGen(CodeGenContext& context) {
 }
 
 Value* Assignment::codeGen(CodeGenContext& context) {
-  std::cout << "Creating assignment for " << lhs.name << endl;
   if (context.locals().find(lhs.name) == context.locals().end()) {
     std::cerr << "undeclared variable " << lhs.name << endl;
     return NULL;
   }
-  cout << "Testing... " << endl;
-  cout << "rhs: " << &rhs << " lhs: " << &lhs << endl;
   return new StoreInst(rhs.codeGen(context), context.locals()[lhs.name], false, context.currentBlock());
 }
 

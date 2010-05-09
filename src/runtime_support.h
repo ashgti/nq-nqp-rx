@@ -68,9 +68,7 @@ P6opaquePtr construct_closure(Stash *lex_scope, SubPtr sub_ptr, unsigned int arg
 
 /* VM Ops: */
 P6opaquePtr vm_invoke(P6opaquePtr sub_obj, unsigned int argc, ...);
-P6opaquePtr vm_dispatch_sub(const char* sub_name, unsigned int argc, ...);
-P6opaquePtr vm_disaptch_method(P6opaquePtr self, char* sub_name, unsigned int argc, ...);
-
+P6opaquePtr vm_dispatch(const char* sub_name, unsigned int argc, ...);
 
 /* Internal ops */
 N_STR internal_to_str(P6opaquePtr val);

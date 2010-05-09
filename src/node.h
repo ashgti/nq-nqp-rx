@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <llvm/Value.h>
+#include <gc/gc_cpp.h>
 
 namespace nqp {
 
@@ -18,7 +19,7 @@ typedef std::vector<Expression*> ExpressionList;
 typedef std::vector<VariableDeclaration*> VariableList;
 typedef std::vector<ParameterDeclaration*> ParameterList;
 
-class Node {
+class Node : public gc {
  public:
   std::string type_hint;
   virtual ~Node() {}
@@ -94,12 +95,21 @@ class MethodCall : public Expression {
   virtual std::string str(std::string prefix = "");
 };
 
-class BasicOp : public Expression {
+class BinaryOp : public Expression {
  public:
   Expression& lhs;
   int op;
   Expression& rhs;
-  BasicOp(Expression& lhs, int op, Expression& rhs);
+  BinaryOp(Expression& lhs, int op, Expression& rhs);
+  virtual llvm::Value* codeGen(CodeGenContext& context);
+  virtual std::string str(std::string prefix = "");
+};
+
+class PrefixOp : public Expression {
+ public:
+  int op;
+  Expression& val;
+  PrefixOp(int op, Expression& val);
   virtual llvm::Value* codeGen(CodeGenContext& context);
   virtual std::string str(std::string prefix = "");
 };
